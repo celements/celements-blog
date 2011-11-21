@@ -153,7 +153,7 @@ public class NewsletterReceivers {
       XWikiDocument doc = wiki.getDocument(articleName, context);
       String baseURL = doc.getExternalURL("view", context);
 
-      List<String[]> allUserMailPairs = new ArrayList<String[]>();
+      List<String[]> allUserMailPairs = null;
       mLogger.debug("is test send: " + isTest);
       if(isTest){
         String user = context.getUser();
@@ -162,15 +162,12 @@ public class NewsletterReceivers {
         if(userObj != null){
           String email = userObj.getStringValue("email");
           if(email.trim().length() > 0){
+            allUserMailPairs = new ArrayList<String[]>();
             allUserMailPairs.add(new String[]{user, email});
           }
         }
       } else {
-        allUserMailPairs.addAll(groupUsers);
-        allUserMailPairs.addAll(users);
-        for (String address : addresses) {
-          allUserMailPairs.add(new String[]{"XWiki.XWikiGuest", address});
-        }
+        allUserMailPairs = getNewsletterReceiversList();
       }
       
       for (String[] userMailPair : allUserMailPairs) {
@@ -193,7 +190,12 @@ public class NewsletterReceivers {
           result.add(new String[]{userMailPair[1], Integer.toString(singleResult)});
           if(singleResult == 0){ successfullySent++; }
         } else {
-          result.add(new String[]{userMailPair[1], "-2"}); // no view rights on article doc
+          mLogger.warn("Tried to send " + doc + " to user " + userMailPair[0] + " which" +
+              "has no view rights on this Document.");
+          List<String> params = new ArrayList<String>();
+          params.add(doc.toString());
+          result.add(new String[]{userMailPair[1], context.getMessageTool(
+              ).get("cel_blog_newsletter_receiver_no_rights", params)});
         }
       
         context.setUser(origUser);
@@ -203,6 +205,26 @@ public class NewsletterReceivers {
     }
     
     return result;
+  }
+
+  List<String[]> getNewsletterReceiversList() {
+    ArrayList<String[]> allUserMailPairs = new ArrayList<String[]>();
+    allUserMailPairs.addAll(groupUsers);
+    allUserMailPairs.addAll(users);
+    for (String address : addresses) {
+      String mailUser = "XWiki.XWikiGuest";
+      String addrUser = null;
+      try {
+        addrUser = celementsweb.getUsernameForUserData(address, "email");
+      } catch(XWikiException e) {
+        mLogger.error("Exception getting username for user email '" + address + "'.", e);
+      }
+      if((addrUser != null) && (addrUser.length() > 0)) {
+        mailUser = addrUser;
+      }
+      allUserMailPairs.add(new String[]{mailUser, address});
+    }
+    return allUserMailPairs;
   }
 
   private String getUnsubscribeFooter(String emailAddress,
