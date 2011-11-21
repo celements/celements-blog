@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class entity-name="Celements.NewsletterReceiverClass" table="cel_newsletterreceiverclass">
+  <id name="id" type="integer" unsaved-value="undefined">
+    <column name="NRC_ID" not-null="true" />
+    <generator class="assigned" />
+  </id>
+  <property name="email" type="string">
+    <column name="NRC_EMAIL" length="128"/>
+  </property>
+  <property name="isactive" type="integer">
+    <column name="NRC_ACTIVE" />
+  </property>
+  <property name="subscribed" type="text">
+    <column name="NRC_SUBSCRIBED" />
+  </property>
+</class>
+</hibernate-mapping>

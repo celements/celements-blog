@@ -1,0 +1,98 @@
+EHLO web2.synventis.com
+MAIL FROM: <fabian.pichler@synventis.com>
+RCPT TO: <fabian.pichler@synventis.com>
+RCPT TO: <fabian@pichlergraf.ch>
+DATA
+
+Date: Thu, 2 Apr 2009 22:55:14 +0200 (CEST)
+From: info@rheumaliga.ch
+To: fabian.pichler@synventis.com
+Subject: =?UTF-8?Q?Erster_Newsletter_Test_f=C3=BCr_das_Rheumaliga_Intranet_Test5?=
+MIME-Version: 1.0
+Content-Type: multipart/alternative; 
+  boundary="----=_Part_0_10925126.1238705714164"
+Content-Location: http://www.rheumaliga.ch/xwiki/bin/view/intranet_Newsletter/Article1
+
+------=_Part_0_10925126.1238705714164
+Content-Type: text/plain; charset=MacRoman
+Content-Transfer-Encoding: quoted-printable
+
+Sie k=9Annen keine HTML Emails empfangen. Den ganzen Newsletter koennen sie=
+ unter der Adresse http://www.rheumaliga.ch/xwiki/bin/view/intranet_Newslet=
+ter/Article1 ansehen.
+------=_Part_0_10925126.1238705714164
+Content-Type: text/html; charset=MacRoman
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<html>
+<head>
+<base href=3D'http://www.rheumaliga.ch/xwiki/bin/view/intranet_Newsletter/A=
+rticle1' />
+</head>
+<body>
+<div class=3D"cel_blog"><div class=3D"el_blog">
+
+=09=09=09=09=09
+
+<div class=3D"article_detail" style=3D"
+background-color:#E6E6E6; border-top:1px solid #E6E6E6;=
+display:block; margin-bottom:20px; padding:14px 20px 15px;">
+=09<div class=3D"article_date">22. Oktober, 2007</div>
+=09<div class=3D"article_title h1"></div>
+=09<div class=3D"text" style=3D"font-family:Arial,Geneva,Helvetica,Verdana,sans-serif;=
+font-size:14px; line-height:20px;"><h1 style=3D"border-bottom:0 none;=
+display:block; font-size:18px; font-weight:bold; line-height:20px;=
+margin:0; padding:0;">Herzlich Willkommen zum ersten Test-Artikel des =
+Rheumaliga Newsletters</h1>
+<p>&nbsp;</p>
+<h1 style=3D"border-bottom:0 none;=
+display:block; font-size:18px; font-weight:bold; line-height:20px;=
+margin:0; padding:0;">Ern&auml;hrung und Rheuma</h1>
+<p>&nbsp;</p>
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"image size=
+2 imageinline" style=3D"float:left; border:medium none;=
+margin:4px 17px 8px 0; padding:0;">
+<tbody>
+<tr>
+<td class=3D"imagepart size2 forcesize" style=3D"margin:0;=
+padding-bottom:5px; display:block;=
+overflow:hidden;"><img src=3D"../../download/ch_fileb=
+ase/AttachmentDocument/ernhrung-broschre-275px.jpg" border=3D"0" /></td>
+</tr>
+</tbody>
+</table>
+<p>Rheumatische Krankheiten kann man &uuml;ber die Ern&auml;hrung positiv
+beeinflussen. Die Rheumaliga Schweiz hat deshalb eine Brosch&uuml;re
+herausgegeben, die sich ausschliesslich diesem Thema widmet.</p>
+<p>&nbsp;</p>
+<p>Sie zeigt auf, wie man mit einer guten Auswahl von Nahrungsmitteln
+und einigen Grundkenntnissen Genuss und gesundheitlichen Nutzen
+verbinden kann, warum eine gezielte Auswahl von Nahrungsmitteln Sinn
+macht, und wie die konkreten Empfehlungen im Alltag umgesetzt werden
+k&ouml;nnen.</p>
+<p>&nbsp;</p>
+<p>Bewegungs&uuml;bungen zur besseren Verdauung, Nahrungsmitteltabellen, ei=
+n
+Wochenmen&uuml;plan und 18 leckere Rezepte mit zahlreichen Bildern erg&auml=
+;nzen
+die Informationen.</p>
+<p>&nbsp;</p>
+<p>Die 80-seitige Brosch&uuml;re (Spiralbindung) k&ouml;nnen Sie f&uuml;r F=
+r. 12.- bestellen.</p>
+<p>&nbsp;</p>
+<p><a href=3D"../../../../ch/Shop?artikelnr=3DD430">Bestellen Sie hier</a><=
+/p></div><!-- article_content -->
+=09<div class=3D"clearleft" style=3D"clear:left; display:block;=
+font-size:1px; height:0; line-height:1px; margin:0;=
+padding:0;"><!-- required:floating images --></div>
+    </div><!--article_detail-->
+<!-- has_comments : 0 -->
+=20
+</div></div>Falls sie diesen Newsletter nicht lesen koennen finden Sie ihn =
+online unter http://www.rheumaliga.ch/xwiki/bin/view/intranet_Newsletter/Ar=
+ticle1
+</body>
+</html>
+------=_Part_0_10925126.1238705714164--
+
