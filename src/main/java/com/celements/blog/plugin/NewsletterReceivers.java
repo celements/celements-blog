@@ -49,6 +49,7 @@ public class NewsletterReceivers {
   private List<String[]> users = new ArrayList<String[]>();
   private List<String> addresses = new ArrayList<String>();
   
+  //TODO ADD UNIT TESTS!!!
   public NewsletterReceivers(XWikiDocument blogDoc, XWikiContext context) throws XWikiException{
     celementsweb = (CelementsWebPluginApi)context.getWiki().getPluginApi("celementsweb", context);
     List<BaseObject> objs = blogDoc.getObjects("Celements2.ReceiverEMail");
@@ -57,7 +58,8 @@ public class NewsletterReceivers {
       for (BaseObject obj : objs) {
         mLogger.debug("obj: " + obj);
         if(obj != null){
-          String address = obj.getStringValue("email").toLowerCase();
+          String receiverAdr = obj.getStringValue("email");
+          String address = receiverAdr.toLowerCase();
           boolean active = (obj.getIntValue("is_active") == 1);
           boolean isMail = address.matches("[\\w\\.]{1,}[@][\\w\\-\\.]{1,}([.]([\\w\\-\\.]{1,})){1,3}$");
           String type = obj.getStringValue("address_type");
@@ -66,8 +68,8 @@ public class NewsletterReceivers {
             allAddresses.add(address);
             mLogger.info("reveiver added: " + address);
           } else {
-            if(context.getWiki().exists(address, context)){
-              parseDocument(address, type, context);
+            if(context.getWiki().exists(receiverAdr, context)){
+              parseDocument(receiverAdr, type, context);
             }
           }
         }
