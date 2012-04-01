@@ -42,4 +42,9 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>  
+  <scm>
+    <connection>scm:git:git@github.com:celements/celements-blog.git</connection>
+    <developerConnection>scm:git:git@github.com:celements/celements-blog.git</developerConnection>
+    <url>https://github.com/celements/celements-blog</url>
+  </scm>
 </project>
