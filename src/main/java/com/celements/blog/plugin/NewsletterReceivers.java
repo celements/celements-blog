@@ -20,6 +20,7 @@
 package com.celements.blog.plugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -181,9 +182,9 @@ public class NewsletterReceivers {
           String htmlContent = getHtmlContent(doc, baseURL, context);
           htmlContent += getUnsubscribeFooter(userMailPair[1], doc, context);
           
-          String textContent = wiki.getRenderingEngine().renderText(
-              "$msg.get('cel_newsletter_text_only_message', ['_NEWSLETTEREMAILADRESSKEY_'])",
-              doc, context);
+          String textContent = context.getMessageTool().get(
+              "cel_newsletter_text_only_message", Arrays.asList(
+                  "_NEWSLETTEREMAILADRESSKEY_"));
           textContent = textContent.replaceAll("_NEWSLETTEREMAILADRESSKEY_",
               doc.getExternalURL("view", context));
           textContent += getUnsubscribeFooter(userMailPair[1], doc, context);
@@ -234,10 +235,10 @@ public class NewsletterReceivers {
       XWikiDocument blogDocument, XWikiContext context) throws XWikiException {
     String unsubscribeFooter = "";
     if(!"".equals(getUnsubscribeLink(blogDocument.getSpace(), emailAddress,
-        context))){
-      unsubscribeFooter = context.getWiki().getRenderingEngine().renderText(
-          "$msg.get('cel_newsletter_unsubscribe_footer'," +
-          " ['_NEWSLETTEREMAILADRESSKEY_'])", blogDocument, context);
+        context))) {
+      unsubscribeFooter = context.getMessageTool().get(
+          "cel_newsletter_unsubscribe_footer", Arrays.asList("_NEWSLETTEREMAILADRESSKEY_"
+              )); 
       unsubscribeFooter = unsubscribeFooter.replaceAll(
           "_NEWSLETTEREMAILADRESSKEY_", getUnsubscribeLink(
               blogDocument.getSpace(), emailAddress, context));
@@ -266,13 +267,12 @@ public class NewsletterReceivers {
       header = "<base href='" + baseURL + "' />\n";
     }
     
-//    IPageType pageType = celementsweb.getPageType(doc.getFullName());
-//    String content = celementsweb.getPlugin().renderCelementsPageType(doc, pageType, context);
     String content = getCelWebService().renderCelementsDocument(doc.getDocumentReference(
         ));
     content = Utils.replacePlaceholders(content, context);
-    
-    String footer = context.getWiki().getRenderingEngine().renderText("$msg.get('cel_newsletter_html_footer_message', ['_NEWSLETTEREMAILADRESSKEY_'])", doc, context);
+
+    String footer = context.getMessageTool().get("cel_newsletter_html_footer_message",
+        Arrays.asList("_NEWSLETTEREMAILADRESSKEY_"));
     footer = footer.replaceAll("_NEWSLETTEREMAILADRESSKEY_", doc.getExternalURL("view", context));
     
     return header + content + footer;
