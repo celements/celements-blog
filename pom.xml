@@ -31,7 +31,7 @@
   <modelVersion>4.0.0</modelVersion>  
   <groupId>com.celements</groupId>
   <artifactId>celements-blog</artifactId>
-  <version>1.7-SNAPSHOT</version>
+  <version>1.7</version>
   <description>Celements Blog</description> 
   <dependencies>    
     <!-- Add here all your dependencies -->
