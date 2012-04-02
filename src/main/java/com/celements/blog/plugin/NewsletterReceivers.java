@@ -27,9 +27,10 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.script.service.ScriptService;
 
-import com.celements.web.pagetype.IPageType;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
+import com.celements.web.service.CelementsWebScriptService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -265,8 +266,10 @@ public class NewsletterReceivers {
       header = "<base href='" + baseURL + "' />\n";
     }
     
-    IPageType pageType = celementsweb.getPageType(doc.getFullName());
-    String content = celementsweb.getPlugin().renderCelementsPageType(doc, pageType, context);
+//    IPageType pageType = celementsweb.getPageType(doc.getFullName());
+//    String content = celementsweb.getPlugin().renderCelementsPageType(doc, pageType, context);
+    String content = getCelWebService().renderCelementsDocument(doc.getDocumentReference(
+        ));
     content = Utils.replacePlaceholders(content, context);
     
     String footer = context.getWiki().getRenderingEngine().renderText("$msg.get('cel_newsletter_html_footer_message', ['_NEWSLETTEREMAILADRESSKEY_'])", doc, context);
@@ -348,4 +351,10 @@ public class NewsletterReceivers {
   public int getNrOfReceivers(){
     return allAddresses.size();
   }
+
+  private CelementsWebScriptService getCelWebService() {
+    return (CelementsWebScriptService) Utils.getComponent(ScriptService.class,
+        "celementsweb");
+  }
+
 }
