@@ -186,6 +186,8 @@ public class Article extends Api{
         if(isEmptyStringAndNotDefLang(fullExtract, lang)){
           fullExtract = getFullArticle(defaultLang);
           effectiveLang = defaultLang;
+        } else {
+          effectiveLang = lang;
         }
         if(!isViewtypeFull && (fullExtract.length() > maxNumChars)){
           fullExtract = fullExtract.substring(0, fullExtract.lastIndexOf(" ", maxNumChars) + 1);
