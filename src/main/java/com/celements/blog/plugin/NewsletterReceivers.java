@@ -64,7 +64,6 @@ public class NewsletterReceivers {
         context);
     List<BaseObject> objs = blogDoc.getObjects("Celements2.ReceiverEMail");
     mLogger.debug("objs.size = " + (objs != null?objs.size():0));
-    //TODO use webUtilsServices as soon as available
     if(objs != null){
       for (BaseObject obj : objs) {
         mLogger.debug("obj: " + obj);
@@ -246,6 +245,7 @@ public class NewsletterReceivers {
     ArrayList<String[]> allUserMailPairs = new ArrayList<String[]>();
     allUserMailPairs.addAll(groupUsers);
     allUserMailPairs.addAll(users);
+    //TODO use webUtilsServices as soon as available
     String defaultLanguage = getContext().getWiki().getWebPreference("default_language",
         getContext());
     for (String address : addresses) {
@@ -276,10 +276,6 @@ public class NewsletterReceivers {
       allUserMailPairs.add(new String[] { mailUser, address, language });
     }
     return allUserMailPairs;
-  }
-
-  private IWebUtilsService getWebUtilsService() {
-    return Utils.getComponent(IWebUtilsService.class);
   }
 
   private String getUnsubscribeFooter(String emailAddress,
@@ -401,6 +397,10 @@ public class NewsletterReceivers {
   
   public int getNrOfReceivers(){
     return allAddresses.size();
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
   private CelementsWebScriptService getCelWebService() {
