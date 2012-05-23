@@ -28,16 +28,22 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
+import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.celements.web.service.CelementsWebScriptService;
+import com.celements.web.service.IWebUtilsService;
+import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 
 public class NewsletterReceivers {
@@ -52,10 +58,13 @@ public class NewsletterReceivers {
   private List<String> addresses = new ArrayList<String>();
   
   //TODO ADD UNIT TESTS!!!
-  public NewsletterReceivers(XWikiDocument blogDoc, XWikiContext context) throws XWikiException{
-    celementsweb = (CelementsWebPluginApi)context.getWiki().getPluginApi("celementsweb", context);
+  public NewsletterReceivers(XWikiDocument blogDoc, XWikiContext context
+      ) throws XWikiException{
+    celementsweb = (CelementsWebPluginApi)context.getWiki().getPluginApi("celementsweb",
+        context);
     List<BaseObject> objs = blogDoc.getObjects("Celements2.ReceiverEMail");
     mLogger.debug("objs.size = " + (objs != null?objs.size():0));
+    //TODO use webUtilsServices as soon as available
     if(objs != null){
       for (BaseObject obj : objs) {
         mLogger.debug("obj: " + obj);
@@ -63,7 +72,8 @@ public class NewsletterReceivers {
           String receiverAdr = obj.getStringValue("email");
           String address = receiverAdr.toLowerCase();
           boolean active = (obj.getIntValue("is_active") == 1);
-          boolean isMail = address.matches("[\\w\\.]{1,}[@][\\w\\-\\.]{1,}([.]([\\w\\-\\.]{1,})){1,3}$");
+          boolean isMail = address.matches(
+              "[\\w\\.]{1,}[@][\\w\\-\\.]{1,}([.]([\\w\\-\\.]{1,})){1,3}$");
           String type = obj.getStringValue("address_type");
           if(isMail && active && (!allAddresses.contains(address))) {
             addresses.add(address);
@@ -82,8 +92,8 @@ public class NewsletterReceivers {
         "and subscribed='" + blogDoc.getFullName() + "'";
     List<String> nlRegAddresses = context.getWiki().search(hql, context);
     if(nlRegAddresses != null) {
-      mLogger.info("Found " + nlRegAddresses.size() + " Celements.NewsletterReceiverClass" +
-          " object-subscriptions for blog " + blogDoc.getFullName());
+      mLogger.info("Found " + nlRegAddresses.size() + " Celements.NewsletterReceiverClass"
+          + " object-subscriptions for blog " + blogDoc.getFullName());
       for (String address : nlRegAddresses) {
         address = address.toLowerCase();
         if(!allAddresses.contains(address)) {
@@ -101,8 +111,9 @@ public class NewsletterReceivers {
     List<BaseObject> groupObjs = recDoc.getObjects("XWiki.XWikiGroups");
     if(userObj != null){
       String email = userObj.getStringValue("email").toLowerCase();
+      String language = userObj.getStringValue("admin_language");
       if((email.trim().length() > 0) && (!allAddresses.contains(email))){
-        users.add(new String[]{recDoc.getFullName(), email});
+        users.add(new String[]{recDoc.getFullName(), email, language});
         allAddresses.add(email);
       }
     } else if((groupObjs != null) && (groupObjs.size() > 0)){
@@ -121,10 +132,11 @@ public class NewsletterReceivers {
           BaseObject groupUserObj = userDoc.getObject("XWiki.XWikiUsers");
           if(groupUserObj != null){
             String email = groupUserObj.getStringValue("email").toLowerCase();
+            String language = groupUserObj.getStringValue("admin_language");
             if((email.trim().length() > 0) && (!allAddresses.contains(email))){
               usersInGroup++;
               allAddresses.add(email);
-              groupUsers.add(new String[]{userDocName, email});
+              groupUsers.add(new String[]{userDocName, email, language});
             }
           }
         }
@@ -174,10 +186,23 @@ public class NewsletterReceivers {
         allUserMailPairs = getNewsletterReceiversList();
       }
       
+      String origUser = context.getUser();
+      String origLanguage = context.getLanguage();
+      VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+      Object origAdminLanguage = vcontext.get("admin_language");
+      Object origMsgTool = vcontext.get("msg");
+      Object origAdminMsgTool = vcontext.get("adminMsg");
       for (String[] userMailPair : allUserMailPairs) {
-        String origUser = context.getUser();
         context.setUser(userMailPair[0]);
-        
+        String language = userMailPair[2];
+        context.setLanguage(language);
+        vcontext.put("language", language);
+        vcontext.put("admin_language", language);
+        XWikiMessageTool msgTool = WebUtils.getInstance().getMessageTool(language,
+            getContext());
+        vcontext.put("msg", msgTool);
+        vcontext.put("adminMsg", msgTool);
+
         if(wiki.checkAccess("view", doc, context)){
           String htmlContent = getHtmlContent(doc, baseURL, context);
           htmlContent += getUnsubscribeFooter(userMailPair[1], doc, context);
@@ -194,18 +219,24 @@ public class NewsletterReceivers {
           result.add(new String[]{userMailPair[1], Integer.toString(singleResult)});
           if(singleResult == 0){ successfullySent++; }
         } else {
-          mLogger.warn("Tried to send " + doc + " to user " + userMailPair[0] + " which" +
-              "has no view rights on this Document.");
+          mLogger.warn("Tried to send " + doc + " to user " + userMailPair[0] + " which"
+              + " has no view rights on this Document.");
           List<String> params = new ArrayList<String>();
           params.add(doc.toString());
           result.add(new String[]{userMailPair[1], context.getMessageTool(
               ).get("cel_blog_newsletter_receiver_no_rights", params)});
         }
       
-        context.setUser(origUser);
       }
+      context.setUser(origUser);
+      context.setLanguage(origLanguage);
+      vcontext.put("language", origLanguage);
+      vcontext.put("admin_language", origAdminLanguage);
+      vcontext.put("msg", origMsgTool);
+      vcontext.put("adminMsg", origAdminMsgTool);
       
-      setNewsletterSentObject(doc, from, replyTo, subject, successfullySent, isTest, context);
+      setNewsletterSentObject(doc, from, replyTo, subject, successfullySent, isTest,
+          context);
     }
     
     return result;
@@ -215,8 +246,11 @@ public class NewsletterReceivers {
     ArrayList<String[]> allUserMailPairs = new ArrayList<String[]>();
     allUserMailPairs.addAll(groupUsers);
     allUserMailPairs.addAll(users);
+    String defaultLanguage = getContext().getWiki().getWebPreference("default_language",
+        getContext());
     for (String address : addresses) {
       String mailUser = "XWiki.XWikiGuest";
+      String language = defaultLanguage;
       String addrUser = null;
       try {
         addrUser = celementsweb.getUsernameForUserData(address, "email");
@@ -225,10 +259,27 @@ public class NewsletterReceivers {
       }
       if((addrUser != null) && (addrUser.length() > 0)) {
         mailUser = addrUser;
+        try {
+          XWikiDocument mailUserDoc = getContext().getWiki().getDocument(
+              getWebUtilsService().resolveDocumentReference(mailUser), getContext());
+          BaseObject mailUserObj = mailUserDoc.getXObject(new DocumentReference(
+              getContext().getDatabase(), "XWiki", "XWikiUsers"));
+          String userAdminLanguage = mailUserObj.getStringValue("admin_language");
+          if ((userAdminLanguage != null) && !"".equals(userAdminLanguage)) {
+            language = userAdminLanguage;
+          }
+        } catch (XWikiException exp) {
+          mLogger.error("Exception getting userdoc to find admin-language ['" + mailUser
+              + "]'.", exp);
+        }
       }
-      allUserMailPairs.add(new String[]{mailUser, address});
+      allUserMailPairs.add(new String[] { mailUser, address, language });
     }
     return allUserMailPairs;
+  }
+
+  private IWebUtilsService getWebUtilsService() {
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
   private String getUnsubscribeFooter(String emailAddress,
@@ -355,6 +406,11 @@ public class NewsletterReceivers {
   private CelementsWebScriptService getCelWebService() {
     return (CelementsWebScriptService) Utils.getComponent(ScriptService.class,
         "celementsweb");
+  }
+
+  private XWikiContext getContext() {
+    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+        "xwikicontext");
   }
 
 }
