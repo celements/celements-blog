@@ -178,7 +178,8 @@ public class NewsletterReceivers {
           String email = userObj.getStringValue("email");
           if(email.trim().length() > 0){
             allUserMailPairs = new ArrayList<String[]>();
-            allUserMailPairs.add(new String[]{user, email});
+            String language = getUserAdminLanguage(user, getDefaultLanguage());
+            allUserMailPairs.add(new String[]{user, email, language });
           }
         }
       } else {
@@ -246,8 +247,7 @@ public class NewsletterReceivers {
     allUserMailPairs.addAll(groupUsers);
     allUserMailPairs.addAll(users);
     //TODO use webUtilsServices as soon as available
-    String defaultLanguage = getContext().getWiki().getWebPreference("default_language",
-        getContext());
+    String defaultLanguage = getDefaultLanguage();
     for (String address : addresses) {
       String mailUser = "XWiki.XWikiGuest";
       String language = defaultLanguage;
@@ -259,23 +259,34 @@ public class NewsletterReceivers {
       }
       if((addrUser != null) && (addrUser.length() > 0)) {
         mailUser = addrUser;
-        try {
-          XWikiDocument mailUserDoc = getContext().getWiki().getDocument(
-              getWebUtilsService().resolveDocumentReference(mailUser), getContext());
-          BaseObject mailUserObj = mailUserDoc.getXObject(new DocumentReference(
-              getContext().getDatabase(), "XWiki", "XWikiUsers"));
-          String userAdminLanguage = mailUserObj.getStringValue("admin_language");
-          if ((userAdminLanguage != null) && !"".equals(userAdminLanguage)) {
-            language = userAdminLanguage;
-          }
-        } catch (XWikiException exp) {
-          mLogger.error("Exception getting userdoc to find admin-language ['" + mailUser
-              + "]'.", exp);
-        }
+        language = getUserAdminLanguage(mailUser, defaultLanguage);
       }
       allUserMailPairs.add(new String[] { mailUser, address, language });
     }
     return allUserMailPairs;
+  }
+
+  private String getDefaultLanguage() {
+    return getContext().getWiki().getWebPreference("default_language",
+        getContext());
+  }
+
+  private String getUserAdminLanguage(String mailUser, String defaultLanguage) {
+    String userLanguage = defaultLanguage;
+    try {
+      XWikiDocument mailUserDoc = getContext().getWiki().getDocument(
+          getWebUtilsService().resolveDocumentReference(mailUser), getContext());
+      BaseObject mailUserObj = mailUserDoc.getXObject(new DocumentReference(
+          getContext().getDatabase(), "XWiki", "XWikiUsers"));
+      String userAdminLanguage = mailUserObj.getStringValue("admin_language");
+      if ((userAdminLanguage != null) && !"".equals(userAdminLanguage)) {
+        userLanguage = userAdminLanguage;
+      }
+    } catch (XWikiException exp) {
+      mLogger.error("Exception getting userdoc to find admin-language ['" + mailUser
+          + "]'.", exp);
+    }
+    return userLanguage;
   }
 
   private String getUnsubscribeFooter(String emailAddress,
