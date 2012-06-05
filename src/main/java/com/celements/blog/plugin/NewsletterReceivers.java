@@ -274,10 +274,12 @@ public class NewsletterReceivers {
   private String getUserAdminLanguage(String mailUser, String defaultLanguage) {
     String userLanguage = defaultLanguage;
     try {
-      XWikiDocument mailUserDoc = getContext().getWiki().getDocument(
-          getWebUtilsService().resolveDocumentReference(mailUser), getContext());
+      DocumentReference userDocRef = getWebUtilsService().resolveDocumentReference(
+          mailUser);
+      XWikiDocument mailUserDoc = getContext().getWiki().getDocument(userDocRef,
+          getContext());
       BaseObject mailUserObj = mailUserDoc.getXObject(new DocumentReference(
-          getContext().getDatabase(), "XWiki", "XWikiUsers"));
+          userDocRef.getWikiReference().getName(), "XWiki", "XWikiUsers"));
       String userAdminLanguage = mailUserObj.getStringValue("admin_language");
       if ((userAdminLanguage != null) && !"".equals(userAdminLanguage)) {
         userLanguage = userAdminLanguage;
