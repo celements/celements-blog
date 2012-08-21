@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
@@ -14,6 +15,7 @@ import com.celements.blog.plugin.NewsletterReceivers;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+@Component("celblog")
 public class BlogScriptService implements ScriptService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
