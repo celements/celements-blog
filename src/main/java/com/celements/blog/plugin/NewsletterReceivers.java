@@ -48,7 +48,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class NewsletterReceivers {
   
-  private static Log mLogger = LogFactory.getFactory().getInstance(NewsletterReceivers.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
+      NewsletterReceivers.class);
   private CelementsWebPluginApi celementsweb;
   
   private List<String> allAddresses = new ArrayList<String>();
@@ -63,10 +64,10 @@ public class NewsletterReceivers {
     celementsweb = (CelementsWebPluginApi)context.getWiki().getPluginApi("celementsweb",
         context);
     List<BaseObject> objs = blogDoc.getObjects("Celements2.ReceiverEMail");
-    mLogger.debug("objs.size = " + (objs != null?objs.size():0));
+    LOGGER.debug("objs.size = " + (objs != null?objs.size():0));
     if(objs != null){
       for (BaseObject obj : objs) {
-        mLogger.debug("obj: " + obj);
+        LOGGER.debug("obj: " + obj);
         if(obj != null){
           String receiverAdr = obj.getStringValue("email");
           String address = receiverAdr.toLowerCase();
@@ -77,7 +78,7 @@ public class NewsletterReceivers {
           if(isMail && active && (!allAddresses.contains(address))) {
             addresses.add(address);
             allAddresses.add(address);
-            mLogger.info("reveiver added: " + address);
+            LOGGER.info("reveiver added: " + address);
           } else {
             if(context.getWiki().exists(receiverAdr, context)){
               parseDocument(receiverAdr, type, context);
@@ -91,14 +92,14 @@ public class NewsletterReceivers {
         "and subscribed='" + blogDoc.getFullName() + "'";
     List<String> nlRegAddresses = context.getWiki().search(hql, context);
     if(nlRegAddresses != null) {
-      mLogger.info("Found " + nlRegAddresses.size() + " Celements.NewsletterReceiverClass"
+      LOGGER.info("Found " + nlRegAddresses.size() + " Celements.NewsletterReceiverClass"
           + " object-subscriptions for blog " + blogDoc.getFullName());
       for (String address : nlRegAddresses) {
         address = address.toLowerCase();
         if(!allAddresses.contains(address)) {
           addresses.add(address);
           allAddresses.add(address);
-          mLogger.info("reveiver added: " + address);
+          LOGGER.info("reveiver added: " + address);
         }
       }
     }
@@ -161,15 +162,15 @@ public class NewsletterReceivers {
     List<String[]> result = new ArrayList<String[]>();
     int successfullySent = 0;
 
-    mLogger.debug("articleName = " + articleName);
-    mLogger.debug("article exists = " + wiki.exists(articleName, context));
+    LOGGER.debug("articleName = " + articleName);
+    LOGGER.debug("article exists = " + wiki.exists(articleName, context));
     if((articleName != null) && (!"".equals(articleName.trim()))
         && (wiki.exists(articleName, context))){
       XWikiDocument doc = wiki.getDocument(articleName, context);
       String baseURL = doc.getExternalURL("view", context);
 
       List<String[]> allUserMailPairs = null;
-      mLogger.debug("is test send: " + isTest);
+      LOGGER.debug("is test send: " + isTest);
       if(isTest){
         String user = context.getUser();
         XWikiDocument userDoc = context.getWiki().getDocument(user, context);
@@ -219,7 +220,7 @@ public class NewsletterReceivers {
           result.add(new String[]{userMailPair[1], Integer.toString(singleResult)});
           if(singleResult == 0){ successfullySent++; }
         } else {
-          mLogger.warn("Tried to send " + doc + " to user " + userMailPair[0] + " which"
+          LOGGER.warn("Tried to send " + doc + " to user " + userMailPair[0] + " which"
               + " has no view rights on this Document.");
           List<String> params = new ArrayList<String>();
           params.add(doc.toString());
@@ -255,7 +256,7 @@ public class NewsletterReceivers {
       try {
         addrUser = celementsweb.getUsernameForUserData(address, "email");
       } catch(XWikiException e) {
-        mLogger.error("Exception getting username for user email '" + address + "'.", e);
+        LOGGER.error("Exception getting username for user email '" + address + "'.", e);
       }
       if((addrUser != null) && (addrUser.length() > 0)) {
         mailUser = addrUser;
@@ -285,7 +286,7 @@ public class NewsletterReceivers {
         userLanguage = userAdminLanguage;
       }
     } catch (XWikiException exp) {
-      mLogger.error("Exception getting userdoc to find admin-language ['" + mailUser
+      LOGGER.error("Exception getting userdoc to find admin-language ['" + mailUser
           + "]'.", exp);
     }
     return userLanguage;
