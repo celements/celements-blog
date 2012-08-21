@@ -163,10 +163,11 @@ public class BlogPluginApi extends Api {
   public Map<String, String> batchImportReceivers(boolean asInactive) {
     String importData = context.getRequest().get("batchImportData");
     String newsletterName = context.getRequest().get("subsBlog");
-    if(hasProgrammingRights()) {
+//    Removed since importing is not dangerous, sending a mail to all receivers is.
+//    if(hasProgrammingRights()) {
       return plugin.batchImportReceivers(asInactive, importData, newsletterName, context);
-    }
-    return null;
+//    }
+//    return null;
   }
   
   public String subscribeNewsletter() throws XWikiException{
