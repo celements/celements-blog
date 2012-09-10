@@ -41,6 +41,26 @@ public class BlogClasses extends AbstractClassCollection {
   public static final String NEWSLETTER_RECEIVER_CLASS = NEWSLETTER_RECEIVER_CLASS_SPACE
         + "." + NEWSLETTER_RECEIVER_CLASS_DOC;
 
+  public static final String BLOG_CONFIG_CLASS_DOC = "BlogConfigClass";
+  public static final String BLOG_CONFIG_CLASS_SPACE = "Celements2";
+  public static final String BLOG_CONFIG_CLASS = BLOG_CONFIG_CLASS_SPACE + "."
+        + BLOG_CONFIG_CLASS_DOC;
+
+  public static final String ARTICLE_CLASS_DOC = "ArticleClass";
+  public static final String ARTICLE_CLASS_SPACE = "XWiki";
+  public static final String ARTICLE_CLASS = ARTICLE_CLASS_SPACE + "."
+        + ARTICLE_CLASS_DOC;
+
+  public static final String RECEIVER_E_MAIL_CLASS_DOC = "ReceiverEMail";
+  public static final String RECEIVER_E_MAIL_CLASS_SPACE = "Celements2";
+  public static final String RECEIVER_E_MAIL_CLASS = RECEIVER_E_MAIL_CLASS_SPACE + "."
+        + RECEIVER_E_MAIL_CLASS_DOC;
+
+  public static final String NEWSLETTER_CONFIG_CLASS_DOC = "NewsletterConfigClass";
+  public static final String NEWSLETTER_CONFIG_CLASS_SPACE = "Classes";
+  public static final String NEWSLETTER_CONFIG_CLASS = NEWSLETTER_CONFIG_CLASS_SPACE + "."
+        + NEWSLETTER_CONFIG_CLASS_DOC;
+
   public BlogClasses() {}
   
   public String getConfigName() {
@@ -111,22 +131,27 @@ public class BlogClasses extends AbstractClassCollection {
     return bclass;
   }
   
+  public DocumentReference getBlogConfigClassRef(String wikiName) {
+    return new DocumentReference(wikiName, BLOG_CONFIG_CLASS_SPACE,
+        BLOG_CONFIG_CLASS_DOC);
+  }
+
   BaseClass getBlogConfigClass() throws XWikiException {
     XWikiDocument doc;
     XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
 
+    DocumentReference blogConfigClassRef = getBlogConfigClassRef(getContext(
+        ).getDatabase());
     try {
-        doc = xwiki.getDocument("Celements2.BlogConfigClass", getContext());
+      doc = xwiki.getDocument(blogConfigClassRef, getContext());
     } catch (Exception e) {
-        doc = new XWikiDocument();
-        doc.setSpace("Celements2");
-        doc.setName("BlogConfigClass");
-        needsUpdate = true;
+      doc = new XWikiDocument(blogConfigClassRef);
+      needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements2.BlogConfigClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setXClassReference(blogConfigClassRef);
     needsUpdate |= bclass.addBooleanField("is_subscribable", "is_subscribable",
         "yesno");
     needsUpdate |= bclass.addTextField("subscribe_to", "subscribe_to", 30);
@@ -151,23 +176,26 @@ public class BlogClasses extends AbstractClassCollection {
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
-  
+
+  public DocumentReference getArticleClassRef(String wikiName) {
+    return new DocumentReference(wikiName, ARTICLE_CLASS_SPACE, ARTICLE_CLASS_DOC);
+  }
+
   BaseClass getArticleClass() throws XWikiException {
     XWikiDocument doc;
     XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
 
+    DocumentReference articleClassRef = getArticleClassRef(getContext().getDatabase());
     try {
-        doc = xwiki.getDocument("XWiki.ArticleClass", getContext());
+      doc = xwiki.getDocument(articleClassRef, getContext());
     } catch (Exception e) {
-        doc = new XWikiDocument();
-        doc.setSpace("XWiki");
-        doc.setName("ArticleClass");
-        needsUpdate = true;
+      doc = new XWikiDocument(articleClassRef);
+      needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("XWiki.ArticleClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setXClassReference(articleClassRef);
     needsUpdate |= bclass.addTextAreaField("extract", "extract", 80, 15);
     needsUpdate |= bclass.addTextAreaField("title", "title", 80, 15);
     //category
@@ -184,22 +212,27 @@ public class BlogClasses extends AbstractClassCollection {
     return bclass;
   }
   
+  public DocumentReference getReceiverEMailClassRef(String wikiName) {
+    return new DocumentReference(wikiName, RECEIVER_E_MAIL_CLASS_SPACE,
+        RECEIVER_E_MAIL_CLASS_DOC);
+  }
+
   BaseClass getReceiverEMailClass() throws XWikiException {
     XWikiDocument doc;
     XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
 
+    DocumentReference receiverEMailClassRef = getReceiverEMailClassRef(getContext(
+        ).getDatabase());
     try {
-        doc = xwiki.getDocument("Celements2.ReceiverEMail", getContext());
+      doc = xwiki.getDocument(receiverEMailClassRef, getContext());
     } catch (Exception e) {
-        doc = new XWikiDocument();
-        doc.setSpace("Celements2");
-        doc.setName("ReceiverEMail");
-        needsUpdate = true;
+      doc = new XWikiDocument(receiverEMailClassRef);
+      needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements2.ReceiverEMail");
+    BaseClass bclass = doc.getXClass();
+    bclass.setXClassReference(receiverEMailClassRef);
     needsUpdate |= bclass.addTextField("email", "email", 30);
     needsUpdate |= bclass.addBooleanField("is_active", "is_active", "yesno");
     needsUpdate |= bclass.addStaticListField("address_type", "address_type", 1, false, 
@@ -209,22 +242,27 @@ public class BlogClasses extends AbstractClassCollection {
     return bclass;
   }
   
+  public DocumentReference getNewsletterConfigClassRef(String wikiName) {
+    return new DocumentReference(wikiName, NEWSLETTER_CONFIG_CLASS_SPACE,
+        NEWSLETTER_CONFIG_CLASS_DOC);
+  }
+
   BaseClass getNewsletterConfigClass() throws XWikiException {
     XWikiDocument doc;
     XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
 
+    DocumentReference newsletterConfigClassRef = getNewsletterConfigClassRef(getContext(
+        ).getDatabase());
     try {
-        doc = xwiki.getDocument("Classes.NewsletterConfigClass", getContext());
+      doc = xwiki.getDocument(newsletterConfigClassRef, getContext());
     } catch (Exception e) {
-        doc = new XWikiDocument();
-        doc.setSpace("Classes");
-        doc.setName("NewsletterConfigClass");
-        needsUpdate = true;
+      doc = new XWikiDocument(newsletterConfigClassRef);
+      needsUpdate = true;
     }
 
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Classes.NewsletterConfigClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setXClassReference(newsletterConfigClassRef);
     needsUpdate |= bclass.addNumberField("times_sent", "times_sent", 30, "integer");
     needsUpdate |= bclass.addDateField("last_sent_date", "last_sent_date", null, 0);
     needsUpdate |= bclass.addTextField("last_sender", "last_sender", 30);
