@@ -30,7 +30,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
-@Component
+@Component("celements.celBlogClasses")
 public class BlogClasses extends AbstractClassCollection {
   
   private static Log LOGGER = LogFactory.getFactory().getInstance(
@@ -55,6 +55,10 @@ public class BlogClasses extends AbstractClassCollection {
   @Override
   protected void initClasses() throws XWikiException {
     getNewsletterReceiverClass();
+    getBlogConfigClass();
+    getArticleClass();
+    getReceiverEMailClass();
+    getNewsletterConfigClass();
   }
 
   public DocumentReference getNewsletterReceiverClassRef(String wikiName) {
@@ -103,6 +107,133 @@ public class BlogClasses extends AbstractClassCollection {
       bclass.setCustomMapping("internal");
     }
     
+    setContentAndSaveClassDocument(doc, needsUpdate);
+    return bclass;
+  }
+  
+  BaseClass getBlogConfigClass() throws XWikiException {
+    XWikiDocument doc;
+    XWiki xwiki = getContext().getWiki();
+    boolean needsUpdate = false;
+
+    try {
+        doc = xwiki.getDocument("Celements2.BlogConfigClass", getContext());
+    } catch (Exception e) {
+        doc = new XWikiDocument();
+        doc.setSpace("Celements2");
+        doc.setName("BlogConfigClass");
+        needsUpdate = true;
+    }
+
+    BaseClass bclass = doc.getxWikiClass();
+    bclass.setName("Celements2.BlogConfigClass");
+    needsUpdate |= bclass.addBooleanField("is_subscribable", "is_subscribable",
+        "yesno");
+    needsUpdate |= bclass.addTextField("subscribe_to", "subscribe_to", 30);
+    needsUpdate |= bclass.addNumberField("art_per_page", "art_per_page", 5,
+        "integer");
+    needsUpdate |= bclass.addBooleanField("is_newsletter", "is_newsletter",
+        "yesno");
+    needsUpdate |= bclass.addTextField("from_address", "from_address", 30);
+    needsUpdate |= bclass.addTextField("reply_to_address", "reply_to_address",
+        30);
+    needsUpdate |= bclass.addBooleanField("unsubscribe_info",
+        "unsubscribe_info", "yesno");
+    needsUpdate |= bclass.addTextField("template", "template", 30);
+    needsUpdate |= bclass.addStaticListField("blogeditor", "blogeditor", 1,
+        false, "plain|wysiwyg", "select");
+    needsUpdate |= bclass.addTextField("blogspace", "blogspace", 30);
+    needsUpdate |= bclass.addStaticListField("viewtype", "viewtype", 1,
+        false, "extract|full", "select");
+    needsUpdate |= bclass.addBooleanField("has_comments", "has_comments",
+        "yesno");
+    
+    setContentAndSaveClassDocument(doc, needsUpdate);
+    return bclass;
+  }
+  
+  BaseClass getArticleClass() throws XWikiException {
+    XWikiDocument doc;
+    XWiki xwiki = getContext().getWiki();
+    boolean needsUpdate = false;
+
+    try {
+        doc = xwiki.getDocument("XWiki.ArticleClass", getContext());
+    } catch (Exception e) {
+        doc = new XWikiDocument();
+        doc.setSpace("XWiki");
+        doc.setName("ArticleClass");
+        needsUpdate = true;
+    }
+
+    BaseClass bclass = doc.getxWikiClass();
+    bclass.setName("XWiki.ArticleClass");
+    needsUpdate |= bclass.addTextAreaField("extract", "extract", 80, 15);
+    needsUpdate |= bclass.addTextAreaField("title", "title", 80, 15);
+    //category
+    needsUpdate |= bclass.addTextAreaField("content", "content", 80, 15);
+    needsUpdate |= bclass.addNumberField("id", "id", 30, "integer");
+    needsUpdate |= bclass.addTextField("lang", "lang", 30);
+    needsUpdate |= bclass.addTextField("blogeditor", "blogeditor", 30);
+    needsUpdate |= bclass.addDateField("publishdate", "publishdate", null, 0);
+    needsUpdate |= bclass.addBooleanField("hasComments", "hasComments", "yesno");
+    needsUpdate |= bclass.addDateField("archivedate", "archivedate", null, 0);
+    needsUpdate |= bclass.addBooleanField("isSubscribable", "isSubscribable", "yesno");
+
+    setContentAndSaveClassDocument(doc, needsUpdate);
+    return bclass;
+  }
+  
+  BaseClass getReceiverEMailClass() throws XWikiException {
+    XWikiDocument doc;
+    XWiki xwiki = getContext().getWiki();
+    boolean needsUpdate = false;
+
+    try {
+        doc = xwiki.getDocument("Celements2.ReceiverEMail", getContext());
+    } catch (Exception e) {
+        doc = new XWikiDocument();
+        doc.setSpace("Celements2");
+        doc.setName("ReceiverEMail");
+        needsUpdate = true;
+    }
+
+    BaseClass bclass = doc.getxWikiClass();
+    bclass.setName("Celements2.ReceiverEMail");
+    needsUpdate |= bclass.addTextField("email", "email", 30);
+    needsUpdate |= bclass.addBooleanField("is_active", "is_active", "yesno");
+    needsUpdate |= bclass.addStaticListField("address_type", "address_type", 1, false, 
+        "to|cc|bcc", "select");
+
+    setContentAndSaveClassDocument(doc, needsUpdate);
+    return bclass;
+  }
+  
+  BaseClass getNewsletterConfigClass() throws XWikiException {
+    XWikiDocument doc;
+    XWiki xwiki = getContext().getWiki();
+    boolean needsUpdate = false;
+
+    try {
+        doc = xwiki.getDocument("Classes.NewsletterConfigClass", getContext());
+    } catch (Exception e) {
+        doc = new XWikiDocument();
+        doc.setSpace("Classes");
+        doc.setName("NewsletterConfigClass");
+        needsUpdate = true;
+    }
+
+    BaseClass bclass = doc.getxWikiClass();
+    bclass.setName("Classes.NewsletterConfigClass");
+    needsUpdate |= bclass.addNumberField("times_sent", "times_sent", 30, "integer");
+    needsUpdate |= bclass.addDateField("last_sent_date", "last_sent_date", null, 0);
+    needsUpdate |= bclass.addTextField("last_sender", "last_sender", 30);
+    needsUpdate |= bclass.addNumberField("last_sent_recipients", "last_sent_recipients", 
+        30, "integer");
+    needsUpdate |= bclass.addTextField("from_address", "from_address", 30);
+    needsUpdate |= bclass.addTextField("reply_to_address", "reply_to_address", 30);
+    needsUpdate |= bclass.addTextField("subject", "subject", 30);
+
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
