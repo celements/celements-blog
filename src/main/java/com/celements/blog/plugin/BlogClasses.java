@@ -61,6 +61,12 @@ public class BlogClasses extends AbstractClassCollection {
   public static final String NEWSLETTER_CONFIG_CLASS = NEWSLETTER_CONFIG_CLASS_SPACE + "."
         + NEWSLETTER_CONFIG_CLASS_DOC;
 
+  public static final String BLOG_ARTICLE_SUBSCRIPTION_CLASS_DOC =
+      "BlogArticleSubscriptionClass";
+  public static final String BLOG_ARTICLE_SUBSCRIPTION_CLASS_SPACE = "Celements2";
+  public static final String BLOG_ARTICLE_SUBSCRIPTION_CLASS =
+    BLOG_ARTICLE_SUBSCRIPTION_CLASS_SPACE + "." + BLOG_ARTICLE_SUBSCRIPTION_CLASS_DOC;
+
   public BlogClasses() {}
   
   public String getConfigName() {
@@ -271,6 +277,34 @@ public class BlogClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextField("from_address", "from_address", 30);
     needsUpdate |= bclass.addTextField("reply_to_address", "reply_to_address", 30);
     needsUpdate |= bclass.addTextField("subject", "subject", 30);
+
+    setContentAndSaveClassDocument(doc, needsUpdate);
+    return bclass;
+  }
+  
+  public DocumentReference getBlogArticleSubscriptionClassRef(String wikiName) {
+    return new DocumentReference(wikiName, BLOG_ARTICLE_SUBSCRIPTION_CLASS_SPACE,
+        BLOG_ARTICLE_SUBSCRIPTION_CLASS_DOC);
+  }
+
+  BaseClass getBlogArticleSubscriptionClass() throws XWikiException {
+    XWikiDocument doc;
+    XWiki xwiki = getContext().getWiki();
+    boolean needsUpdate = false;
+
+    DocumentReference getBlogArticleSubscriptionClassRef =
+      getBlogArticleSubscriptionClassRef(getContext().getDatabase());
+    try {
+      doc = xwiki.getDocument(getBlogArticleSubscriptionClassRef, getContext());
+    } catch (Exception e) {
+      doc = new XWikiDocument(getBlogArticleSubscriptionClassRef);
+      needsUpdate = true;
+    }
+
+    BaseClass bclass = doc.getXClass();
+    bclass.setXClassReference(getBlogArticleSubscriptionClassRef);
+    needsUpdate |= bclass.addTextField("subscriber", "subscriber", 30);
+    needsUpdate |= bclass.addBooleanField("doSubscribe", "doSubscribe", "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
