@@ -76,7 +76,6 @@ public class BlogPlugin extends XWikiDefaultPlugin{
       getArticleClass(context);
       getReceiverEMailClass(context);
       getNewsletterConfigClass(context);
-      BlogClasses.getInstance().runUpdate(context);
     } catch (Exception e) {
       mLogger.fatal(e);
     }

@@ -21,52 +21,64 @@ package com.celements.blog.plugin;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.classes.CelementsClassCollection;
+import com.celements.common.classes.AbstractClassCollection;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
-public class BlogClasses extends CelementsClassCollection {
+@Component
+public class BlogClasses extends AbstractClassCollection {
   
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static Log LOGGER = LogFactory.getFactory().getInstance(
       BlogClasses.class);
   
-  private static BlogClasses instance;
+  public static final String NEWSLETTER_RECEIVER_CLASS_DOC = "NewsletterReceiverClass";
+  public static final String NEWSLETTER_RECEIVER_CLASS_SPACE = "Celements";
+  public static final String NEWSLETTER_RECEIVER_CLASS = NEWSLETTER_RECEIVER_CLASS_SPACE
+        + "." + NEWSLETTER_RECEIVER_CLASS_DOC;
+
+  public BlogClasses() {}
   
-  public void initClasses(XWikiContext context) throws XWikiException {
-    getNewsletterReceiverClass(context);
+  public String getConfigName() {
+    return "blog";
   }
   
-  private BlogClasses() {
+  @Override
+  protected Log getLogger() {
+    return LOGGER;
   }
-  
-  public static BlogClasses getInstance() {
-    if (instance == null) {
-      instance = new BlogClasses();
-    }
-    return instance;
+
+  @Override
+  protected void initClasses() throws XWikiException {
+    getNewsletterReceiverClass();
   }
-  
-  protected BaseClass getNewsletterReceiverClass(XWikiContext context) throws XWikiException {
+
+  public DocumentReference getNewsletterReceiverClassRef(String wikiName) {
+    return new DocumentReference(wikiName, NEWSLETTER_RECEIVER_CLASS_SPACE,
+        NEWSLETTER_RECEIVER_CLASS_DOC);
+  }
+
+  BaseClass getNewsletterReceiverClass() throws XWikiException {
     XWikiDocument doc;
-    XWiki xwiki = context.getWiki();
+    XWiki xwiki = getContext().getWiki();
     boolean needsUpdate = false;
     
+    DocumentReference newsletterReceiverClassRef = getNewsletterReceiverClassRef(
+        getContext().getDatabase());
     try {
-      doc = xwiki.getDocument("Celements.NewsletterReceiverClass", context);
+      doc = xwiki.getDocument(newsletterReceiverClassRef, getContext());
     } catch (XWikiException e) {
-      mLogger.error(e);
-      doc = new XWikiDocument();
-      doc.setSpace("Celements");
-      doc.setName("NewsletterReceiverClass");
+      LOGGER.error(e);
+      doc = new XWikiDocument(newsletterReceiverClassRef);
       needsUpdate = true;
     }
     
-    BaseClass bclass = doc.getxWikiClass();
-    bclass.setName("Celements.NewsletterReceiverClass");
+    BaseClass bclass = doc.getXClass();
+    bclass.setXClassReference(newsletterReceiverClassRef);
     
     needsUpdate |= bclass.addTextField("email", "E-Mail", 30);
     needsUpdate |= bclass.addBooleanField("isactive", "Is Active", "yesno");
@@ -91,16 +103,8 @@ public class BlogClasses extends CelementsClassCollection {
       bclass.setCustomMapping("internal");
     }
     
-    setContentAndSaveClassDocument(doc, needsUpdate, context);
+    setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
   }
   
-  public String getConfigName() {
-    return "blog";
-  }
-  
-  @Override
-  protected Log getLogger() {
-    return mLogger;
-  }
 }
