@@ -33,39 +33,39 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public class BlogPluginApi extends Api {
-  
-  private static Log mLogger = LogFactory.getFactory().getInstance(BlogPlugin.class);
-  
+
+  private static Log LOGGER = LogFactory.getFactory().getInstance(BlogPlugin.class);
+
   private BlogPlugin plugin;
-  
+
   public BlogPluginApi(BlogPlugin plugin, XWikiContext context) {
     super(context);
     setPlugin(plugin);
   }
-  
+
   public void setPlugin(BlogPlugin plugin) {
     this.plugin = plugin;
   }
-  
+
   public BlogPlugin getPlugin(){
     return plugin;
   }
-  
-  public Document getBlogPageByBlogSpace(String blogSpaceName) throws XWikiException{
-    XWikiDocument blogPageByBlogSpace 
-        = plugin.getBlogPageByBlogSpace(blogSpaceName, context);
+
+  public Document getBlogPageByBlogSpace(String blogSpaceName) throws XWikiException {
+    XWikiDocument blogPageByBlogSpace = plugin.getBlogPageByBlogSpace(blogSpaceName,
+        context);
     if (blogPageByBlogSpace != null) {
       return blogPageByBlogSpace.newDocument(context);
     }
     return null;
   }
-  
-  public Article getArticle(Document doc) throws XWikiException{
+
+  public Article getArticle(Document doc) throws XWikiException {
     Article article = null;
     try{
       article = new Article(doc, context);
     } catch (EmptyArticleException e) {
-      mLogger.info(e);
+      LOGGER.info(e);
     }
     return article;
   }
@@ -81,59 +81,59 @@ public class BlogPluginApi extends Api {
    */
   public List<Article> getAllArticles(String blogArticleSpace, String subscribedBlogs, 
       String language) throws XWikiException{
-    mLogger.info("ENTER getAllArticles");
+    LOGGER.info("ENTER getAllArticles");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, false, false, false, true, true, true, true, true, true, false, 
         context);
-    mLogger.info("END getAllArticles");
+    LOGGER.info("END getAllArticles");
     return result;
   }
   
   public List<Article> getAllWithRightsArticles(String blogArticleSpace, 
       String subscribedBlogs, String language) throws XWikiException{
-    mLogger.info("ENTER getAllWithRightsArticles");
+    LOGGER.info("ENTER getAllWithRightsArticles");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, false, false, false, true, true, true, true, true, true, true, context);
-    mLogger.info("END getAllWithRightsArticles");
+    LOGGER.info("END getAllWithRightsArticles");
     return result;
   }
   
   public List<Article> getArticles(String blogArticleSpace, String subscribedBlogs, 
       String language) throws XWikiException{
-    mLogger.info("ENTER getArticles");
+    LOGGER.info("ENTER getArticles");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, false, false, false, false, true, true, true, false, true, true, 
         context);
-    mLogger.info("END getArticles");
+    LOGGER.info("END getArticles");
     return result;
   }
   
   public List<Article> getArchivedArticles(String blogArticleSpace, 
       String subscribedBlogs, String language) throws XWikiException{
-    mLogger.info("ENTER getArchivedArticles");
+    LOGGER.info("ENTER getArchivedArticles");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, true, false, false, true, true, true, true, false, true, true, 
         context);
-    mLogger.info("END getArchivedArticles");
+    LOGGER.info("END getArchivedArticles");
     return result;
   }
   
   public List<Article> getAllFromSubscribedBlogs(String blogArticleSpace, 
       String subscribedBlogs, String language) throws XWikiException{
-    mLogger.info("ENTER getAllFromSubscribedBlogs");
+    LOGGER.info("ENTER getAllFromSubscribedBlogs");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, false, false, true, true, true, true, true, true, true, true, context);
-    mLogger.info("END getAllFromSubscribedBlogs");
+    LOGGER.info("END getAllFromSubscribedBlogs");
     return result;
   }
   
   public List<Article> getAllNewSubscribable(String blogArticleSpace, String 
       subscribedBlogs, String language) throws XWikiException{
-    mLogger.info("ENTER getAllNewSubscribable");
+    LOGGER.info("ENTER getAllNewSubscribable");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, false, false, true, true, true, true, false, false, true, true, 
         context);
-    mLogger.info("END getAllNewSubscribable");
+    LOGGER.info("END getAllNewSubscribable");
     return result;
   }
   
@@ -148,7 +148,7 @@ public class BlogPluginApi extends Api {
     return subsArts;
   }
   
-  public int containsUndecidedArticles(List<Article> articles, String blogArticleSpace){
+  public int containsUndecidedArticles(List<Article> articles, String blogArticleSpace) {
     int unSubsArts = 0;
     for (Iterator<Article> iterator = articles.iterator(); iterator.hasNext();) {
       Article article = iterator.next();
@@ -198,4 +198,5 @@ public class BlogPluginApi extends Api {
   public Article getNextArticle(Article article) {
     return plugin.getNeighbourArticle(article, true, context);
   }
+
 }

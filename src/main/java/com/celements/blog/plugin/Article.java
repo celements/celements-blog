@@ -39,7 +39,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class Article extends Api{
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(Article.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(Article.class);
   
   private Map<String, Object> articleObj;
   private Boolean isSubscribed;
@@ -48,15 +48,18 @@ public class Article extends Api{
   private Map<String, Boolean> hasMoreLinkDots;
   private String defaultLang;
   
-  public Article(XWikiDocument articleDoc, XWikiContext context) throws XWikiException, EmptyArticleException{
+  public Article(XWikiDocument articleDoc, XWikiContext context
+      ) throws XWikiException, EmptyArticleException {
     this(articleDoc.newDocument(context), context);
   }
   
-  public Article(Document articleDoc, XWikiContext context) throws XWikiException, EmptyArticleException{
+  public Article(Document articleDoc, XWikiContext context
+      ) throws XWikiException, EmptyArticleException{
     this(articleDoc.getObjects("XWiki.ArticleClass"), articleDoc.getSpace(), context);
   }
   
-  public Article(List<Object> objList, String space, XWikiContext context) throws XWikiException, EmptyArticleException{
+  public Article(List<Object> objList, String space, XWikiContext context
+      ) throws XWikiException, EmptyArticleException{
     super(context);
     for (Iterator<Object> iterator = objList.iterator(); iterator.hasNext();) {
       Object artObj = iterator.next();
@@ -72,7 +75,7 @@ public class Article extends Api{
       articleObj = new HashMap<String, Object>();
       defaultLang = context.getWiki().getWebPreference("default_language", space, "", context);
     }
-    mLogger.debug("Init Article Object");
+    LOGGER.debug("Init Article Object");
     if (obj != null) {
       Property prop = obj.getProperty("lang");
       if (prop != null) {
@@ -88,14 +91,16 @@ public class Article extends Api{
     try {
       doc = context.getWiki().getDocument(getDocName(), context);
     } catch (XWikiException e) {
-      mLogger.error(e);
+      LOGGER.error(e);
     }
     if(doc != null) {
-      BaseObject obj = doc.getObject("Celements2.BlogArticleSubscriptionClass", "subscriber", context.getDoc().getFullName(), false);
-      mLogger.info("Search for object with subscriber == '" + context.getDoc().getFullName() + "' had result: " + obj);
+      BaseObject obj = doc.getObject("Celements2.BlogArticleSubscriptionClass",
+          "subscriber", context.getDoc().getFullName(), false);
+      LOGGER.info("Search for object with subscriber == '"
+          + context.getDoc().getFullName() + "' had result: " + obj);
       if(obj != null){
         int isSubscr = obj.getIntValue("doSubscribe");
-        mLogger.info("'" + doc.getFullName() + "' doSubscribe is: '" + isSubscr + "'");
+        LOGGER.info("'" + doc.getFullName() + "' doSubscribe is: '" + isSubscr + "'");
         if(isSubscr == 1){
           isSubscribed = true;
         } else if(isSubscr == 0){
@@ -103,7 +108,7 @@ public class Article extends Api{
         }
       } else{
         isSubscribed = null;
-        mLogger.info("'" + doc.getFullName() + "' doSubscribe is: '" + isSubscribed + "'");
+        LOGGER.info("'" + doc.getFullName() + "' doSubscribe is: '" + isSubscribed + "'");
       }
     }
   }
@@ -169,9 +174,10 @@ public class Article extends Api{
     return getExtractDetailed(lang, isViewtypeFull, maxNumChars)[1];
   }
   
-  public String[] getExtractDetailed(String lang, boolean isViewtypeFull, int maxNumChars){
+  public String[] getExtractDetailed(String lang, boolean isViewtypeFull,
+      int maxNumChars) {
     String effectiveLang = lang;
-    mLogger.info("getExtract('" + lang + "', " + isViewtypeFull + "')");
+    LOGGER.info("getExtract('" + lang + "', " + isViewtypeFull + "')");
     if((extract == null) || !extract.containsKey(lang)){
       String fullExtract = getStringProperty(getObj(lang), "extract");
       boolean needsMoreLink = true;
@@ -190,7 +196,8 @@ public class Article extends Api{
           effectiveLang = lang;
         }
         if(!isViewtypeFull && (fullExtract.length() > maxNumChars)){
-          fullExtract = fullExtract.substring(0, fullExtract.lastIndexOf(" ", maxNumChars) + 1);
+          fullExtract = fullExtract.substring(0, fullExtract.lastIndexOf(" ", maxNumChars
+              ) + 1);
           needsMoreLink = true;
           needsMoreLinkDots = true;
         }
@@ -252,7 +259,8 @@ public class Article extends Api{
   }
   
   public String getDocName(){
-    for (Iterator<String> iterator = articleObj.keySet().iterator(); iterator.hasNext();) {
+    for (Iterator<String> iterator = articleObj.keySet().iterator();
+        iterator.hasNext();) {
       String key = (String) iterator.next();
       return articleObj.get(key).getName();
     }
@@ -302,23 +310,26 @@ public class Article extends Api{
   
   public Object getObj(String lang){
     Object obj = null;
-    if(articleObj.containsKey(lang)){
-      mLogger.info("'" + getDocName() + "' - Getting object for lang '" + lang + "'");
+    if (articleObj.containsKey(lang)) {
+      LOGGER.info("'" + getDocName() + "' - Getting object for lang '" + lang + "'");
       obj = articleObj.get(lang);
-    } else{
-      if(articleObj.containsKey(defaultLang)){
-        mLogger.info("'" + getDocName() + "' - Getting object for defaultLang '" + lang + "'");
+    } else {
+      if (articleObj.containsKey(defaultLang)) {
+        LOGGER.info("'" + getDocName() + "' - Getting object for defaultLang '" + lang
+            + "'");
         obj = articleObj.get(defaultLang);
-      } else{
-        if(articleObj.containsKey("")){
-          mLogger.info("'" + getDocName() + "' - Getting object failed for lang ''");
+      } else {
+        if (articleObj.containsKey("")) {
+          LOGGER.info("'" + getDocName() + "' - Getting object failed for lang ''");
           obj = articleObj.get("");
-        } else{
-          mLogger.info("'" + getDocName() + "' - Getting object failed for lang '" + lang + "' and defaultLang '" + defaultLang + "'");
+        } else {
+          LOGGER.info("'" + getDocName() + "' - Getting object failed for lang '" + lang
+              + "' and defaultLang '" + defaultLang + "'");
         }
       }
     }
-    mLogger.info("Object found: doc name='" + ((obj != null)?obj.getName():"") + "' obj='" + obj + "'");
+    LOGGER.info("Object found: doc name='" + ((obj != null) ? obj.getName() : "")
+        + "' obj='" + obj + "'");
     return obj;
   }
 

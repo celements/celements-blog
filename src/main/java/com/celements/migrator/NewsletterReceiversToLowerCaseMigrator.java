@@ -39,7 +39,8 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 @Component("NewsletterReceiversToLowerCase")
-public class NewsletterReceiversToLowerCaseMigrator extends AbstractCelementsHibernateMigrator {
+public class NewsletterReceiversToLowerCaseMigrator
+    extends AbstractCelementsHibernateMigrator {
 
   private static Log mLogger = LogFactory.getFactory().getInstance(
       NewsletterReceiversToLowerCaseMigrator.class);

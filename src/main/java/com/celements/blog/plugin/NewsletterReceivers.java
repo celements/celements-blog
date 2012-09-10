@@ -105,7 +105,8 @@ public class NewsletterReceivers {
     }
   }
   
-  private void parseDocument(String address, String type, XWikiContext context) throws XWikiException {
+  private void parseDocument(String address, String type, XWikiContext context
+      ) throws XWikiException {
     XWikiDocument recDoc = context.getWiki().getDocument(address, context);
     BaseObject userObj = recDoc.getObject("XWiki.XWikiUsers");
     List<BaseObject> groupObjs = recDoc.getObjects("XWiki.XWikiGroups");
@@ -122,12 +123,14 @@ public class NewsletterReceivers {
     }
   }
 
-  private int parseGroupMembers(List<BaseObject> groupObjs, String type, XWikiContext context) throws XWikiException {
+  private int parseGroupMembers(List<BaseObject> groupObjs, String type,
+      XWikiContext context) throws XWikiException {
     int usersInGroup = 0;
     for (BaseObject groupObj : groupObjs) {
       if ((groupObj != null) && (groupObj.getStringValue("member") != null)) {
         String userDocName = groupObj.getStringValue("member");
-        if((userDocName.trim().length() > 0) && context.getWiki().exists(userDocName, context)){
+        if((userDocName.trim().length() > 0) && context.getWiki().exists(userDocName,
+            context)){
           XWikiDocument userDoc = context.getWiki().getDocument(userDocName, context);
           BaseObject groupUserObj = userDoc.getObject("XWiki.XWikiUsers");
           if(groupUserObj != null){
@@ -322,7 +325,8 @@ public class NewsletterReceivers {
     return unsubscribeLink;
   }
 
-  private String getHtmlContent(XWikiDocument doc, String baseURL, XWikiContext context) throws XWikiException {
+  private String getHtmlContent(XWikiDocument doc, String baseURL, XWikiContext context
+      ) throws XWikiException {
     String header = "";
     if((baseURL != null) && !"".equals(baseURL.trim())){
       header = "<base href='" + baseURL + "' />\n";
@@ -334,21 +338,26 @@ public class NewsletterReceivers {
 
     String footer = context.getMessageTool().get("cel_newsletter_html_footer_message",
         Arrays.asList("_NEWSLETTEREMAILADRESSKEY_"));
-    footer = footer.replaceAll("_NEWSLETTEREMAILADRESSKEY_", doc.getExternalURL("view", context));
+    footer = footer.replaceAll("_NEWSLETTEREMAILADRESSKEY_", doc.getExternalURL("view",
+        context));
     
     return header + content + footer;
   }
 
-  private int sendMail(String from, String replyTo, String to, String subject, String baseURL, 
-      String htmlContent, String textContent, XWikiContext context) throws XWikiException {
+  private int sendMail(String from, String replyTo, String to, String subject,
+      String baseURL, String htmlContent, String textContent, XWikiContext context
+      ) throws XWikiException {
     if((to != null) && (to.trim().length() == 0)){ to = null; }
     Map<String, String> otherHeader = new HashMap<String, String>();
     otherHeader.put("Content-Location", baseURL);
     
-    return celementsweb.getPlugin().sendMail(from, replyTo, to, null, null, subject, htmlContent, textContent, null, otherHeader, context);
+    return celementsweb.getPlugin().sendMail(from, replyTo, to, null, null, subject,
+        htmlContent, textContent, null, otherHeader, context);
   }
   
-  private void setNewsletterSentObject(XWikiDocument doc, String from, String replyTo, String subject, int nrOfSent, boolean isTest, XWikiContext context) throws XWikiException {
+  private void setNewsletterSentObject(XWikiDocument doc, String from, String replyTo,
+      String subject, int nrOfSent, boolean isTest, XWikiContext context
+      ) throws XWikiException {
     BaseObject configObj = doc.getObject("Classes.NewsletterConfigClass");
     if(configObj == null){
       configObj = doc.newObject("Classes.NewsletterConfigClass", context);
@@ -365,7 +374,8 @@ public class NewsletterReceivers {
     context.getWiki().saveDocument(doc, context);
   }
   
-  private void setNewsletterHistory(BaseObject configObj, int nrOfSent, XWikiContext context){
+  private void setNewsletterHistory(BaseObject configObj, int nrOfSent,
+      XWikiContext context) {
     int timesSent = configObj.getIntValue("times_sent");
     configObj.set("times_sent", timesSent + 1, context);
     configObj.set("last_sent_date", new Date(), context);

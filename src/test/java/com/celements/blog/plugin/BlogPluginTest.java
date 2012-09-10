@@ -20,7 +20,6 @@
 package com.celements.blog.plugin;
 
 import static org.easymock.EasyMock.*;
-import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -94,7 +93,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     Vector<BaseObject> objVec = new Vector<BaseObject>();
     objVec.add(obj);
     expect(xdoc.getSpace()).andReturn(artSpace).atLeastOnce();
-    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
+    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki",
+        "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef);
@@ -109,7 +109,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
   }
 
   @Test
-  public void testGetBlogArticles_getArchivedArticles_notYetArchived() throws XWikiException {
+  public void testGetBlogArticles_getArchivedArticles_notYetArchived(
+      ) throws XWikiException {
     String artSpace = "ArtSpace";
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
@@ -142,7 +143,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     obj.setStringValue("content", "the content");
     Vector<BaseObject> objVec = new Vector<BaseObject>();
     objVec.add(obj);
-    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
+    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki",
+        "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef);
@@ -158,7 +160,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
   }
 
   @Test
-  public void testGetBlogArticles_getArchivedArticles_archiveBeforePublish() throws XWikiException {
+  public void testGetBlogArticles_getArchivedArticles_archiveBeforePublish(
+      ) throws XWikiException {
     String artSpace = "ArtSpace";
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
@@ -193,7 +196,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     obj.setStringValue("content", "the content");
     Vector<BaseObject> objVec = new Vector<BaseObject>();
     objVec.add(obj);
-    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
+    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki",
+        "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef);
@@ -209,7 +213,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
   }
 
   @Test
-  public void testGetBlogArticles_getArchivedArticles_archiveBeforePublishBeforeToday() throws XWikiException {
+  public void testGetBlogArticles_getArchivedArticles_archiveBeforePublishBeforeToday(
+      ) throws XWikiException {
     String artSpace = "ArtSpace";
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
@@ -244,7 +249,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     obj.setStringValue("content", "the content");
     Vector<BaseObject> objVec = new Vector<BaseObject>();
     objVec.add(obj);
-    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
+    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki",
+        "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef);
@@ -260,7 +266,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
   }
 
   @Test
-  public void testGetBlogArticles_getArchivedArticles_noArchiveDateSet() throws XWikiException {
+  public void testGetBlogArticles_getArchivedArticles_noArchiveDateSet(
+      ) throws XWikiException {
     String artSpace = "ArtSpace";
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
@@ -293,7 +300,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     obj.setStringValue("content", "the content");
     Vector<BaseObject> objVec = new Vector<BaseObject>();
     objVec.add(obj);
-    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
+    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki",
+        "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef);
@@ -344,7 +352,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc).atLeastOnce();
-    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
+    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki",
+        "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef).anyTimes();
@@ -400,7 +409,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc).atLeastOnce();
-    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
+    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki",
+        "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef).anyTimes();
@@ -456,7 +466,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc).atLeastOnce();
-    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
+    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki",
+        "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef).anyTimes();
@@ -512,7 +523,8 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc).atLeastOnce();
-    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
+    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki",
+        "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef).anyTimes();

@@ -40,7 +40,8 @@ public class BlogUtils {
 
   public XWikiDocument getBlogPageByBlogSpace(String blogSpaceName,
       XWikiContext context) throws XWikiException{
-    String hql = "select doc.fullName from XWikiDocument as doc, BaseObject as obj, StringProperty bspace ";
+    String hql = "select doc.fullName from XWikiDocument as doc, BaseObject as obj,";
+    hql += " StringProperty bspace ";
     hql += "where obj.name=doc.fullName ";
     hql += "and obj.className='Celements2.BlogConfigClass' ";
     hql += "and obj.id = bspace.id.id and bspace.id.name = 'blogspace' ";
