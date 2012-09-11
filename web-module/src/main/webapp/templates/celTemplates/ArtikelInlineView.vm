@@ -1,4 +1,3 @@
-{pre}
 <div class="cel_blog"><div class="el_blog" ##
 style="font-family:Arial,Geneva,Helvetica,Verdana,sans-serif; ##
 margin-left: auto; margin-right: auto; ##
@@ -61,4 +60,3 @@ height:0; line-height:1px; margin:0; padding:0;"><!-- required:floating images -
 #end ## #if("$!obj" != '')
 #set($renderDocumentRecursionHistory = "${renderDocumentRecursionHistory}${doc.fullName} ")
 </div></div>
-{/pre}

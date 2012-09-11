@@ -1,4 +1,3 @@
-{pre}
 #if($articles.size() > 0)
   #set($cdate = '')
   #foreach($article in $articles)
@@ -7,4 +6,3 @@
 #else
 No news is good news.
 #end
-{/pre}

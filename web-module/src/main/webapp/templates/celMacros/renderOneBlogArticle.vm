@@ -1,4 +1,3 @@
-{pre}
     #set($articleBlogMoreLinkParams = "$!articleBlogMoreLinkParams")
     #set($bentrydoc = $xwiki.getDocument("$article.getDocName()"))
     #set($creationDate = '')
@@ -89,4 +88,3 @@ $xwiki.includeForm("celements2web:Macros.getInlineBlogComments", false)
       $xwiki.includeForm('Macros.blogArticleSubscribeBar', false)
     #end
     </div> <!-- article_abstract -->
-{/pre}

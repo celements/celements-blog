@@ -1,7 +1,4 @@
-{pre}
 ##BlogView on celements2web.web.synventis.com
-
-
 #if("$!blogTitle" == '')
 #set($blogTitle = "$!doc.getObject('Content.Title').get('title')")
 #end
@@ -232,4 +229,3 @@ No news is good news.
 </div> <!-- articles_start -->
 ##
 #end
-{/pre}

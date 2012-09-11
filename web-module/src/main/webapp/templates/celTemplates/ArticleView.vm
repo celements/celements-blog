@@ -1,4 +1,3 @@
-{pre}
 #set($blogSpace = "$!request.get('space')")
 #if($xwiki.isMultiLingual())
 	#set($defObj = $doc.getObject("XWiki.ArticleClass", "lang", $!{default_language}, false))
@@ -92,4 +91,3 @@ $xwiki.formatDate($comment.getProperty('date').getValue(),"dd. MMMM, yyyy")
 #end
 #end ## #if("$!obj" != '')
 #set($renderDocumentRecursionHistory = "${renderDocumentRecursionHistory}${doc.fullName} ")
-{/pre}

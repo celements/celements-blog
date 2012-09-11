@@ -1,4 +1,3 @@
-{pre}
 $context.setCacheDuration(0)
 #set($space_blogName = '')
 #if("$!renderDocument" != '')
@@ -158,4 +157,3 @@ $response.setDateHeader("Last-Modified", $lastChanged.getTime())
 ##
 #end
 #end ## ##If-Modified-Since
-{/pre}

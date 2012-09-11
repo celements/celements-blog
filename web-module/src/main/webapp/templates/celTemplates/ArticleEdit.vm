@@ -1,4 +1,3 @@
-{pre}
 #set($celSkin_doc = $xwiki.getDocument("celements2web:XWiki.Celements2Skin"))
 #if("$!celSkin_doc" != '')
 $celementsweb.addExtJSfileOnce($celSkin_doc.getAttachmentURL('article-edit.js', 'skin'))
@@ -140,4 +139,3 @@ $xwiki.includeForm('celements2web:Macros.includeRTELanguageSelect', false)
 	#end
 </form><!-- IE6 -->
 </div><!-- IE6 -->
-{/pre}

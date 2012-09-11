@@ -1,4 +1,3 @@
-{pre}
 ## generateNewsTicker uses a predefined outputNewsArticle Macro to
 ## generate the NewsTicker XHTML output.
 ## input: maxNumArticle, spacename, maxNumChars
@@ -34,4 +33,3 @@
     #set($newsContent = "No news is good news.")
     #ouputNewsArticle()
 #end
-{/pre}
