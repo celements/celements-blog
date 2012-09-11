@@ -1,0 +1,37 @@
+{pre}
+## generateNewsTicker uses a predefined outputNewsArticle Macro to
+## generate the NewsTicker XHTML output.
+## input: maxNumArticle, spacename, maxNumChars
+## output: {XHTML}
+#set($articles = $xwiki.celementsblog.getArticles("$spacename", "$!space_blogName", "$default_language"))
+#if($articles.size() > 0)
+  #set($count = 0)
+  #foreach ($article in $articles)
+    #if($count < $maxNumArticle)
+      #set($count = $count + 1)
+      #set($bentrydoc = $xwiki.getDocument("$!article.getDocName()"))
+      #set($content = $article.getExtract("$language", false, $xwiki.parseInt("$!maxNumChars")))
+      #set($creationDate = $article.getPublishDate())
+      #if("$!creationDate" != '')
+        #set($blog_dateFormat = $msg.get('cel_blog_dateformat'))
+        #if("$!blog_dateFormat" == '')
+        ##TODO i18n issue: we must use java DateFormat for given language.
+        #set($blog_dateFormat = "dd. MMMM, yyyy")
+        #end
+        #set($creationDateStr = $xwiki.formatDate($creationDate, $blog_dateFormat))
+      #end
+      #set($newsDate = "$!creationDateStr")
+      #set($newsTitle = "$!article.getTitle($language)")
+      #set($newsLink = $!bentrydoc.getURL("view"))
+      #set($newsContent = ${content})
+      #ouputNewsArticle()
+    #end ## maxNumArticle
+  #end ##foreach
+#else
+    #set($newsDate = "")
+    #set($newsTitle = "No news is good news.")
+    #set($newsLink = "")
+    #set($newsContent = "No news is good news.")
+    #ouputNewsArticle()
+#end
+{/pre}

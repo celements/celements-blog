@@ -1,0 +1,158 @@
+{pre}
+#macro(migrateDataToPublishDateVersion $spacename)
+  #set($newBlogEditor = "$!blogConfig_obj.getProperty('blogeditor').getValue()")
+  #if($migrateme && ("$!newBlogEditor" != ''))
+    ##  	migrating...
+    #set ($sql = ", BaseObject as obj")
+    #set ($sql = "${sql} where doc.web = '$spacename'")
+    #set ($sql = "${sql} and obj.name=doc.fullName")
+    #set ($sql = "${sql} and obj.className='XWiki.ArticleClass'")
+    #set ($sql = "${sql} and obj.name<>'XWiki.ArticleClassTemplate'")
+    #set($counter = 0)
+    #foreach ($item in $xwiki.searchDocuments($sql))
+      #set($bentrydoc = $xwiki.getDocument($item))
+      #set($bentryobj = '')
+	  #if($xwiki.isMultiLingual())
+        #set($bentryobj = $bentrydoc.getObject("XWiki.ArticleClass", "lang", $!{default_language}, false))
+	  #end
+	  #if("$!bentryobj" == '')
+	    #set($bentryobj = $bentrydoc.getObject("XWiki.ArticleClass", 0))
+	  #end
+      #if(("$!bentryobj" != '') && (("$!bentryobj.getProperty('blogeditor').getValue()" == '') || ("$!bentryobj.getProperty('publishdate').getValue()" == '') || ("$!bentryobj.getProperty('lang').getValue()" == '')))
+        #if("$!bentryobj.getProperty('blogeditor').getValue()" == '')
+          $bentryobj.set('blogeditor', $newBlogEditor)
+        #end
+        #if("$!bentryobj.getProperty('publishdate').getValue()" == '')
+          $bentryobj.set('publishdate', $bentrydoc.creationDate)
+        #end
+        #if("$!bentryobj.getProperty('lang').getValue()" == '')
+          $bentryobj.set('lang', "$!{default_language}")
+        #end
+      	$bentrydoc.save()
+      #end
+    #end ## #foreach
+  #end ## #if($migrateme && ("$!newBlogEditor" != ''))
+#end ## migrateDataToPublishDateVersion
+#set($cur_doc = $doc)
+#set($blogConfig_obj = $!cur_doc.getObject('Celements2.BlogConfigClass'))
+#set($complete = true)
+#set($changed = $!request.get("changed") == "1")
+#set($migrateme = "$!request.get('migrateme')" == "1")
+#set($spacename = "$!blogConfig_obj.getProperty('blogspace').getValue()")
+#if("$!blogConfig_obj" == '')
+  #set($blogConfig_obj = $cur_doc.newObject('Celements2.BlogConfigClass'))
+  $cur_doc.save()
+#end
+#if($changed && $complete)
+ ## if changed is true it is a save request (redirect after xwiki save)
+ #setAccessRights($spacename)
+ $xwiki.includeForm('celements2web:Macros.setBlogSpaceAccessRights',false)
+ #migrateDataToPublishDateVersion($spacename)
+ $context.getResponse().sendRedirect($cur_doc.getURL('view'))
+#else ## #if($changed && $complete)
+#if("$!blogConfig_obj.getProperty('blogeditor').getValue()" == '')
+ #set($migrateme = "&migrateme=1")
+#else
+ #set($migrateme = '')
+#end
+##
+##
+#if($xwiki.celementsweb.getVersionMode() == 'celements3')
+	<!-- load Blog Edit into Content Tab -->
+	<div id="con_titblock" class="titleblock">$adminMsg.get('cel_tm_blog_edit')</div>
+	<form id="edit" method="post" action="$cur_doc.getURL('save')">
+	<input type="hidden" name="xredirect" value="$cur_doc.getURL('edit','changed=1')$!{migrateme}" />
+	<input type="hidden" name="Celements2.BlogConfigClass_nb"   value="0" />
+#if($celementsweb.getPageType($doc.fullName).hasPageTitle())
+<div id="con_titleEdit" class="editblock">$adminMsg.get('cel_tm_title'):
+    <input id="pagetitle" name="title" class="fullwidth" value="$!tdoc.getTitle()" type="text"  onfocus="setFocus('con_titleEdit');" onblur="removeFocus('con_titleEdit');">
+</div>
+#end
+	<div id="con_blogSpace" class="editblock">$adminMsg.get('cel_tm_blog_space'):
+		<input size='30' value='$!spacename' name='Celements2.BlogConfigClass_0_blogspace' type='text' class="celements2_input" onfocus="setFocus('con_blogSpace');" onblur="removeFocus('con_blogSpace');"/>
+	</div>
+	<div id="con_viewType" class="editblock">$adminMsg.get('cel_tm_view_type'):
+		#set($viewTypeEditStr = $cur_doc.display('viewtype', 'edit', $blogConfig_obj))
+		##<!-- $debug.matches('.*\{pre\}.*'), $debug.matches('.*\{/pre\}.*') -->
+		${viewTypeEditStr.replaceAll('\{/?pre\}','')}
+	</div>
+	<div id="con_editorType" class="editblock">$adminMsg.get('cel_tm_editor_type'):
+		#set($editorTypeEditStr = $cur_doc.display('blogeditor', 'edit', $blogConfig_obj))
+		${editorTypeEditStr.replaceAll('\{/?pre\}','')}
+	</div>
+	<div id="con_hasComments" class="editblock">$adminMsg.get('cel_tm_has_comments'):
+		#set($hasCommentsEditStr = $cur_doc.display('has_comments', 'edit', $blogConfig_obj))
+		${hasCommentsEditStr.replaceAll('\{/?pre\}','')}
+    </div>
+    <div id="con_is_subscribable" class="editblock">$adminMsg.get('cel_tm_is_subscribable'):
+		#set($isSubscribableEditStr = $cur_doc.display('is_subscribable', 'edit', $blogConfig_obj))
+		${isSubscribableEditStr.replaceAll('\{/?pre\}','')}
+    </div>
+    <div id="con_subscribe_to" class="editblock">$adminMsg.get('cel_tm_subscribe_to'):
+        #set($blogObj = $doc.getObject('Celements2.BlogConfigClass'))
+        <input size='30' value="$!blogObj.getProperty('subscribe_to').getValue()" name='Celements2.BlogConfigClass_0_subscribe_to' type='text' class="celements2_input" onfocus="setFocus('con_subscribe_to');" onblur="removeFocus('con_subscribe_to');"/>
+    </div>
+    <div id="con_template" class="editblock">$adminMsg.get('cel_tm_edit_template'):
+      <input size='30' value="$!blogObj.getProperty('template').getValue()" name='Celements2.BlogConfigClass_0_template' type='text' class="celements2_input" onfocus="setFocus('con_subscribe_to');" onblur="removeFocus('con_subscribe_to');" />
+    </div>
+    <div id="con_newsletter" class="editblock">$adminMsg.get('cel_tm_edit_is_newsletter'):
+        #set($isNewsletterEditStr = $cur_doc.display('is_newsletter', 'edit', $blogConfig_obj))
+        ${isNewsletterEditStr.replaceAll('\{/?pre\}','')}
+    </div>
+    <div id="con_newsletter_from" class="editblock">$adminMsg.get('cel_tm_edit_newsletter_from'):
+      <input size='30' value="$!blogObj.getProperty('from_address').getValue()" name='Celements2.BlogConfigClass_0_from_address' type='text' class="celements2_input" onfocus="setFocus('con_newsletter_from');" onblur="removeFocus('con_newsletter_from');" />
+    </div>
+    <div id="con_newsletter_reply_to" class="editblock">$adminMsg.get('cel_tm_edit_newsletter_reply_to'):
+      <input size='30' value="$!blogObj.getProperty('reply_to_address').getValue()" name='Celements2.BlogConfigClass_0_reply_to_address' type='text' class="celements2_input" onfocus="setFocus('con_newsletter_reply_to');" onblur="removeFocus('con_newsletter_reply_to');" />
+    </div>
+    #* moeglichkeit vorhanden oder nicht?
+    <div id="con_unsubscribe" class="editblock">$adminMsg.get('cel_tm_edit_newsletter_unsubscribe'):
+        #set($isUnsubscribeInfoEditStr = $cur_doc.display('unsubscribe_info', 'edit', $blogConfig_obj))
+        ${isUnsubscribeInfoEditStr.replaceAll('\{/?pre\}','')}
+    </div> *#
+	#if($xwiki.exists("$cur_doc.fullName"))
+	#set($red = "$cur_doc.fullName")
+	#else
+	#set($red = "${space}.WebHome")
+	#end
+	<div id="con_cancelButton" class="buttonblock">
+		<input type="button" value="$adminMsg.get('cel_cancel')" onclick="window.location.href='$xwiki.getURL($red,'view')'" class="cancelButton"/>
+	</div>
+	</form>
+#else ##if($xwiki.celementsweb.getVersionMode() != 'celements3')
+<div style="width:100%">
+<div class="celements2_box">
+<div class="celements2_box_title">$adminMsg.get('cel_tm_blog_edit')</div>
+<form id="update" method="post" action="$cur_doc.getURL('save')">
+<input type="hidden" name="xredirect" value="$cur_doc.getURL('edit','changed=1')$!{migrateme}" />
+##<input type="hidden" name="changed" value="1" />
+<input type="hidden" name="Celements2.BlogConfigClass_nb"   value="0" />
+$adminMsg.get('cel_tm_blog_space'):
+<input size='30' value='$!spacename' name='Celements2.BlogConfigClass_0_blogspace' type='text' class="celements2_input"/>
+<br/>
+$adminMsg.get('cel_tm_view_type'):
+#set($viewTypeEditStr = $cur_doc.display('viewtype', 'edit', $blogConfig_obj))
+${viewTypeEditStr.replaceAll('\{/?pre\}','')}
+<br/>
+$adminMsg.get('cel_tm_editor_type'):
+#set($editorTypeEditStr = $cur_doc.display('blogeditor', 'edit', $blogConfig_obj))
+${editorTypeEditStr.replaceAll('\{/?pre\}','')}
+<br/>
+$adminMsg.get('cel_tm_has_comments'):
+#set($hasCommentsEditStr = $cur_doc.display('has_comments', 'edit', $blogConfig_obj))
+${hasCommentsEditStr.replaceAll('\{/?pre\}','')}
+<br/>
+<br/>
+#if($xwiki.exists("$cur_doc.fullName"))
+#set($red = "$cur_doc.fullName")
+#else
+#set($red = "${space}.WebHome")
+#end
+<input type="button" value="$adminMsg.get('cel_cancel')" onclick="window.location.href='$xwiki.getURL($red,'view')'" class="celements2_input_button" />
+<input type="submit" value="$adminMsg.get('cel_save')" class="celements2_input_button"/> 
+ </form>
+ </div>
+ </div>
+#end ## if celements2
+#end ## #if($changed && $complete)
+{/pre}

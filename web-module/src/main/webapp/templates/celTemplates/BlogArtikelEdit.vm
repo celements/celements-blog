@@ -1,0 +1,3 @@
+#if("$!context.action" == 'edit')
+$context.getResponse().sendRedirect($doc.getURL('inline'))
+#end

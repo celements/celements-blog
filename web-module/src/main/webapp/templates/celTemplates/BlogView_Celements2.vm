@@ -1,0 +1,235 @@
+{pre}
+##BlogView on celements2web.web.synventis.com
+
+
+#if("$!blogTitle" == '')
+#set($blogTitle = "$!doc.getObject('Content.Title').get('title')")
+#end
+#if("$!supressBlogTitle" == '')
+#set($supressBlogTitle = false)
+#end
+#set($blogConfig_obj = $!doc.getObject('Celements2.BlogConfigClass'))
+#if("$!blogConfig_obj" != '')
+#set($spacename = "$!blogConfig_obj.getProperty('blogspace').getValue()")
+#end
+#if("$!spacename" == '')
+#set($spacename = "$!doc.web")
+#end
+#if("$!request.xpage" == 'rdf')
+## RSS mode
+  #set($doc_name = "$!blogTitle")
+  #set($title = $!xwiki.getWebPreference("title"))
+  #if ("$title" != '')
+    #set($title = "$xwiki.parseContent($title) $!{doc_name}")
+  #else
+    #set($title = "$!{doc_name}")
+  #end
+  #set($blogSpace = $spacename)
+  #set ($baseurl =  "http://${request.serverName}")
+  #set($maxItems = 20)
+  $xwiki.includeForm("celements2web:Macros.BlogRssCode",true)
+#else
+## normal (XHTML) mode
+#set($viewtype = "$!blogConfig_obj.getProperty('viewtype').getValue()")
+#if("$!viewtype" == '')
+  #set($viewtype = 'extract')
+#end
+#set($has_comments = "$!blogConfig_obj.getProperty('has_comments').getValue()") 
+#if("$!has_comments" == '1')
+  #set($has_comments = true)
+#else
+  #set($has_comments = false)
+#end
+## blog editor: RTE or plain
+#set($blogeditor = "$!blogConfig_obj.getProperty('blogeditor').getValue()")
+##
+#if(("$!blogTitle" != '') && !$supressBlogTitle)
+<h1>$blogTitle</h1>
+#end
+## compose news context menu
+#set($className = 'XWiki.ArticleClass')
+$xwiki.includeForm('celements2web:Macros.getNextObjPageId', false) ##returns $next_id
+#set($default_language = "$!xwiki.getWebPreference('default_language')")
+#set($contextMenu = "")
+#if($hasedit && $context.getAction() == "view")
+  #set($new_name = "${spacename}.Article$next_id")
+  #if($has_comments)
+    #set($hasCommentsURL = '1')
+  #else
+    #set($hasCommentsURL = '0')
+  #end
+  #set($Q = '"') ## Ugly, in velocity there is no way to escape the double quote character
+  #set($q = "'")
+  #set($contextMenu = 'oncontextmenu="return myContextMenu.show(event, new Array(')
+  #set($l = "${q}window.location.href=&quot;$xwiki.getURL($new_name, 'inline')?template=XWiki.ArticleClassTemplate&id=${next_id}&blogeditor=${blogeditor}&language=${default_language}&has_comments=${hasCommentsURL}&quot;${q}")
+  #set($t = "${q}Add Article${q}")
+  #set($p = "null")
+  #set($contextMenu = "${contextMenu}new ContextMenuItem(${l},${t}, ${p})")
+  #set($contextMenu = "${contextMenu}));${Q}")
+#end
+##
+<div $!contextMenu id="articles_start">
+#set($inbitems = 10)
+#if($!context.getRequest().get("nbstart") != "")
+  #set($inbstart = $xwiki.parseInt($!context.getRequest().get("nbstart")))
+#else
+  #set($inbstart = 0)
+#end
+##
+#set($isoldblog = ("$!blogeditor" == ''))
+#if($isoldblog)
+## use old query with creationDate.
+## This blog gets migrated on next safe of the blog-config
+##
+#set ($sql = ", BaseObject as obj")
+#set ($sql = "${sql} where doc.web = '$spacename'")
+#set ($sql = "${sql} and obj.name=doc.fullName")
+#set ($sql = "${sql} and obj.className='XWiki.ArticleClass'")
+#set ($sql = "${sql} and obj.name<>'XWiki.ArticleClassTemplate'")
+#set ($sql = "${sql} order by doc.creationDate desc")
+#else
+#set ($sql = ", BaseObject as obj, DateProperty as date, StringProperty as lang")
+#set ($sql = "${sql} where doc.web = '$spacename'")
+#set ($sql = "${sql} and obj.name=doc.fullName")
+#set ($sql = "${sql} and obj.className='XWiki.ArticleClass'")
+#set ($sql = "${sql} and obj.name<>'XWiki.ArticleClassTemplate'")
+#set ($sql = "${sql} and lang.id.id=obj.id")
+#set ($sql = "${sql} and lang.id.name='lang'")
+#set ($sql = "${sql} and lang.value = '$default_language'")
+#set ($sql = "${sql} and obj.id = date.id.id")
+#set ($sql = "${sql} and date.id.name='publishdate'")
+#if(!$hasedit)
+#set ($sql = "${sql} and date.value <= now()")
+#end
+#set ($sql = "${sql} order by date.value desc, doc.creationDate desc")
+#end
+#set($cdate = "")
+#set($counter = 0)
+<!-- $sql -->
+#set($articles = $xwiki.searchDocuments($sql, $inbitems, $inbstart))
+#if($articles.size() > 0)
+  #foreach ($item in $articles)
+    #set($counter = $counter+1)
+    #set($bentrydoc = $xwiki.getDocument($item))
+    #set($bentryobj = '')
+  #if($xwiki.isMultiLingual())
+    #set($bentryDefObj = $bentrydoc.getObject("XWiki.ArticleClass", "lang", $!{default_language}, false))
+    #set($bentryobj = $bentrydoc.getObject("XWiki.ArticleClass","lang",$language))
+    #if(("$!bentryobj" == '') || ($!bentryobj.getProperty('content').getValue() == ""))
+    	#set($bentryobj = $bentryDefObj)
+    #end
+  #else
+    #set($bentryDefObj = $bentrydoc.getObject("XWiki.ArticleClass", 0))
+  #end
+  ## if we still have not found a valid article object it might be that the Article
+  ## class is not yet updated to multilingual or multilingual is switched off.
+  #if("$!bentryobj" == '')
+    #set($bentryobj = $bentrydoc.getObject('XWiki.ArticleClass'))
+  #end
+	  	## compose article context menu
+		  #set($contextMenu = "")
+			 #if($hasedit && $context.getAction() == "view")
+			   #set($Q = '"') ## Ugly, in velocity there is no way to escape the double quote character
+			   #set($q = "'")
+			   #set($contextMenu = 'oncontextmenu="return myContextMenu.show(event, new Array(')
+##
+      ## Edit Article
+      #set($l = "${q}window.location.href=&quot;$xwiki.getURL($bentrydoc.getFullName(), 'inline')&quot;${q}")
+      #set($t = "${q}Edit Article${q}")
+      #set($p = "null")
+      #set($contextMenu = "${contextMenu}new ContextMenuItem(${l},${t}, ${p}),")
+##
+      ## Delete Article
+      #set($l = "${q}confirmURL(&quot;Do you really want to delete this news article?&quot;,&quot;$xwiki.getURL($bentrydoc.getFullName(), 'delete')?confirm=1&quot;)${q}")
+      #set($t = "${q}Delete Article${q}")
+      #set($p = "null")
+      #set($contextMenu = "${contextMenu}new ContextMenuItem(${l},${t}, ${p})")
+      #set($contextMenu = "${contextMenu}));${Q}")
+		  #end
+##
+  #if($isoldblog)
+    #set($creationDate = $xwiki.formatDate($bentrydoc.creationDate,"dd. MMMM, yyyy"))
+  #else
+    #set($creationDate = $xwiki.formatDate($bentryDefObj.getProperty('publishdate').getValue(),"dd. MMMM, yyyy"))
+    #set($additionalArticleClass = '')
+    #if($xwiki.getCurrentDate().before($bentryDefObj.getProperty('publishdate').getValue()))
+      #set($additionalArticleClass = " future")
+    #end
+  #end
+    <div class="article_abstract$!{additionalArticleClass}" $!contextMenu>
+##
+    #if($cdate!=$creationDate)
+      <div class="article_date">
+        $creationDate        
+      </div>
+      #set ($cdate = $creationDate)
+    #end
+##
+	#set($fullTextLink = "$xwiki.getURL($bentrydoc.fullName,'view')")
+    <div class="article_title h1">
+    #if("$!viewtype" == 'extract')<a class='article_link' href="$fullTextLink">#end
+    $bentrydoc.display("title","view", $bentryobj)##
+    #if("$!viewtype" == 'extract')</a>#end</div>
+    <div class="text">
+##
+    #if("$!viewtype" == 'extract')
+      ##TODO: fix [..] and Mehr to a variable version.
+      #set($content = $bentrydoc.display('extract', 'view', $bentryobj))
+	    #if("$!content" == '')
+	      #set($content = $bentrydoc.display('content', 'view', $bentryobj))
+	      #if($content.length() > 250)
+	        #set($i = $content.lastIndexOf(" ",250))
+	        #set($i = $i + 1)
+	        #set($content = "${content.substring(0,$i)} ... <a class='article_link' href='$xwiki.getURL($bentrydoc.fullName,'view')'>Mehr</a>")
+	      #end
+	    #else
+	      #set($content = "${content} <a class='article_link' href='$fullTextLink'>{pre}[ $msg.get('cel_rls_blog_article_more') ]{/pre}</a>")
+	    #end
+    #elseif("$!viewtype" == 'full')
+      #set($content = $bentrydoc.display('content', 'view', $bentryobj))
+    #end
+    $xwiki.renderText($content, $bentrydoc)
+    #if($has_comments)
+<div class="comment">
+      <a class='article_link' href="$fullTextLink">
+      #set($comment_obj = $!bentrydoc.getObjects('XWiki.XWikiComments'))
+      #set($commentCount = 0)
+      #if("$!comment_obj" != '')
+        #foreach($comment in $comment_obj)
+          #set($commentCount = $commentCount + 1)
+        #end
+      #end
+      #if($commentCount == 1)
+        ##TODO refactor for multilingual ('Kommentare')
+        $commentCount Kommentar
+      #else
+        ##TODO refactor for multilingual ('Kommentare')
+        $commentCount Kommentare
+      #end
+      </a>
+</div>
+    #end
+    </div> <!-- article_content -->
+    </div> <!-- article_abstract -->
+  #end ##foreach
+##
+##
+<div style="float: right; margin-top:20px;margin-right: 30px">
+##
+#if ($inbstart!=0)
+  #set($iprev = $inbstart - $inbitems)
+  <a class='article_link' href="$doc.getURL('view')?nbstart=${iprev}">Neuer</a>
+#end
+#if($counter==$inbitems)
+  #set($inext = $inbstart + $inbitems)
+  <a class='article_link' href="$doc.getURL('view')?nbstart=${inext}">&Auml;lter</a>
+#end
+</div>
+##
+#else
+No news is good news.
+#end
+</div> <!-- articles_start -->
+##
+#end
+{/pre}

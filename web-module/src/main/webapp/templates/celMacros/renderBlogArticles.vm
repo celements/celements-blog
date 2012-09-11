@@ -1,0 +1,10 @@
+{pre}
+#if($articles.size() > 0)
+  #set($cdate = '')
+  #foreach($article in $articles)
+   $xwiki.includeForm('celements2web:Macros.renderOneBlogArticle',false)
+  #end
+#else
+No news is good news.
+#end
+{/pre}

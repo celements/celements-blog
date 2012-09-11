@@ -1,0 +1,92 @@
+{pre}
+    #set($articleBlogMoreLinkParams = "$!articleBlogMoreLinkParams")
+    #set($bentrydoc = $xwiki.getDocument("$article.getDocName()"))
+    #set($creationDate = '')
+    #set($creationDateStr = '')
+    #set($creationDate = $article.getPublishDate())
+    #if("$!creationDate" != '')
+      #set($blog_dateFormat = $msg.get('cel_blog_dateformat'))
+      #if("$!blog_dateFormat" == '')
+      ##TODO i18n issue: we must use java DateFormat for given language.
+      #set($blog_dateFormat = "dd. MMMM, yyyy")
+      #end
+      #set($creationDateStr = $xwiki.formatDate($creationDate, $blog_dateFormat))
+    #end
+    #set($additionalArticleClass = '')
+    #if(("$!creationDate" != '') && $xwiki.getCurrentDate().before($!creationDate))
+      #set($additionalArticleClass = " future")
+    #end
+    <div class="cel_cm_blog_article article_abstract$!{additionalArticleClass}" id="Art${blogDoc.getFullName()}:${bentrydoc.getFullName()}">
+    #if($showArticleBlogName)
+      <div class="article_blogPageName">
+      #set($articleBlogDoc = '')
+      #set($articleBlogDoc = $xwiki.getDocument("$!article.getDocName()"))
+      #set($blogspaceName = "$!articleBlogDoc.getSpace()")
+      $xwiki.includeForm('celements2web:Macros.getBlogPageByBlogSpace', false)
+      #set($blogPageName = '')
+      #set($blogPageName = $blogDocument.getTitle())
+      #if(("$!blogPageName" == ''))
+        #set($blogPageName = $articleBlogDoc.name)
+      #end
+      $blogPageName
+      </div>
+    #end
+    #if($cdate!=$creationDate)
+      <div class="article_date">
+        $creationDateStr
+      </div>
+      #set ($cdate = $creationDate)
+    #end
+    #set($fullTextLink = "$xwiki.getURL($article.getDocName(),'view', $articleBlogMoreLinkParams)")
+    <div class="article_title $!{article.getTitleLang($language)} h1">
+    #if("$!viewtype" == 'extract')<a class='article_link' href="$fullTextLink">#end
+    $article.getTitle($language)
+    #if("$!viewtype" == 'extract')</a>#end</div>
+    <div class="text $!{article.getExtractLang($language, $viewtypefull)}">
+    #if("$!viewtype" == 'extract')
+      #set($viewtypefull = false)
+    #elseif("$!viewtype" == 'full')
+      #set($viewtypefull = true)
+    #end
+    #set($content = $article.getExtract("$language", $viewtypefull))
+    #if($article.hasMoreLink("$language", $viewtypefull))
+      #if($article.hasMoreLinkDots("$language", $viewtypefull))
+        #set($content = "$content ...")
+      #end
+      <!-- moreLink: $language , $msg.get('cel_rls_blog_article_more') -->
+      #set($content = "$content <a class='article_link' href='$xwiki.getURL($article.getDocName(),'view', $articleBlogMoreLinkParams)'>$msg.get('cel_rls_blog_article_more')</a>")
+    #end
+    $xwiki.renderText($content, $bentrydoc)
+    #if($has_comments)
+      #if($viewtypefull)
+#set($inline = true)
+#set($articleDoc = $xwiki.getDocument($article.getDocName()))
+$xwiki.includeForm("celements2web:Macros.getInlineBlogComments", false)
+      #else
+      <div class="comment">
+      <a class='article_link' href="$fullTextLink">
+      #set($comment_obj = $!bentrydoc.getObjects('XWiki.XWikiComments'))
+      #set($commentCount = 0)
+      #if("$!comment_obj" != '')
+        #foreach($comment in $comment_obj)
+          #set($commentCount = $commentCount + 1)
+        #end
+      #end
+      #if($commentCount == 1)
+        $commentCount $adminMsg.get('cel_tm_comment')
+      #else
+        $commentCount $adminMsg.get('cel_tm_comments')
+      #end
+      </a>
+      </div>
+    #end ## no full view
+    #end
+    </div> <!-- article_content -->
+    <div class="clearleft"><!-- required:floating images --></div>
+    #if(($article.getDocName().indexOf("$!{spacename}.") != 0) && $article.isSubscribable() && $article.isFromSubscribableBlog("$blogDoc.getFullName()"))
+      #set($blogSaveArticle = $bentrydoc)
+      #set($blogSaveSpace = "$doc.fullName")
+      $xwiki.includeForm('Macros.blogArticleSubscribeBar', false)
+    #end
+    </div> <!-- article_abstract -->
+{/pre}

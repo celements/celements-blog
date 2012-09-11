@@ -1,0 +1,8 @@
+{pre}
+## deprecated!! use BlogView instead!!!
+#set($blogDoc = $!xwiki.getDocument("Content.${doc.getSpace()}"))
+#if("$!blogDoc" != '')
+<h1><a class="h1" href="$!blogDoc.getURL('view')">$!blogDoc.getObject("Content.Title").title</a></h1>
+#end
+$xwiki.celementsweb.renderDocument($!tdoc)
+{/pre}

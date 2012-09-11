@@ -1,0 +1,64 @@
+{pre}
+<div class="cel_blog"><div class="el_blog" ##
+style="font-family:Arial,Geneva,Helvetica,Verdana,sans-serif; ##
+margin-left: auto; margin-right: auto; ##
+display:block; margin-top:20px; ##
+padding:0px; width: 590px; ##
+">
+#set($blogSpace = "$!request.get('space')")
+#if($xwiki.isMultiLingual())
+    #set($defObj = $doc.getObject("XWiki.ArticleClass", "lang", $!{default_language}, false))
+    #set($obj = $doc.getObject("XWiki.ArticleClass","lang",$language))
+    #if(("$!obj" == '') || ($!obj.getProperty('content').getValue() == ""))
+        #set($obj = $defObj)
+    #end
+#else
+    #set($defObj = $doc.getObject("XWiki.ArticleClass", 0))
+#end
+#set($blogDoc = $xwiki.celementsblog.getBlogPageByBlogSpace("${doc.web}"))
+<h1 class="rlstitle" style="display: block; font-size: 14px;##
+font-weight: bold; height: 32px; line-height: 14px;##
+padding-top: 1px;">$!blogDoc.getTitle()</h1>
+## if we still have not found a valid article object it might be that the Article
+## class is not yet updated to multilingual or multilingual is switched off.
+#if("$!obj" == '')
+    #set($obj = $doc.getObject('XWiki.ArticleClass'))
+#end
+#if("$!obj" != '')
+    #set($has_comments = '0')
+    #if($obj.getProperty('hasComments').getValue() && ("$!obj.getProperty('hasComments').getValue()" == '1'))
+        #set($has_comments = '1')
+    #end
+    ## blog editor: RTE or plain
+    #set($blogeditor = "$!defObj.getProperty('blogeditor').getValue()")
+    #set($isoldblog = ("$!blogeditor" == ''))
+    #if($isoldblog)
+        #set($creationDate = $xwiki.formatDate($doc.creationDate,"dd. MMMM, yyyy"))
+    #else
+    #set($creationDate = $xwiki.formatDate($defObj.getProperty('publishdate').getValue(),"dd. MMMM, yyyy"))
+    #set($additionalArticleClass = '')
+    #if($xwiki.getCurrentDate().before($defObj.getProperty('publishdate').getValue()))
+        #set($additionalArticleClass = " future")
+    #end
+#end
+#set($bentrydoc = $doc)
+$xwiki.includeForm('celements2web:Macros.getArticleContext', false)
+<style type="text/css">
+.el_blog p {
+    margin: 0px;
+    padding: 0px;
+}
+</style>
+<div class="article_detail$!{additionalArticleClass}" ##
+style="background-color:#E6E6E6; ##
+border-top:1px solid #E6E6E6; display:block; margin-bottom:20px; ##
+padding:14px 20px 15px; width: 550px;" $!contextMenu>
+    <div class="text" style="font-family:Arial,Geneva,Helvetica,Verdana,sans-serif;##
+font-size:14px; line-height:20px; margin:0; padding:0;">$doc.display("content", "rendered", $obj)</div><!-- article_content -->
+    <div class="clearleft" style="clear:left; display:block; font-size:1px;##
+height:0; line-height:1px; margin:0; padding:0;"><!-- required:floating images --></div>
+</div><!--article_detail-->
+#end ## #if("$!obj" != '')
+#set($renderDocumentRecursionHistory = "${renderDocumentRecursionHistory}${doc.fullName} ")
+</div></div>
+{/pre}
