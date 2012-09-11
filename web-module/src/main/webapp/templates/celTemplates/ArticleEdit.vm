@@ -1,7 +1,4 @@
-#set($celSkin_doc = $xwiki.getDocument("celements2web:XWiki.Celements2Skin"))
-#if("$!celSkin_doc" != '')
-$celementsweb.addExtJSfileOnce($celSkin_doc.getAttachmentURL('article-edit.js', 'skin'))
-#end
+$celementsweb.addExtJSfileOnce(':celJS/article-edit.js')
 #set($id = $!context.getRequest().get('id'))
 #set($blogeditor = $!context.getRequest().get('blogeditor'))
 #set($deflang_obj = $doc.getObject('XWiki.ArticleClass','lang',"$default_language"))
