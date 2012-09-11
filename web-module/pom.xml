@@ -60,4 +60,7 @@
       <version>1.11-SNAPSHOT</version>
     </dependency>
   </dependencies>
+  <build>
+    <finalName>blog-web</finalName>
+  </build>
 </project>
