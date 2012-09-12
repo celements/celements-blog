@@ -1,0 +1,76 @@
+#set($sqlBlogSpace = '')
+#if(!$maxItems)
+#set($maxItems = 0) ##all items
+#end
+#if(!$startAtItem)
+#set($startAtItem = 0)
+#end
+#if("$!blogSpace" != '')
+#set($sqlBlogSpace = "doc.web='$blogSpace' and")
+#end
+#if(!$sql)
+#set ($sql = ", BaseObject as obj where $!{sqlBlogSpace} obj.name=doc.fullName and obj.className='XWiki.ArticleClass' and obj.name<>'XWiki.ArticleClassTemplate' order by doc.date desc")
+#end
+#set($list = $xwiki.searchDocuments($sql , $maxItems , $startAtItem))
+#set($rsvc= $xwiki.xWiki.getRightService())
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:wiki="http://purl.org/rss/1.0/modules/wiki/" 
+encoding="$xwiki.encoding" >
+<channel rdf:about="$baseurl">
+<title>$title</title>
+<link>$baseurl</link>
+<description>
+$!description
+</description>
+<image rdf:resource="${baseurl}/xwiki/skins/default/logo.gif" />
+<dc:language>$doc.defaultLanguage</dc:language>
+<dc:rights>$xwiki.webCopyright</dc:rights>
+<dc:publisher>$doc.author</dc:publisher>
+<dc:creator>$doc.author</dc:creator>
+<items>
+<rdf:Seq>
+#foreach ($item in $list)
+#if($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
+#set($currentdoc = $xwiki.getDocument($item))
+<rdf:li rdf:resource="${baseurl}/xwiki/bin/view/${currentdoc.web}/${currentdoc.name}" />
+#end
+#end
+</rdf:Seq>
+</items>
+</channel>
+<image rdf:about="${baseurl}/xwiki/skins/default/logo.gif">
+  <title>Logo</title>
+  <link>${baseurl}</link>
+  <url>${baseurl}/xwiki/skins/default/logo.gif</url>
+</image>
+#foreach ($item in $list)
+#if ($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
+#set($currentdoc = $xwiki.getDocument($item))
+#set($url = "/xwiki/bin/view/${currentdoc.web}/${currentdoc.name}")
+#set($currentobj = $currentdoc.getObject('XWiki.ArticleClass'))
+#set($content = "$!currentobj.getProperty('extract').getValue()")
+#if("$!content" == '')
+#set($content = $currentdoc.display("content"))
+#if($content.length() >= 250)
+#set($i = $content.lastIndexOf(" ",250))
+#set($i = $i + 1)
+#set($Q = '"')
+#set($content = "${content.substring(0,$i)} ... <a href=${Q}${url}${Q}>continue</a>")
+#end
+#end
+#set($desc = $xwiki.getXMLEncoded($xwiki.renderText($content, $doc)))
+<item rdf:about="${baseurl}$url">
+<title>$xwiki.formatDate($currentdoc.date, "dd/MM/yyyy") : $currentdoc.display("title")</title>
+<link>${baseurl}$url</link>
+<description>
+$desc
+</description>
+<dc:date>$currentdoc.date</dc:date>
+<dc:contributor>
+<rdf:Description link="">
+<rdf:value>$currentdoc.author</rdf:value>
+</rdf:Description>
+</dc:contributor>
+</item>
+#end
+#end
+</rdf:RDF>

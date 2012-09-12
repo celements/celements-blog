@@ -76,7 +76,7 @@ $response.setDateHeader("Last-Modified", $lastChanged.getTime())
   #set($blogSpace = $spacename)
   #set ($baseurl =  "http://${request.serverName}")
   #set($maxItems = 20)
-  $xwiki.includeForm("celements2web:Macros.BlogRssCode",false)
+  #parse('celMacros/BlogRssCode.vm')
 #else
 ## normal (XHTML) mode
 #set($viewtype = "$!blogConfig_obj.getProperty('viewtype').getValue()")
@@ -150,9 +150,11 @@ $response.setDateHeader("Last-Modified", $lastChanged.getTime())
 #end
 <div class="cel_cm_blog_article" id="articles_start:$isarchive:$!{spacename}:">
 #if(("$!renderArticlesMacro" == '') || !$xwiki.exists($renderArticlesMacro))
-  #set($renderArticlesMacro = 'celements2web:Macros.renderBlogArticles')
-#end
+  #set($renderArticlesMacro = 'celMacros/renderBlogArticles.vm')
+  #parse('celMacros/renderBlogArticles.vm')
+#else
    $xwiki.includeForm("$renderArticlesMacro", false)
+#end
 </div> <!-- articles_start -->
 ##
 #end
