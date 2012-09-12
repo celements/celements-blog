@@ -27,7 +27,9 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -36,6 +38,7 @@ import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.api.Property;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 
 public class Article extends Api{
 
@@ -73,7 +76,7 @@ public class Article extends Api{
   public void init(Object obj, String space){
     if (articleObj == null) {
       articleObj = new HashMap<String, Object>();
-      defaultLang = context.getWiki().getWebPreference("default_language", space, "", context);
+      defaultLang = context.getWiki().getSpacePreference("default_language", space, "", context);
     }
     LOGGER.debug("Init Article Object");
     if (obj != null) {
@@ -257,7 +260,18 @@ public class Article extends Api{
     }
     return result;
   }
-  
+
+  public DocumentReference getDocumentReference() {
+    if (articleObj.size() > 0) {
+      return getWebService().resolveDocumentReference(articleObj.get(0).getName());
+    }
+    return null;
+  }
+
+  /**
+   * @deprecated since 2.18.0 instead use getDocumentReference()
+   */
+  @Deprecated
   public String getDocName(){
     for (Iterator<String> iterator = articleObj.keySet().iterator();
         iterator.hasNext();) {
@@ -353,4 +367,9 @@ public class Article extends Api{
     }
     return hasMoreLinkDots.get(lang);
   }
+
+  private IWebUtilsService getWebService() {
+    return Utils.getComponent(IWebUtilsService.class);
+  }
+
 }
