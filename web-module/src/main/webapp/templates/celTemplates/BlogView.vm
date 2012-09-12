@@ -33,7 +33,7 @@ $context.setCacheDuration(0)
 #set($spacename = "$!blogConfig_obj.getProperty('blogspace').getValue()")
 #end
 #if("$!spacename" == '')
-#set($spacename = "$!blogDoc.web")
+#set($spacename = "$!blogDoc.space")
 #end
 #set($blog_template = "$!blogConfig_obj.getProperty('template').getValue()")
 #if("$!blog_template" == '')
@@ -41,10 +41,10 @@ $context.setCacheDuration(0)
 #end
 ##
 #set ($sql = " where")
-#set ($sql = "${sql} (doc.web = '$spacename'")
+#set ($sql = "${sql} (doc.space = '$spacename'")
 #foreach($subscSpace in $subscriptions) 
   #if("$!subscSpace" != '')
-    #set ($sql = "${sql} or doc.web='$subscSpace'")
+    #set ($sql = "${sql} or doc.space='$subscSpace'")
   #end
 #end
 #set ($sql = "${sql}) order by doc.date desc")
