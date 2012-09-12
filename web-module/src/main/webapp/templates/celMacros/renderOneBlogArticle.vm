@@ -21,7 +21,7 @@
       #set($articleBlogDoc = '')
       #set($articleBlogDoc = $xwiki.getDocument("$!article.getDocName()"))
       #set($blogspaceName = "$!articleBlogDoc.getSpace()")
-      $xwiki.includeForm('celements2web:Macros.getBlogPageByBlogSpace', false)
+      #set($blogDocument = $xwiki.celementsblog.getBlogPageByBlogSpace($blogspaceName))
       #set($blogPageName = '')
       #set($blogPageName = $blogDocument.getTitle())
       #if(("$!blogPageName" == ''))
@@ -60,7 +60,7 @@
       #if($viewtypefull)
 #set($inline = true)
 #set($articleDoc = $xwiki.getDocument($article.getDocName()))
-$xwiki.includeForm("celements2web:Macros.getInlineBlogComments", false)
+#parse('celMacros/getInlineBlogComments.vm')
       #else
       <div class="comment">
       <a class='article_link' href="$fullTextLink">
@@ -85,6 +85,6 @@ $xwiki.includeForm("celements2web:Macros.getInlineBlogComments", false)
     #if(($article.getDocName().indexOf("$!{spacename}.") != 0) && $article.isSubscribable() && $article.isFromSubscribableBlog("$blogDoc.getFullName()"))
       #set($blogSaveArticle = $bentrydoc)
       #set($blogSaveSpace = "$doc.fullName")
-      $xwiki.includeForm('Macros.blogArticleSubscribeBar', false)
+#parse('celMacros/blogArticleSubscribeBar.vm')
     #end
     </div> <!-- article_abstract -->

@@ -1,0 +1,55 @@
+{pre}
+## INPUT $blogArticleSubscriptionObj, $blogSaveArticle, $blogSaveSpace
+#set($articleDoc = $xwiki.getDocument("$!request.get('article')"))
+#set($subscriberSpace = "$!request.get('subscriber')")
+#if($hasEdit || $xwiki.checkAccess("$subscriberSpace", 'edit'))
+  #if("$!request.get('doSubscribe')" != '')
+    #set($subscriptionObj = $articleDoc.getObject('Celements2.BlogArticleSubscriptionClass', 'subscriber', "$subscriberSpace", false))
+    #if("$!subscriptionObj" == '')
+      #set($subscriptionObj = $articleDoc.newObject('Celements2.BlogArticleSubscriptionClass'))
+      $subscriptionObj.set('subscriber', "$subscriberSpace")
+    #end
+    #set($value = $xwiki.parseInt("$!request.get('doSubscribe')"))
+    $value - $value.class
+    $subscriptionObj.set('doSubscribe', $value)
+    $articleDoc.saveWithProgrammingRights()
+    Changes saved.
+  #else
+    #set($additionalClasses = '')
+    #set($isSubscribed = '')
+    #set($isNotSubscribed = '')
+    #set($subscr = '')
+    #set($subscr = $article.isSubscribed())
+    #if("$!subscr" != '')
+      #if($subscr)
+        #set($additionalClasses = "$additionalClasses subscribed")
+        #set($isSubscribed = 'checked="checked"')
+      #else
+        #set($additionalClasses = "$additionalClasses unsubscribed")
+        #set($isNotSubscribed = 'checked="checked"')
+      #end
+    #else
+      #set($additionalClasses = "$additionalClasses undecided")
+    #end
+    <div class="subscribeToArticle $additionalClasses">
+      <div class="changeSubscription">$adminMsg.get('cel_blog_subscriber_show')
+        $adminMsg.get("yesno_1")<input type="radio" name="subscribe$!velocityCount" value="1" onclick="execAjax('${blogSaveArticle}', value);" $!isSubscribed/>
+        <input type="radio" name="subscribe$!velocityCount" value="0" onclick="execAjax('${blogSaveArticle}', value);" $!isNotSubscribed/>$adminMsg.get("yesno_0")
+      </div><!-- /changeSubscription -->
+      <div class="infoText">$adminMsg.get('cel_blog_subscriber_notice', ["$!blogPageName"])</div><!-- /infoText -->
+    </div><!-- /subscribeToArticle -->
+    <script type="text/javascript">
+      var execAjax = function(article, value){
+        ajax('article=' + article + '&subscriber=${blogSaveSpace}&doSubscribe=' + value);
+      }
+      var ajax = function(url){
+        #set($extension = "xpage=plainpagetype&")
+        var urlPrefix = "/Macros/blogArticleSubscribeBar?$extension";
+        new Ajax.Request(urlPrefix + url, { method: 'get' });
+      }
+    </script>
+  #end
+#else
+<!--  Abo needs edit  right -->
+#end
+{/pre}

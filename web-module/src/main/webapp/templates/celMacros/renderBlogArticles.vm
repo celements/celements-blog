@@ -1,7 +1,7 @@
 #if($articles.size() > 0)
   #set($cdate = '')
   #foreach($article in $articles)
-   $xwiki.includeForm('celements2web:Macros.renderOneBlogArticle',false)
+   #parse('celMacros/renderOneBlogArticle.vm')
   #end
 #else
 No news is good news.

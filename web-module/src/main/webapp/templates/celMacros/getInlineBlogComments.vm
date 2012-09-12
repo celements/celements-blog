@@ -1,0 +1,79 @@
+{pre}
+## getInlineBlogComments
+##
+## INPUT (optional) : $commentAddRedirect (default: $doc.getURL('view') )
+## INPUT (optional) : $articleDoc (default: $doc)
+##
+## List article comments
+###
+#if("$!articleDoc" == '')
+  #set($articleDoc = $doc)
+#end
+#if($xwiki.getWebPreferenceAsInt("commentsorder",1)==1)
+#set($comments = $articleDoc.getComments())
+#else
+#set($comments = $articleDoc.getComments(false))
+#end
+#set($commentsId = "commentscontent$!{articleDoc.getName()}")
+#set($commentsWrapperId = "comments$!{articleDoc.getName()}")
+  <div id="$commentsId" class="xwikiintracontent">
+#if($inline && ($inline == true)) 
+	<div class="xwikititlewrapper" onclick="toggleClass($('${commentsWrapperId}'), 'hidden'); toggleClass($('${commentsId}'), 'exp')">
+	<h3 class="xwikiintratitle">$msg.get("comments")<span class="hidden">:</span><span class="commentsno"><span>$comments.size()</span></span></h3></div>
+#end
+    <div id="${commentsWrapperId}">
+#if($comments.size()>0)
+#foreach($comment in $comments)
+#if($velocityCount > 1)    <hr class="commentspacer"/>
+#end
+    <div id="xwikicomment_${velocityCount}" class="xwikicomment #if($velocityCount % 2 == 1) odd #else even #end">
+##      <div class="commentavatar">#useravatar($comment.author)</div>
+      <div class="commentheader"><span class="commentauthor">$!xwiki.getLocalUserName($articleDoc.display('author','view', $comment))</span>
+## #set($date = $articleDoc.display("date","view",$comment))
+#set($date = $comment.getProperty("date").value)
+#if($date)
+ | <span class="commentdate">$xwiki.formatDate($date, "dd.MM.yyyy") $msg.get("at") $xwiki.formatDate($date, "hh:mm a")</span>
+#end
+#if($hasEdit)<span class="commentdelete"><a class="commentremove" href="$articleDoc.getURL("objectremove" , "classname=XWiki.XWikiComments&amp;classid=${comment.number}&amp;xredirect=${request.getRequestURL()}")" onclick="return confirm('$msg.get("confirmcommentremove")')">[$msg.get("removethiscomment")]</a></span>#end
+      </div>
+      <div class="commentcontent">$articleDoc.getRenderedContent($articleDoc.display("comment","view",$comment))</div>
+    </div>
+#end
+#else
+$msg.get("nocomments")
+#end
+#if($xwiki.hasAccessLevel("comment"))
+#set($cclass = $xwiki.getDocument("XWiki.XWikiComments").getxWikiClass())
+#set($comment = $cclass.newObject())
+#if("$!commentAddRedirect" == '')
+#set($commentAddRedirect = ${doc.getURL('view')})
+#end
+      <form action="$articleDoc.getURL("commentadd")" method="post">
+        <fieldset class="commentform expanded">
+        <legend onclick="toggleForm(this.form)">$msg.get("addcomment")<span class="expands">...</span></legend>
+        <input type="hidden" name="xredirect" value="$commentAddRedirect" />
+        <input type="hidden" name="XWiki.XWikiComments_author" value="$context.user"/>
+        <input type="hidden" name="XWiki.XWikiComments_date" value=""/>
+        <div><textarea id='XWiki.XWikiComments_comment' rows='5' cols="80" name='XWiki.XWikiComments_comment' style="width: 100%;"></textarea></div>
+        <div>
+        <span class="buttonwrapper"><input type="submit" value="$msg.get("addcomment")" class="button"/></span>
+        <span class="buttonwrapper"><input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/></span>
+        </div>
+        </fieldset>
+      </form>
+#end
+    </div> ## comments
+  </div> ## commentscontent
+#if($inline && ($inline == true))
+      <script type="text/javascript">
+//<![CDATA[
+var commentForms = $$('#${commentsId} .commentform');
+if(commentForms && commentForms[0]) {
+  commentForms[0].addClassName('collapsed');
+  commentForms[0].removeClassName('expanded');
+}
+$('$commentsWrapperId').addClassName('hidden');
+//]]>
+      </script>
+#end
+{/pre}
