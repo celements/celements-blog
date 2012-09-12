@@ -81,7 +81,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase{
     List<Object> list = new ArrayList<Object>();
     list.add(obj);
     list.add(frObj);
-    expect(xwiki.getWebPreference(eq("default_language"), eq("space"), eq(""), 
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("space"), eq(""), 
         same(context))).andReturn("de");
     replay(xwiki);
     article = new Article(list, "space", context);
@@ -116,7 +116,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase{
     List<Object> list = new ArrayList<Object>();
     list.add(obj);
     list.add(frObj);
-    expect(xwiki.getWebPreference(eq("default_language"), eq("space"), eq(""), 
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("space"), eq(""), 
         same(context))).andReturn("de");
     replay(xwiki);
     article = new Article(list, "space", context);
@@ -161,7 +161,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase{
     expect(articleDoc.getXObjects(eq(articleClassRef))).andReturn(articleObjs);
     DocumentReference articleDocRef = new DocumentReference("xwikidb", "News", "Bla");
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq("News"), eq(""),
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
     replay(articleDoc, xwiki);
     article = new Article(articleDoc , context);
@@ -198,7 +198,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase{
     expect(articleDoc.getXObjects(eq(articleClassRef))).andReturn(articleObjs);
     DocumentReference articleDocRef = new DocumentReference("xwikidb", "News", "Bla");
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq("News"), eq(""),
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
     replay(articleDoc, xwiki);
     article = new Article(articleDoc , context);
@@ -227,7 +227,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase{
     expect(articleDoc.getXObjects(eq(articleClassRef))).andReturn(articleObjs);
     DocumentReference articleDocRef = new DocumentReference("xwikidb", "News", "Bla");
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq("News"), eq(""),
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
     replay(articleDoc, xwiki);
     article = new Article(articleDoc , context);
@@ -255,7 +255,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase{
     expect(articleDoc.getXObjects(eq(articleClassRef))).andReturn(articleObjs);
     DocumentReference articleDocRef = new DocumentReference("xwikidb", "News", "Bla");
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq("News"), eq(""),
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
     replay(articleDoc, xwiki);
     article = new Article(articleDoc , context);
@@ -283,7 +283,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase{
     expect(articleDoc.getXObjects(eq(articleClassRef))).andReturn(articleObjs);
     DocumentReference articleDocRef = new DocumentReference("xwikidb", "News", "Bla");
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq("News"), eq(""),
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
     replay(articleDoc, xwiki);
     article = new Article(articleDoc , context);
@@ -315,7 +315,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase{
     expect(articleDoc.getXObjects(eq(articleClassRef))).andReturn(articleObjs);
     DocumentReference articleDocRef = new DocumentReference("xwikidb", "News", "Bla");
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq("News"), eq(""),
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
     replay(articleDoc, xwiki);
     article = new Article(articleDoc , context);
@@ -346,7 +346,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase{
     expect(articleDoc.getXObjects(eq(articleClassRef))).andReturn(articleObjs);
     DocumentReference articleDocRef = new DocumentReference("xwikidb", "News", "Bla");
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq("News"), eq(""),
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
     replay(articleDoc, xwiki);
     article = new Article(articleDoc , context);

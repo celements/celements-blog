@@ -77,7 +77,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         .andReturn(confxDoc).atLeastOnce();
     expect(xwiki.getDocument(eq(artSpace + ".Article"), same(context))).andReturn(xdoc)
         .atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq(artSpace), eq(""), 
+    expect(xwiki.getSpacePreference(eq("default_language"), eq(artSpace), eq(""), 
         same(context))).andReturn("de").once();
     expect(confDoc.hasProgrammingRights()).andReturn(true).atLeastOnce();
     expect(confDoc.hasAccessLevel((String)anyObject())).andReturn(true).atLeastOnce();
@@ -130,7 +130,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         .andReturn(confxDoc).atLeastOnce();
     expect(xwiki.getDocument(eq(artSpace + ".Article"), same(context))).andReturn(xdoc)
         .atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq(artSpace), eq(""), 
+    expect(xwiki.getSpacePreference(eq("default_language"), eq(artSpace), eq(""), 
         same(context))).andReturn("de").once();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc);
@@ -181,7 +181,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         .andReturn(confxDoc).atLeastOnce();
     expect(xwiki.getDocument(eq(artSpace + ".Article"), same(context))).andReturn(xdoc)
         .atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq(artSpace), eq(""), 
+    expect(xwiki.getSpacePreference(eq("default_language"), eq(artSpace), eq(""), 
         same(context))).andReturn("de").once();
     expect(confDoc.hasProgrammingRights()).andReturn(true).atLeastOnce();
     expect(confDoc.hasAccessLevel((String)anyObject())).andReturn(true).atLeastOnce();
@@ -234,7 +234,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         .andReturn(confxDoc).atLeastOnce();
     expect(xwiki.getDocument(eq(artSpace + ".Article"), same(context))).andReturn(xdoc)
         .atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq(artSpace), eq(""), 
+    expect(xwiki.getSpacePreference(eq("default_language"), eq(artSpace), eq(""), 
         same(context))).andReturn("de").once();
     expect(confDoc.hasProgrammingRights()).andReturn(true).atLeastOnce();
     expect(confDoc.hasAccessLevel((String)anyObject())).andReturn(true).atLeastOnce();
@@ -287,7 +287,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         .andReturn(confxDoc).atLeastOnce();
     expect(xwiki.getDocument(eq(artSpace + ".Article"), same(context))).andReturn(xdoc)
         .atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq(artSpace), eq(""), 
+    expect(xwiki.getSpacePreference(eq("default_language"), eq(artSpace), eq(""), 
         same(context))).andReturn("de").once();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc);
@@ -348,7 +348,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     .atLeastOnce();
     expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc)
     .atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq("Space"), eq(""), 
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("Space"), eq(""), 
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc).atLeastOnce();
@@ -405,7 +405,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     .atLeastOnce();
     expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc)
     .atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq("Space"), eq(""), 
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("Space"), eq(""), 
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc).atLeastOnce();
@@ -462,7 +462,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     .atLeastOnce();
     expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc)
     .atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq("Space"), eq(""), 
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("Space"), eq(""), 
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc).atLeastOnce();
@@ -519,7 +519,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     .atLeastOnce();
     expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc)
     .atLeastOnce();
-    expect(xwiki.getWebPreference(eq("default_language"), eq("Space"), eq(""), 
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("Space"), eq(""), 
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc).atLeastOnce();

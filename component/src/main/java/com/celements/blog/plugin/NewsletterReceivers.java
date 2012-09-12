@@ -271,7 +271,7 @@ public class NewsletterReceivers {
   }
 
   private String getDefaultLanguage() {
-    return getContext().getWiki().getWebPreference("default_language",
+    return getContext().getWiki().getSpacePreference("default_language",
         getContext());
   }
 
