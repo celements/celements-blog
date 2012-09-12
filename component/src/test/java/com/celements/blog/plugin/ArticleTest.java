@@ -39,7 +39,7 @@ import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class ArticleTest extends AbstractBridgedComponentTestCase{
+public class ArticleTest extends AbstractBridgedComponentTestCase {
 
   private XWikiContext context;
   private XWikiDocument articleDoc;
@@ -92,7 +92,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase{
   }
   
   @Test
-  public void getTitle() throws XWikiException, EmptyArticleException {
+  public void getTitle() throws Exception {
     BaseObject bObj = new BaseObject();
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
@@ -102,7 +102,38 @@ public class ArticleTest extends AbstractBridgedComponentTestCase{
     article = new Article(list, "space", context);
     assertEquals("Article Title", article.getTitle("de"));
   }
-  
+
+  @Test
+  public void testGetDocumentReference() throws Exception {
+    BaseObject bObj = new BaseObject();
+    bObj.setStringValue("title", "Article Title");
+    bObj.setStringValue("lang", "de");
+    DocumentReference expectedDocRef = new DocumentReference(getContext().getDatabase(),
+        "MyBlog", "Article1");
+    bObj.setDocumentReference(expectedDocRef);
+    Object obj = new Object(bObj, context);
+    List<Object> list = new ArrayList<Object>();
+    list.add(obj);
+    article = new Article(list, "space", context);
+    assertEquals(expectedDocRef, article.getDocumentReference());
+  }
+
+  @Test
+  public void testGetDocumentReference_nullObject() throws Exception {
+    BaseObject bObj = new BaseObject();
+    bObj.setStringValue("title", "Article Title");
+    bObj.setStringValue("lang", "de");
+    DocumentReference expectedDocRef = new DocumentReference(getContext().getDatabase(),
+        "MyBlog", "Article1");
+    bObj.setDocumentReference(expectedDocRef);
+    Object obj = new Object(bObj, context);
+    List<Object> list = new ArrayList<Object>();
+    list.add(null);
+    list.add(obj);
+    article = new Article(list, "space", context);
+    assertEquals(expectedDocRef, article.getDocumentReference());
+  }
+
   @Test
   public void getTitle_noTranslation() throws XWikiException, EmptyArticleException {
     BaseObject bObj = new BaseObject();

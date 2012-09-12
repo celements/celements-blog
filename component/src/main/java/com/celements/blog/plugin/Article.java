@@ -34,7 +34,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.api.Property;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -44,7 +43,7 @@ public class Article extends Api{
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(Article.class);
   
-  private Map<String, Object> articleObj;
+  private Map<String, com.xpn.xwiki.api.Object> articleObjMap;
   private Boolean isSubscribed;
   private Map<String, String> extract;
   private Map<String, Boolean> hasMoreLink;
@@ -61,30 +60,32 @@ public class Article extends Api{
     this(articleDoc.getObjects("XWiki.ArticleClass"), articleDoc.getSpace(), context);
   }
   
-  public Article(List<Object> objList, String space, XWikiContext context
-      ) throws XWikiException, EmptyArticleException{
+  public Article(List<com.xpn.xwiki.api.Object> objList, String space,
+      XWikiContext context) throws XWikiException, EmptyArticleException{
     super(context);
-    for (Iterator<Object> iterator = objList.iterator(); iterator.hasNext();) {
-      Object artObj = iterator.next();
+    for (Iterator<com.xpn.xwiki.api.Object> iterator = objList.iterator();
+        iterator.hasNext();) {
+      com.xpn.xwiki.api.Object artObj = iterator.next();
       init(artObj, space);
     }
-    if(articleObj == null) {
+    if(articleObjMap == null) {
       throw new EmptyArticleException();
     }
   }
   
-  public void init(Object obj, String space){
-    if (articleObj == null) {
-      articleObj = new HashMap<String, Object>();
-      defaultLang = context.getWiki().getSpacePreference("default_language", space, "", context);
+  public void init(com.xpn.xwiki.api.Object obj, String space){
+    if (articleObjMap == null) {
+      articleObjMap = new HashMap<String, com.xpn.xwiki.api.Object>();
+      defaultLang = context.getWiki().getSpacePreference("default_language", space, "",
+          context);
     }
     LOGGER.debug("Init Article Object");
     if (obj != null) {
       Property prop = obj.getProperty("lang");
       if (prop != null) {
-        articleObj.put((String) prop.getValue(), obj);
+        articleObjMap.put((String) prop.getValue(), obj);
       } else {
-        articleObj.put("", obj);
+        articleObjMap.put("", obj);
       }
     }
   }
@@ -262,9 +263,11 @@ public class Article extends Api{
   }
 
   public DocumentReference getDocumentReference() {
-    if ((articleObj.size() > 0) && (articleObj.get(0) != null)) {
-      LOGGER.debug("getDocumentReference: for [" + articleObj.get(0) + "].");
-      return getWebService().resolveDocumentReference(articleObj.get(0).getName());
+    if (articleObjMap.size() > 0) {
+      String firstKey = articleObjMap.keySet().iterator().next();
+      com.xpn.xwiki.api.Object articleObj = articleObjMap.get(firstKey);
+      LOGGER.debug("getDocumentReference: for [" + articleObj.getName() + "].");
+      return getWebService().resolveDocumentReference(articleObj.getName());
     }
     return null;
   }
@@ -274,15 +277,15 @@ public class Article extends Api{
    */
   @Deprecated
   public String getDocName(){
-    for (Iterator<String> iterator = articleObj.keySet().iterator();
+    for (Iterator<String> iterator = articleObjMap.keySet().iterator();
         iterator.hasNext();) {
       String key = (String) iterator.next();
-      return articleObj.get(key).getName();
+      return articleObjMap.get(key).getName();
     }
     return "";
   }
 
-  public String getStringProperty(Object obj, String name){
+  public String getStringProperty(com.xpn.xwiki.api.Object obj, String name){
     String result = "";
     if(obj != null){
       Property prop = obj.getProperty(name);
@@ -293,7 +296,7 @@ public class Article extends Api{
     return result;
   }
   
-  public Date getDateProperty(Object obj, String name){
+  public Date getDateProperty(com.xpn.xwiki.api.Object obj, String name){
     Date result = null;
     if(obj != null){
       Property prop = obj.getProperty(name);
@@ -305,7 +308,7 @@ public class Article extends Api{
   }
   
   // not set = null, false = 0, true = 1
-  public Boolean getBooleanProperty(Object obj, String name){
+  public Boolean getBooleanProperty(com.xpn.xwiki.api.Object obj, String name){
     Boolean result = null;
     if(obj != null){
       Property prop = obj.getProperty(name);
@@ -323,20 +326,20 @@ public class Article extends Api{
     return result;
   }
   
-  public Object getObj(String lang){
-    Object obj = null;
-    if (articleObj.containsKey(lang)) {
+  public com.xpn.xwiki.api.Object getObj(String lang){
+    com.xpn.xwiki.api.Object obj = null;
+    if (articleObjMap.containsKey(lang)) {
       LOGGER.info("'" + getDocName() + "' - Getting object for lang '" + lang + "'");
-      obj = articleObj.get(lang);
+      obj = articleObjMap.get(lang);
     } else {
-      if (articleObj.containsKey(defaultLang)) {
+      if (articleObjMap.containsKey(defaultLang)) {
         LOGGER.info("'" + getDocName() + "' - Getting object for defaultLang '" + lang
             + "'");
-        obj = articleObj.get(defaultLang);
+        obj = articleObjMap.get(defaultLang);
       } else {
-        if (articleObj.containsKey("")) {
+        if (articleObjMap.containsKey("")) {
           LOGGER.info("'" + getDocName() + "' - Getting object failed for lang ''");
-          obj = articleObj.get("");
+          obj = articleObjMap.get("");
         } else {
           LOGGER.info("'" + getDocName() + "' - Getting object failed for lang '" + lang
               + "' and defaultLang '" + defaultLang + "'");
