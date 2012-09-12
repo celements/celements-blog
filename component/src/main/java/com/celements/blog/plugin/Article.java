@@ -262,7 +262,7 @@ public class Article extends Api{
   }
 
   public DocumentReference getDocumentReference() {
-    if (articleObj.size() > 0) {
+    if ((articleObj.size() > 0) && (articleObj.get(0) != null)) {
       LOGGER.debug("getDocumentReference: for [" + articleObj.get(0) + "].");
       return getWebService().resolveDocumentReference(articleObj.get(0).getName());
     }
