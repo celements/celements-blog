@@ -74,7 +74,7 @@ $desc
 <dc:date>$currentdoc.date</dc:date>
 <dc:contributor>
 <rdf:Description link="">
-<rdf:value>$currentdoc.author</rdf:value>
+<rdf:value>$xwiki.getUserName($currentdoc.author, false)</rdf:value>
 </rdf:Description>
 </dc:contributor>
 </item>
