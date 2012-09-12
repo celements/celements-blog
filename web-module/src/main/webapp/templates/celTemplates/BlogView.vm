@@ -67,7 +67,7 @@ $response.setDateHeader("Last-Modified", $lastChanged.getTime())
 #if("$!request.xpage" == 'rdf')
 ## RSS mode
   #set($doc_name = "$!blogTitle")
-  #set($title = $!xwiki.getWebPreference("title"))
+  #set($title = $!xwiki.getSpacePreference("title"))
   #if ("$title" != '')
     #set($title = "$xwiki.parseContent($title) $!{doc_name}")
   #else

@@ -15,7 +15,7 @@
 #if("$!request.xpage" == 'rdf')
 ## RSS mode
   #set($doc_name = "$!blogTitle")
-  #set($title = $!xwiki.getWebPreference("title"))
+  #set($title = $!xwiki.getSpacePreference("title"))
   #if ("$title" != '')
     #set($title = "$xwiki.parseContent($title) $!{doc_name}")
   #else
@@ -46,7 +46,7 @@
 ## compose news context menu
 #set($className = 'XWiki.ArticleClass')
 $xwiki.includeForm('celements2web:Macros.getNextObjPageId', false) ##returns $next_id
-#set($default_language = "$!xwiki.getWebPreference('default_language')")
+#set($default_language = "$!xwiki.getSpacePreference('default_language')")
 #set($contextMenu = "")
 #if($hasedit && $context.getAction() == "view")
   #set($new_name = "${spacename}.Article$next_id")
