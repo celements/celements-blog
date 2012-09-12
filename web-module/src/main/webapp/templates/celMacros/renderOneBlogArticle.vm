@@ -1,5 +1,5 @@
     #set($articleBlogMoreLinkParams = "$!articleBlogMoreLinkParams")
-    #set($bentrydoc = $xwiki.getDocument("$article.getDocName()"))
+    #set($bentrydoc = $xwiki.getDocument($article.getDocumentReference()))
     #set($creationDate = '')
     #set($creationDateStr = '')
     #set($creationDate = $article.getPublishDate())
@@ -19,7 +19,7 @@
     #if($showArticleBlogName)
       <div class="article_blogPageName">
       #set($articleBlogDoc = '')
-      #set($articleBlogDoc = $xwiki.getDocument("$!article.getDocName()"))
+      #set($articleBlogDoc = $xwiki.getDocument($!article.getDocumentReference()))
       #set($blogspaceName = "$!articleBlogDoc.getSpace()")
       #set($blogDocument = $xwiki.celementsblog.getBlogPageByBlogSpace($blogspaceName))
       #set($blogPageName = '')
@@ -36,7 +36,7 @@
       </div>
       #set ($cdate = $creationDate)
     #end
-    #set($fullTextLink = "$xwiki.getURL($article.getDocName(),'view', $articleBlogMoreLinkParams)")
+    #set($fullTextLink = "$xwiki.getURL($article.getDocumentReference(),'view', $articleBlogMoreLinkParams)")
     <div class="article_title $!{article.getTitleLang($language)} h1">
     #if("$!viewtype" == 'extract')<a class='article_link' href="$fullTextLink">#end
     $article.getTitle($language)
@@ -53,13 +53,13 @@
         #set($content = "$content ...")
       #end
       <!-- moreLink: $language , $msg.get('cel_rls_blog_article_more') -->
-      #set($content = "$content <a class='article_link' href='$xwiki.getURL($article.getDocName(),'view', $articleBlogMoreLinkParams)'>$msg.get('cel_rls_blog_article_more')</a>")
+      #set($content = "$content <a class='article_link' href='$xwiki.getURL($article.getDocumentReference(),'view', $articleBlogMoreLinkParams)'>$msg.get('cel_rls_blog_article_more')</a>")
     #end
     $xwiki.renderText($content, $bentrydoc)
     #if($has_comments)
       #if($viewtypefull)
 #set($inline = true)
-#set($articleDoc = $xwiki.getDocument($article.getDocName()))
+#set($articleDoc = $xwiki.getDocument($article.getDocumentReference()))
 #parse('celMacros/getInlineBlogComments.vm')
       #else
       <div class="comment">
