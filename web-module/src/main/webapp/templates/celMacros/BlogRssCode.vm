@@ -1,17 +1,21 @@
-#set($sqlBlogSpace = '')
-#if(!$maxItems)
-#set($maxItems = 0) ##all items
+#set($space_blogName = '')
+#set($blogApi = $xwiki.celementsblog)
+#if("$!blogDoc" ==  '')
+#set($blogDoc = $doc)
 #end
-#if(!$startAtItem)
-#set($startAtItem = 0)
+#set($blogConfig_obj = $!blogDoc.getObject('Celements2.BlogConfigClass'))
+#if("$!blogConfig_obj" != '')
+#set($spacename = "$!blogConfig_obj.getProperty('blogspace').getValue()")
 #end
-#if("$!blogSpace" != '')
-#set($sqlBlogSpace = "doc.web='$blogSpace' and")
+#if("$!spacename" == '')
+#set($spacename = "$!blogDoc.space")
 #end
-#if(!$sql)
-#set ($sql = ", BaseObject as obj where $!{sqlBlogSpace} obj.name=doc.fullName and obj.className='XWiki.ArticleClass' and obj.name<>'XWiki.ArticleClassTemplate' order by doc.date desc")
+#set($viewtype = "$!blogConfig_obj.getProperty('viewtype').getValue()")
+#if("$!viewtype" == '')
+  #set($viewtype = 'extract')
 #end
-#set($list = $xwiki.searchDocuments($sql , $maxItems , $startAtItem))
+#set($space_blogName = "$!blogConfig_obj.getProperty('subscribe_to').getValue()")
+#set($articles = $blogApi.getArticles("$spacename", "$space_blogName", "$default_language"))
 #set($rsvc= $xwiki.xWiki.getRightService())
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:wiki="http://purl.org/rss/1.0/modules/wiki/" 
 encoding="$xwiki.encoding" >
@@ -28,11 +32,9 @@ $!description
 <dc:creator>$doc.author</dc:creator>
 <items>
 <rdf:Seq>
-#foreach ($item in $list)
-#if($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
-#set($currentdoc = $xwiki.getDocument($item))
-<rdf:li rdf:resource="${baseurl}/xwiki/bin/view/${currentdoc.web}/${currentdoc.name}" />
-#end
+#foreach ($article in $articles)
+#set($currentdoc = $xwiki.getDocument($article.getDocumentReference()))
+<rdf:li rdf:resource="${baseurl}$currentdoc.getURL()" />
 #end
 </rdf:Seq>
 </items>
@@ -42,24 +44,29 @@ $!description
   <link>${baseurl}</link>
   <url>${baseurl}/xwiki/skins/default/logo.gif</url>
 </image>
-#foreach ($item in $list)
-#if ($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
-#set($currentdoc = $xwiki.getDocument($item))
-#set($url = "/xwiki/bin/view/${currentdoc.web}/${currentdoc.name}")
-#set($currentobj = $currentdoc.getObject('XWiki.ArticleClass'))
-#set($content = "$!currentobj.getProperty('extract').getValue()")
-#if("$!content" == '')
-#set($content = $currentdoc.display("content"))
-#if($content.length() >= 250)
-#set($i = $content.lastIndexOf(" ",250))
-#set($i = $i + 1)
-#set($Q = '"')
-#set($content = "${content.substring(0,$i)} ... <a href=${Q}${url}${Q}>continue</a>")
+#if("$!viewtype" == 'extract')
+  #set($viewtypefull = false)
+#elseif("$!viewtype" == 'full')
+  #set($viewtypefull = true)
 #end
+#foreach ($article in $articles)
+#set($creationDate = '')
+#set($creationDateStr = '')
+#set($creationDate = $article.getPublishDate())
+#if("$!creationDate" != '')
+  #set($blog_dateFormat = $msg.get('cel_blog_dateformat'))
+  #if("$!blog_dateFormat" == '')
+  ##TODO i18n issue: we must use java DateFormat for given language.
+  #set($blog_dateFormat = "dd. MMMM, yyyy")
+  #end
+  #set($creationDateStr = $xwiki.formatDate($creationDate, $blog_dateFormat))
 #end
+#set($currentdoc = $xwiki.getDocument($article.getDocumentReference()))
+#set($url = $currentdoc.getURL())
+#set($content = $article.getExtract("$language", $viewtypefull))
 #set($desc = $xwiki.getXMLEncoded($xwiki.renderText($content, $doc)))
 <item rdf:about="${baseurl}$url">
-<title>$xwiki.formatDate($currentdoc.date, "dd/MM/yyyy") : $currentdoc.display("title")</title>
+<title>$creationDateStr : $article.getTitle($language)</title>
 <link>${baseurl}$url</link>
 <description>
 $desc
@@ -71,6 +78,5 @@ $desc
 </rdf:Description>
 </dc:contributor>
 </item>
-#end
 #end
 </rdf:RDF>
