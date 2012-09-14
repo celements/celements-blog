@@ -56,7 +56,6 @@
 #end
 ##
 ##
-#if($xwiki.celementsweb.getVersionMode() == 'celements3')
 	<!-- load Blog Edit into Content Tab -->
 	<div id="con_titblock" class="titleblock">$adminMsg.get('cel_tm_blog_edit')</div>
 	<form id="edit" method="post" action="$cur_doc.getURL('save')">
@@ -118,39 +117,4 @@
 		<input type="button" value="$adminMsg.get('cel_cancel')" onclick="window.location.href='$xwiki.getURL($red,'view')'" class="cancelButton"/>
 	</div>
 	</form>
-#else ##if($xwiki.celementsweb.getVersionMode() != 'celements3')
-<div style="width:100%">
-<div class="celements2_box">
-<div class="celements2_box_title">$adminMsg.get('cel_tm_blog_edit')</div>
-<form id="update" method="post" action="$cur_doc.getURL('save')">
-<input type="hidden" name="xredirect" value="$cur_doc.getURL('edit','changed=1')$!{migrateme}" />
-##<input type="hidden" name="changed" value="1" />
-<input type="hidden" name="Celements2.BlogConfigClass_nb"   value="0" />
-$adminMsg.get('cel_tm_blog_space'):
-<input size='30' value='$!spacename' name='Celements2.BlogConfigClass_0_blogspace' type='text' class="celements2_input"/>
-<br/>
-$adminMsg.get('cel_tm_view_type'):
-#set($viewTypeEditStr = $cur_doc.display('viewtype', 'edit', $blogConfig_obj))
-${viewTypeEditStr.replaceAll('\{/?pre\}','')}
-<br/>
-$adminMsg.get('cel_tm_editor_type'):
-#set($editorTypeEditStr = $cur_doc.display('blogeditor', 'edit', $blogConfig_obj))
-${editorTypeEditStr.replaceAll('\{/?pre\}','')}
-<br/>
-$adminMsg.get('cel_tm_has_comments'):
-#set($hasCommentsEditStr = $cur_doc.display('has_comments', 'edit', $blogConfig_obj))
-${hasCommentsEditStr.replaceAll('\{/?pre\}','')}
-<br/>
-<br/>
-#if($xwiki.exists("$cur_doc.fullName"))
-#set($red = "$cur_doc.fullName")
-#else
-#set($red = "${space}.WebHome")
-#end
-<input type="button" value="$adminMsg.get('cel_cancel')" onclick="window.location.href='$xwiki.getURL($red,'view')'" class="celements2_input_button" />
-<input type="submit" value="$adminMsg.get('cel_save')" class="celements2_input_button"/> 
- </form>
- </div>
- </div>
-#end ## if celements2
 #end ## #if($changed && $complete)
