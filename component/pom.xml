@@ -31,7 +31,7 @@
   <modelVersion>4.0.0</modelVersion>  
   <groupId>com.celements</groupId>
   <artifactId>celements-blog</artifactId>
-  <version>1.11-SNAPSHOT</version>
+  <version>1.11</version>
   <description>Celements Blog</description> 
   <dependencies>    
     <!-- Add here all your dependencies -->
@@ -46,5 +46,6 @@
     <connection>scm:git:git@github.com:celements/celements-blog.git</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-blog.git</developerConnection>
     <url>https://github.com/celements/celements-blog</url>
+    <tag>celements-blog-1.11</tag>
   </scm>
 </project>
