@@ -36,7 +36,7 @@
       </div>
       #set ($cdate = $creationDate)
     #end
-    #set($fullTextLink = "$xwiki.getURL($article.getDocumentReference(),'view', $articleBlogMoreLinkParams)")
+    #set($fullTextLink = "$xwiki.getURL($article.getDocName(),'view', $articleBlogMoreLinkParams)")
     <div class="article_title $!{article.getTitleLang($language)} h1">
     #if("$!viewtype" == 'extract')<a class='article_link' href="$fullTextLink">#end
     $article.getTitle($language)
@@ -53,7 +53,7 @@
         #set($content = "$content ...")
       #end
       <!-- moreLink: $language , $msg.get('cel_rls_blog_article_more') -->
-      #set($content = "$content <a class='article_link' href='$xwiki.getURL($article.getDocumentReference(),'view', $articleBlogMoreLinkParams)'>$msg.get('cel_rls_blog_article_more')</a>")
+      #set($content = "$content <a class='article_link' href='$xwiki.getURL($article.getDocName(),'view', $articleBlogMoreLinkParams)'>$msg.get('cel_rls_blog_article_more')</a>")
     #end
     $xwiki.renderText($content, $bentrydoc)
     #if($has_comments)
