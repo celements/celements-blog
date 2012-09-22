@@ -31,10 +31,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.script.service.ScriptService;
 
-import com.celements.web.plugin.api.CelementsWebPluginApi;
-import com.celements.web.service.CelementsWebScriptService;
+import com.celements.rendering.RenderCommand;
+import com.celements.web.plugin.cmd.CelSendMail;
+import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWiki;
@@ -50,8 +50,10 @@ public class NewsletterReceivers {
   
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       NewsletterReceivers.class);
-  private CelementsWebPluginApi celementsweb;
-  
+  private UserNameForUserDataCommand userNameForUserDataCmd =
+      new UserNameForUserDataCommand();
+  private RenderCommand renderCommand = new RenderCommand();
+
   private List<String> allAddresses = new ArrayList<String>();
   private List<String[]> groups = new ArrayList<String[]>();
   private List<String[]> groupUsers = new ArrayList<String[]>();
@@ -61,8 +63,6 @@ public class NewsletterReceivers {
   //TODO ADD UNIT TESTS!!!
   public NewsletterReceivers(XWikiDocument blogDoc, XWikiContext context
       ) throws XWikiException{
-    celementsweb = (CelementsWebPluginApi)context.getWiki().getPluginApi("celementsweb",
-        context);
     List<BaseObject> objs = blogDoc.getObjects("Celements2.ReceiverEMail");
     LOGGER.debug("objs.size = " + (objs != null?objs.size():0));
     if(objs != null){
@@ -257,8 +257,9 @@ public class NewsletterReceivers {
       String language = defaultLanguage;
       String addrUser = null;
       try {
-        addrUser = celementsweb.getUsernameForUserData(address, "email");
-      } catch(XWikiException e) {
+        addrUser = userNameForUserDataCmd.getUsernameForUserData(address, "email",
+            getContext());
+      } catch (XWikiException e) {
         LOGGER.error("Exception getting username for user email '" + address + "'.", e);
       }
       if((addrUser != null) && (addrUser.length() > 0)) {
@@ -332,8 +333,9 @@ public class NewsletterReceivers {
       header = "<base href='" + baseURL + "' />\n";
     }
     
-    String content = getCelWebService().renderCelementsDocument(doc.getDocumentReference(
-        ));
+    renderCommand.setDefaultPageType("RichText");
+    String content = renderCommand.renderCelementsDocument(doc.getDocumentReference(),
+        "view");
     content = Utils.replacePlaceholders(content, context);
 
     String footer = context.getMessageTool().get("cel_newsletter_html_footer_message",
@@ -351,8 +353,15 @@ public class NewsletterReceivers {
     Map<String, String> otherHeader = new HashMap<String, String>();
     otherHeader.put("Content-Location", baseURL);
     
-    return celementsweb.getPlugin().sendMail(from, replyTo, to, null, null, subject,
-        htmlContent, textContent, null, otherHeader, context);
+    CelSendMail sender = new CelSendMail(getContext());
+    sender.setFrom(from);
+    sender.setReplyTo(replyTo);
+    sender.setTo(to);
+    sender.setSubject(subject);
+    sender.setHtmlContent(htmlContent, false);
+    sender.setTextContent(textContent);
+    sender.setOthers(otherHeader);
+    return sender.sendMail();
   }
   
   private void setNewsletterSentObject(XWikiDocument doc, String from, String replyTo,
@@ -425,11 +434,6 @@ public class NewsletterReceivers {
 
   private IWebUtilsService getWebUtilsService() {
     return Utils.getComponent(IWebUtilsService.class);
-  }
-
-  private CelementsWebScriptService getCelWebService() {
-    return (CelementsWebScriptService) Utils.getComponent(ScriptService.class,
-        "celementsweb");
   }
 
   private XWikiContext getContext() {
