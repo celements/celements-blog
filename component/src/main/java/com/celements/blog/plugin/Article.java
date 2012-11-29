@@ -27,8 +27,11 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.service.IBlogServiceRole;
+import com.celements.common.classes.IClassCollectionRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -49,7 +52,16 @@ public class Article extends Api{
   private Map<String, Boolean> hasMoreLink;
   private Map<String, Boolean> hasMoreLinkDots;
   private String defaultLang;
-  
+
+  IBlogServiceRole injected_blogService;
+
+  /**
+   * For Test Use only!!!
+   */
+  Article(XWikiContext context) {
+    super(context);
+  }
+
   public Article(XWikiDocument articleDoc, XWikiContext context
       ) throws XWikiException, EmptyArticleException {
     this(articleDoc.newDocument(context), context);
@@ -160,6 +172,24 @@ public class Article extends Api{
     return new String[]{lang, title};
   }
   
+  int getMaxNumChars() {
+    int maxNumChars = 250;
+    String blogSpaceName = getDocumentReference().getLastSpaceReference().getName();
+    XWikiDocument blogDoc = getBlogService().getBlogPageByBlogSpace(blogSpaceName);
+    if (blogDoc != null) {
+      BaseObject blogConfigObj = blogDoc.getXObject(getBlogClasses(
+          ).getBlogConfigClassRef(getContext().getDatabase()));
+      if ((blogConfigObj != null) && (blogConfigObj.getIntValue(
+          BlogClasses.MAX_NUM_CHARS_FIELD, -1) > 0)) {
+        maxNumChars = blogConfigObj.getIntValue(BlogClasses.MAX_NUM_CHARS_FIELD);
+      }
+    } else {
+      LOGGER.info("BlogConfig document not found for space name [" + blogSpaceName
+          + "].");
+    }
+    return maxNumChars;
+  }
+  
   /**
    * Get the effective language of the title. E.g. getExtractLang('fr', x) returns 'de' if 
    * default is 'de' and there is no 'fr' translation.
@@ -167,11 +197,11 @@ public class Article extends Api{
    * @return
    */
   public String getExtractLang(String lang, boolean isViewtypeFull) {
-    return getExtractDetailed(lang, isViewtypeFull, 250)[0];
+    return getExtractDetailed(lang, isViewtypeFull, getMaxNumChars())[0];
   }
   
   public String getExtract(String lang, boolean isViewtypeFull) {
-    return getExtractDetailed(lang, isViewtypeFull, 250)[1];
+    return getExtractDetailed(lang, isViewtypeFull, getMaxNumChars())[1];
   }
 
   public String getExtract(String lang, boolean isViewtypeFull, int maxNumChars){
@@ -374,6 +404,23 @@ public class Article extends Api{
 
   private IWebUtilsService getWebService() {
     return Utils.getComponent(IWebUtilsService.class);
+  }
+  
+  private BlogClasses getBlogClasses() {
+    return (BlogClasses) Utils.getComponent(IClassCollectionRole.class,
+        "celements.celBlogClasses");
+  }
+
+  IBlogServiceRole getBlogService() {
+    if (injected_blogService != null) {
+      return injected_blogService;
+    }
+    return Utils.getComponent(IBlogServiceRole.class);
+  }
+
+  private XWikiContext getContext() {
+    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+        "xwikicontext");
   }
 
 }

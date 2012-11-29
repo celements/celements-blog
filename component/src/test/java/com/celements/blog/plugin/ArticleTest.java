@@ -30,12 +30,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.service.BlogService;
+import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -45,24 +46,46 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   private XWikiDocument articleDoc;
   private Article article;
   private XWiki xwiki;
+  private IBlogServiceRole blogServiceMock;
 
   @Before
   public void setUp_ArticleTest() throws Exception {
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
+    article = new Article(context);
+    blogServiceMock = createMock(IBlogServiceRole.class);
+    article.injected_blogService = blogServiceMock;
+    articleDoc = createMock(XWikiDocument.class);
   }
-  
+
+  @Test
+  public void testGetBlogService_default() {
+    article.injected_blogService = null;
+    assertNotNull(article.getBlogService());
+  }
+
+  @Test
+  public void testGetBlogService_inject() {
+    BlogService testBlogService = new BlogService();
+    article.injected_blogService = testBlogService;
+    assertSame(testBlogService, article.getBlogService());
+  }
+
   @Test
   public void testGetTitleDetailed() throws XWikiException, EmptyArticleException {
     BaseObject bObj = new BaseObject();
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
-    Object obj = new Object(bObj, context);
-    List<Object> list = new ArrayList<Object>();
+    com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
     list.add(obj);
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("space"), eq(""),
+        same(context))).andReturn("").anyTimes();
+    replayAll();
     article = new Article(list, "space", context);
     String[] result = article.getTitleDetailed("de");
+    verifyAll();
     assertEquals("de", result[0]);
     assertEquals("Article Title", result[1]);
   }
@@ -73,22 +96,22 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     BaseObject bObj = new BaseObject();
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
-    Object obj = new Object(bObj, context);
+    com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
     BaseObject frbObj = new BaseObject();
     frbObj.setStringValue("title", "");
     frbObj.setStringValue("lang", "fr");
-    Object frObj = new Object(frbObj, context);
-    List<Object> list = new ArrayList<Object>();
+    com.xpn.xwiki.api.Object frObj = new com.xpn.xwiki.api.Object(frbObj, context);
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
     list.add(obj);
     list.add(frObj);
     expect(xwiki.getSpacePreference(eq("default_language"), eq("space"), eq(""), 
         same(context))).andReturn("de");
-    replay(xwiki);
+    replayAll();
     article = new Article(list, "space", context);
     String[] result = article.getTitleDetailed("fr");
     assertEquals("de", result[0]);
     assertEquals("Article Title", result[1]);
-    verify(xwiki);
+    verifyAll();
   }
   
   @Test
@@ -96,8 +119,8 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     BaseObject bObj = new BaseObject();
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
-    Object obj = new Object(bObj, context);
-    List<Object> list = new ArrayList<Object>();
+    com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
     list.add(obj);
     article = new Article(list, "space", context);
     assertEquals("Article Title", article.getTitle("de"));
@@ -111,8 +134,8 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     DocumentReference expectedDocRef = new DocumentReference(getContext().getDatabase(),
         "MyBlog", "Article1");
     bObj.setDocumentReference(expectedDocRef);
-    Object obj = new Object(bObj, context);
-    List<Object> list = new ArrayList<Object>();
+    com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
     list.add(obj);
     article = new Article(list, "space", context);
     assertEquals(expectedDocRef, article.getDocumentReference());
@@ -126,8 +149,8 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     DocumentReference expectedDocRef = new DocumentReference(getContext().getDatabase(),
         "MyBlog", "Article1");
     bObj.setDocumentReference(expectedDocRef);
-    Object obj = new Object(bObj, context);
-    List<Object> list = new ArrayList<Object>();
+    com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
     list.add(null);
     list.add(obj);
     article = new Article(list, "space", context);
@@ -139,28 +162,28 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     BaseObject bObj = new BaseObject();
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
-    Object obj = new Object(bObj, context);
+    com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
     BaseObject frbObj = new BaseObject();
     frbObj.setStringValue("title", "");
     frbObj.setStringValue("lang", "fr");
-    Object frObj = new Object(frbObj, context);
-    List<Object> list = new ArrayList<Object>();
+    com.xpn.xwiki.api.Object frObj = new com.xpn.xwiki.api.Object(frbObj, context);
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
     list.add(obj);
     list.add(frObj);
     expect(xwiki.getSpacePreference(eq("default_language"), eq("space"), eq(""), 
         same(context))).andReturn("de");
-    replay(xwiki);
+    replayAll();
     article = new Article(list, "space", context);
     assertEquals("Article Title", article.getTitle("fr"));
-    verify(xwiki);
+    verifyAll();
   }
 
   @Test 
   public void getStringProperty() throws XWikiException, EmptyArticleException {
     BaseObject bObj = new BaseObject();
     bObj.setStringValue("field", "value");
-    Object obj = new Object(bObj, context);
-    List<Object> list = new ArrayList<Object>();
+    com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
     list.add(obj);
     article = new Article(list, "space", context);
     assertEquals("value", article.getStringProperty(obj, "field"));
@@ -169,7 +192,6 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testHasMoreLink_in_translation_translation_empty(
       ) throws XWikiException, EmptyArticleException {
-    articleDoc = createMock(XWikiDocument.class);
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
     Vector<BaseObject> articleObjs = new Vector<BaseObject>();
@@ -194,17 +216,18 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
-    replay(articleDoc, xwiki);
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("Main"))).andReturn(null).anyTimes();
+    replayAll();
     article = new Article(articleDoc , context);
+    article.injected_blogService = blogServiceMock;
     assertTrue("No translation in it but details in de.", article.hasMoreLink("it",
         false));
-    verify(articleDoc, xwiki);
+    verifyAll();
   }
 
   @Test
   public void testHasMoreLink_in_translation_translation_not_empty(
       ) throws XWikiException, EmptyArticleException {
-    articleDoc = createMock(XWikiDocument.class);
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
     Vector<BaseObject> articleObjs = new Vector<BaseObject>();
@@ -231,17 +254,18 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
-    replay(articleDoc, xwiki);
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("Main"))).andReturn(null).anyTimes();
+    replayAll();
     article = new Article(articleDoc , context);
+    article.injected_blogService = blogServiceMock;
     assertTrue("Has translation in it.", article.hasMoreLink("it",
         false));
-    verify(articleDoc, xwiki);
+    verifyAll();
   }
 
   @Test
   public void testHasMoreLink_in_default_lang(
       ) throws XWikiException, EmptyArticleException {
-    articleDoc = createMock(XWikiDocument.class);
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
     Vector<BaseObject> articleObjs = new Vector<BaseObject>();
@@ -260,17 +284,18 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
-    replay(articleDoc, xwiki);
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("Main"))).andReturn(null).anyTimes();
+    replayAll();
     article = new Article(articleDoc , context);
+    article.injected_blogService = blogServiceMock;
     assertTrue("Details in de.", article.hasMoreLink("de",
         false));
-    verify(articleDoc, xwiki);
+    verifyAll();
   }
 
   @Test
   public void testHasMoreLink_in_default_lang_no_extract(
       ) throws XWikiException, EmptyArticleException {
-    articleDoc = createMock(XWikiDocument.class);
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
     Vector<BaseObject> articleObjs = new Vector<BaseObject>();
@@ -288,17 +313,18 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
-    replay(articleDoc, xwiki);
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("Main"))).andReturn(null).anyTimes();
+    replayAll();
     article = new Article(articleDoc , context);
+    article.injected_blogService = blogServiceMock;
     assertFalse("Only details (short) but no extract in de.", article.hasMoreLink("de",
         false));
-    verify(articleDoc, xwiki);
+    verifyAll();
   }
 
   @Test
   public void testHasMoreLink_in_default_lang_no_extract_long_content(
       ) throws XWikiException, EmptyArticleException {
-    articleDoc = createMock(XWikiDocument.class);
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
     Vector<BaseObject> articleObjs = new Vector<BaseObject>();
@@ -316,17 +342,18 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
-    replay(articleDoc, xwiki);
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("Main"))).andReturn(null).anyTimes();
+    replayAll();
     article = new Article(articleDoc , context);
+    article.injected_blogService = blogServiceMock;
     assertTrue("Only details (to long for extract) but no extract in de.", 
         article.hasMoreLink("de", false));
-    verify(articleDoc, xwiki);
+    verifyAll();
   }
   
   @Test
   public void testHasMoreLink_in_translation_no_extract(
       ) throws XWikiException, EmptyArticleException {
-    articleDoc = createMock(XWikiDocument.class);
 //    expect(articleDoc.getSpace()).andReturn("News");
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
@@ -348,17 +375,18 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
-    replay(articleDoc, xwiki);
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("Main"))).andReturn(null).anyTimes();
+    replayAll();
     article = new Article(articleDoc , context);
+    article.injected_blogService = blogServiceMock;
     assertFalse("Only details (short) but no extract in de.", 
         article.hasMoreLink("it", false));
-    verify(articleDoc, xwiki);
+    verifyAll();
   }
   
   @Test
   public void testHasMoreLink_in_translation_no_extract_long_content(
       ) throws XWikiException, EmptyArticleException {
-    articleDoc = createMock(XWikiDocument.class);
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
     Vector<BaseObject> articleObjs = new Vector<BaseObject>();
@@ -379,15 +407,75 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     expect(articleDoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
         same(context))).andReturn("de");
-    replay(articleDoc, xwiki);
-    article = new Article(articleDoc , context);
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("Main"))).andReturn(null).anyTimes();
+    replayAll();
+    article = new Article(articleDoc, context);
+    article.injected_blogService = blogServiceMock;
     assertTrue("Only details (to long for extract) but no extract in de.", 
         article.hasMoreLink("it", false));
-    verify(articleDoc, xwiki);
+    verifyAll();
+  }
+
+  @Test
+  public void testGetMaxNumChars_default() throws Exception {
+    BaseObject articleObj = new BaseObject();
+    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", 
+        "ArticleClass");
+    articleObj.setXClassReference(articleClassRef);
+    DocumentReference articleDocRef = new DocumentReference("xwikidb", "News", "Bla");
+    articleObj.setDocumentReference(articleDocRef);
+    com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(articleObj, context);
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
+        same(context))).andReturn("de");
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("News"))).andReturn(null).anyTimes();
+    replayAll();
+    article.init(obj, "News");
+    int maxNumChars = article.getMaxNumChars();
+    assertEquals(250, maxNumChars);
+    verifyAll();
+  }
+
+  @Test
+  public void testGetMaxNumChars_blogConfig() throws Exception {
+    BaseObject articleObj = new BaseObject();
+    DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", 
+        "ArticleClass");
+    articleObj.setXClassReference(articleClassRef);
+    DocumentReference articleDocRef = new DocumentReference("xwikidb", "News", "Bla");
+    articleObj.setDocumentReference(articleDocRef);
+    com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(articleObj, context);
+    expect(xwiki.getSpacePreference(eq("default_language"), eq("News"), eq(""),
+        same(context))).andReturn("de");
+    DocumentReference blogDocRef = new DocumentReference(context.getDatabase(), "Content",
+        "news");
+    XWikiDocument blogDoc = new XWikiDocument(blogDocRef);
+    BaseObject blogConfigObj = new BaseObject();
+    DocumentReference blogConfigClassRef = new DocumentReference("xwikidb",
+        BlogClasses.BLOG_CONFIG_CLASS_SPACE, BlogClasses.BLOG_CONFIG_CLASS_DOC);
+    blogConfigObj.setXClassReference(blogConfigClassRef);
+    blogConfigObj.setIntValue(BlogClasses.MAX_NUM_CHARS_FIELD, 1000);
+    blogDoc.addXObject(blogConfigObj);
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("News"))).andReturn(blogDoc
+        ).anyTimes();
+    replayAll();
+    article.init(obj, "News");
+    int maxNumChars = article.getMaxNumChars();
+    assertEquals(1000, maxNumChars);
+    verifyAll();
   }
 
   // Helper
   
+  private void replayAll(Object ... mocks) {
+    replay(xwiki, articleDoc, blogServiceMock);
+    replay(mocks);
+  }
+
+  private void verifyAll(Object ... mocks) {
+    verify(xwiki, articleDoc, blogServiceMock);
+    verify(mocks);
+  }
+
   String getLoremIpsum() {
     return "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo " +
     		"ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis " +

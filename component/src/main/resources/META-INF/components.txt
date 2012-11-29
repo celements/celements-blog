@@ -1,2 +1,4 @@
 com.celements.migrator.NewsletterReceiversToLowerCaseMigrator
+com.celements.blog.plugin.BlogClasses
 com.celements.blog.service.BlogScriptService
+com.celements.blog.service.BlogService

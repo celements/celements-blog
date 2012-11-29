@@ -19,18 +19,20 @@
  */
 package com.celements.blog.plugin;
 
-import java.util.List;
-
+import com.celements.blog.service.IBlogServiceRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
+@Deprecated
 public class BlogUtils {
   
   private static BlogUtils utilsInstance;
   
   private BlogUtils() {}
-  
+
+  @Deprecated
   public static BlogUtils getInstance() {
     if (utilsInstance == null) {
       utilsInstance = new BlogUtils();
@@ -38,19 +40,18 @@ public class BlogUtils {
     return utilsInstance;
   }
 
+  /**
+   * @deprecated since 2.23.0 instead use BlogService.getBlogPageByBlogSpace(
+   *        String blogSpaceName)
+   */
+  @Deprecated
   public XWikiDocument getBlogPageByBlogSpace(String blogSpaceName,
-      XWikiContext context) throws XWikiException{
-    String hql = "select doc.fullName from XWikiDocument as doc, BaseObject as obj,";
-    hql += " StringProperty bspace ";
-    hql += "where obj.name=doc.fullName ";
-    hql += "and obj.className='Celements2.BlogConfigClass' ";
-    hql += "and obj.id = bspace.id.id and bspace.id.name = 'blogspace' ";
-    hql += "and bspace.value = '" + blogSpaceName + "'";
-    List<String> blogList = context.getWiki().search(hql, 1, 0, context);
-    if((blogList.size() > 0) && context.getWiki().exists(blogList.get(0), context)){
-      return context.getWiki().getDocument(blogList.get(0), context);
-    }
-    return null;
+      XWikiContext context) throws XWikiException {
+    return getBlogService().getBlogPageByBlogSpace(blogSpaceName);
+  }
+
+  private IBlogServiceRole getBlogService() {
+    return Utils.getComponent(IBlogServiceRole.class);
   }
 
 }

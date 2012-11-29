@@ -45,6 +45,7 @@ public class BlogClasses extends AbstractClassCollection {
   public static final String BLOG_CONFIG_CLASS_SPACE = "Celements2";
   public static final String BLOG_CONFIG_CLASS = BLOG_CONFIG_CLASS_SPACE + "."
         + BLOG_CONFIG_CLASS_DOC;
+  public static final String MAX_NUM_CHARS_FIELD = "max_num_chars";
 
   public static final String ARTICLE_CLASS_DOC = "ArticleClass";
   public static final String ARTICLE_CLASS_SPACE = "XWiki";
@@ -178,6 +179,8 @@ public class BlogClasses extends AbstractClassCollection {
         false, "extract|full", "select");
     needsUpdate |= bclass.addBooleanField("has_comments", "has_comments",
         "yesno");
+    needsUpdate |= bclass.addNumberField(MAX_NUM_CHARS_FIELD, "max number of characters"
+        + " in extract", 5, "integer");
     
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
