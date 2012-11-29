@@ -78,6 +78,10 @@
 		#set($editorTypeEditStr = $cur_doc.display('blogeditor', 'edit', $blogConfig_obj))
 		${editorTypeEditStr.replaceAll('\{/?pre\}','')}
 	</div>
+	<div id="con_maxNumChars" class="editblock">$adminMsg.get('cel_tm_max_num_chars'):
+		#set($maxNumCharsEditStr = $cur_doc.display('max_num_chars', 'edit', $blogConfig_obj))
+		${maxNumCharsEditStr.replaceAll('\{/?pre\}','')}
+	</div>
 	<div id="con_hasComments" class="editblock">$adminMsg.get('cel_tm_has_comments'):
 		#set($hasCommentsEditStr = $cur_doc.display('has_comments', 'edit', $blogConfig_obj))
 		${hasCommentsEditStr.replaceAll('\{/?pre\}','')}
