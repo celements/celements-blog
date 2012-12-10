@@ -33,7 +33,9 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.service.IBlogServiceRole;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -45,11 +47,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 
 public class BlogPlugin extends XWikiDefaultPlugin{
   
   private static final String DEFAULT_RECEIVER_SPACE = "NewsletterReceivers";
   private static Log LOGGER = LogFactory.getFactory().getInstance(BlogPlugin.class);
+  IBlogServiceRole injected_BlogService;
   
   public BlogPlugin(String name, String className, XWikiContext context) {
     super(name, className, context);
@@ -135,9 +139,9 @@ public class BlogPlugin extends XWikiDefaultPlugin{
   private void filterRightsAndSubscription(List<Article> articles, 
       String blogArticleSpace, String language, boolean withUnsubscribed, 
       boolean withUndecided, boolean withSubscribed, boolean subscribableOnly, 
-      boolean checkRights, XWikiContext context) throws XWikiException{
+      boolean checkRights, XWikiContext context) throws XWikiException {
     List<Article> deleteArticles = new ArrayList<Article>();
-    XWikiDocument spaceBlogDoc = getBlogPageByBlogSpace(blogArticleSpace, context);
+    XWikiDocument spaceBlogDoc = getBlogService().getBlogPageByBlogSpace(blogArticleSpace);
     if(spaceBlogDoc == null){
       LOGGER.debug("Missing Blog Configuration! (Blog space: '" + blogArticleSpace 
           + "')");
@@ -146,75 +150,81 @@ public class BlogPlugin extends XWikiDefaultPlugin{
       Document origBlogDoc = spaceBlogDoc.newDocument(context);
       for (Iterator<Article> artIter = articles.iterator(); artIter.hasNext();) {
         Article article = (Article) artIter.next();
-        XWikiDocument articleDoc = context.getWiki().getDocument(article.getDocName(), 
-            context);
-        LOGGER.debug("articleDoc='" + articleDoc + "', " + getBlogPageByBlogSpace(
-            articleDoc.getSpace(), context));
-        Document blogDoc = getBlogPageByBlogSpace(articleDoc.getSpace(), context
-            ).newDocument(context);
-        boolean hasRight = false;
-        boolean hasEditOnBlog = false;
-        if(checkRights || !blogDoc.hasProgrammingRights()){
-          LOGGER.info("'" + article.getDocName() + "' - Checking rights. Reason: " +
-              "checkRights='" + checkRights + "' || !programming='" + 
-              !blogDoc.hasProgrammingRights() + "'");
-          Date publishdate = article.getPublishDate(language);
-          if((publishdate != null) && (publishdate.after(new Date()))){
-            if(blogDoc.hasAccessLevel("edit")){
+        try {
+          XWikiDocument articleDoc = context.getWiki().getDocument(
+              article.getDocumentReference(), context);
+          DocumentReference blogDocRef = getBlogService().getBlogDocRefByBlogSpace(
+              articleDoc.getDocumentReference().getLastSpaceReference().getName());
+          LOGGER.debug("articleDoc='" + articleDoc + "', " + blogDocRef);
+          Document blogDoc = context.getWiki().getDocument(blogDocRef, context
+              ).newDocument(context);
+          boolean hasRight = false;
+          boolean hasEditOnBlog = false;
+          if(checkRights || !blogDoc.hasProgrammingRights()){
+            LOGGER.info("'" + article.getDocName() + "' - Checking rights. Reason: " +
+                "checkRights='" + checkRights + "' || !programming='" + 
+                !blogDoc.hasProgrammingRights() + "'");
+            Date publishdate = article.getPublishDate(language);
+            if((publishdate != null) && (publishdate.after(new Date()))){
+              if(blogDoc.hasAccessLevel("edit")){
+                hasRight = true;
+              }
+            } else if(blogDoc.hasAccessLevel("view")){
               hasRight = true;
             }
-          } else if(blogDoc.hasAccessLevel("view")){
+            LOGGER.debug("'" + articleDoc.getSpace() + "' != '" + blogArticleSpace + 
+                "' && origBlogDoc.hasAccessLevel('edit') => '"
+                + origBlogDoc.hasAccessLevel("edit") + "'");
+            if(!articleDoc.getSpace().equals(blogArticleSpace) && origBlogDoc
+                .hasAccessLevel("edit")){
+              hasEditOnBlog = true;
+            }
+          } else{
+            LOGGER.info("'" + article.getDocName() + "' - Saved with programming rights " +
+                "and not checking for rights.");
             hasRight = true;
-          }
-          LOGGER.debug("'" + articleDoc.getSpace() + "' != '" + blogArticleSpace + 
-              "' && origBlogDoc.hasAccessLevel('edit') => '" + origBlogDoc.hasAccessLevel(
-              "edit") + "'");
-          if(!articleDoc.getSpace().equals(blogArticleSpace) && origBlogDoc
-              .hasAccessLevel("edit")){
             hasEditOnBlog = true;
           }
-        } else{
-          LOGGER.info("'" + article.getDocName() + "' - Saved with programming rights " +
-              "and not checking for rights.");
-          hasRight = true;
-          hasEditOnBlog = true;
-        }
-        
-        LOGGER.info("'" + article.getDocName() + "' - hasRight: '" + hasRight + "' " +
-            "hasEditOnBlog: '" + hasEditOnBlog + "'");
-        if(hasRight){
-          if(!articleDoc.getSpace().equals(blogArticleSpace)){
-            Boolean isSubscribed = article.isSubscribed();
-            
-            if(isSubscribed == null){
-              if(!withUndecided || !hasEditOnBlog){
-                LOGGER.info("'" + article.getDocName() + "' - Removed reason: from " +
-                    "subscribed blog && isUndecided && (!withUndecided='" + 
-                    !withUndecided + "' || !hasEditOnBlog='" + !hasEditOnBlog + "')");
-                deleteArticles.add(article);
+          
+          LOGGER.info("'" + article.getDocName() + "' - hasRight: '" + hasRight + "' " +
+              "hasEditOnBlog: '" + hasEditOnBlog + "'");
+          if(hasRight){
+            if(!articleDoc.getSpace().equals(blogArticleSpace)){
+              Boolean isSubscribed = article.isSubscribed();
+              
+              if(isSubscribed == null){
+                if(!withUndecided || !hasEditOnBlog){
+                  LOGGER.info("'" + article.getDocName() + "' - Removed reason: from " +
+                      "subscribed blog && isUndecided && (!withUndecided='" + 
+                      !withUndecided + "' || !hasEditOnBlog='" + !hasEditOnBlog + "')");
+                  deleteArticles.add(article);
+                }
+              } else {
+                if(!isSubscribed && (!withUnsubscribed || !hasEditOnBlog)){
+                  LOGGER.info("'" + article.getDocName() + "' - Removed reason: from " +
+                      "subscribed blog && isDecided && ((!isSubscribed='" + !isSubscribed + 
+                      "' && !withUnsubscribed='" + !withUnsubscribed + "') || " +
+                      "!hasEditOnBlog='" + !hasEditOnBlog + "')");
+                  deleteArticles.add(article);
+                } else if(isSubscribed && !withSubscribed){
+                  LOGGER.info("'" + article.getDocName() + "' - Removed reason: from " +
+                      "subscribed blog && isDecided && (isSubscribed='" + isSubscribed + 
+                      "' && !withSubscribed='" + !withSubscribed + "')");
+                  deleteArticles.add(article);
+                }
               }
-            } else {
-              if(!isSubscribed && (!withUnsubscribed || !hasEditOnBlog)){
-                LOGGER.info("'" + article.getDocName() + "' - Removed reason: from " +
-                    "subscribed blog && isDecided && ((!isSubscribed='" + !isSubscribed + 
-                    "' && !withUnsubscribed='" + !withUnsubscribed + "') || " +
-                    "!hasEditOnBlog='" + !hasEditOnBlog + "')");
-                deleteArticles.add(article);
-              } else if(isSubscribed && !withSubscribed){
-                LOGGER.info("'" + article.getDocName() + "' - Removed reason: from " +
-                    "subscribed blog && isDecided && (isSubscribed='" + isSubscribed + 
-                    "' && !withSubscribed='" + !withSubscribed + "')");
-                deleteArticles.add(article);
-              }
+            } else if(subscribableOnly){
+              LOGGER.info("'" + article.getDocName() + "' - Removed reason: from own " +
+                  "blog, but subscribableOnly='" + subscribableOnly + "'");
+              deleteArticles.add(article);
             }
-          } else if(subscribableOnly){
-            LOGGER.info("'" + article.getDocName() + "' - Removed reason: from own " +
-                "blog, but subscribableOnly='" + subscribableOnly + "'");
+          } else{
+            LOGGER.info("'" + article.getDocName() + "' - Removed reason: has no rights");
             deleteArticles.add(article);
           }
-        } else{
-          LOGGER.info("'" + article.getDocName() + "' - Removed reason: has no rights");
-          deleteArticles.add(article);
+        } catch (XWikiException exp) {
+          LOGGER.error("filterRightsAndSubscription: Failed to check rights on: "
+              + article.getDocumentReference(), exp);
         }
       }
     }
@@ -643,4 +653,12 @@ public class BlogPlugin extends XWikiDefaultPlugin{
     }
     return nArticle;
   }
+
+  private IBlogServiceRole getBlogService() {
+    if (injected_BlogService != null) {
+      return injected_BlogService; 
+    }
+    return Utils.getComponent(IBlogServiceRole.class);
+  }
+
 }

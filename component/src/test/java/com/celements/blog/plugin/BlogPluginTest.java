@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -47,6 +48,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
   BlogPlugin plugin;
   XWikiContext context;
   XWiki xwiki;
+  private IBlogServiceRole blogServiceMock;
   
   @Before
   public void setUp_BlogPluginTest() throws Exception {
@@ -54,37 +56,43 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     context = getContext();
     context.setWiki(xwiki);
     plugin = new BlogPlugin("", "", context);
+    blogServiceMock = createMock(IBlogServiceRole.class);
+    plugin.injected_BlogService = blogServiceMock;
   }
 
   @Test
   public void testGetBlogArticles_getArchivedArticles() throws XWikiException {
     String artSpace = "ArtSpace";
+    DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace,
+        "Article");
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
     List<Object> artName = new ArrayList<Object>();
-    artName.add(artSpace + ".Article");
-    expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context)))
-        .andReturn(artName).once();
-    List<Object> configName = new ArrayList<Object>();
-    configName.add(artSpace + ".BlogConfig");
-    expect(xwiki.search(eq(getBlogConfigHQL(artSpace)), eq(1), eq(0), same(context)))
-        .andReturn(configName).atLeastOnce();
-    expect(xwiki.exists(eq(artSpace + ".BlogConfig"), same(context))).andReturn(true)
-        .atLeastOnce();
+    String articleFN = artSpace + ".Article";
+    artName.add(articleFN);
+    expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context))
+        ).andReturn(artName).once();
+    DocumentReference blogConfigDocRef = new DocumentReference(context.getDatabase(),
+        artSpace, "BlogConfig");
     XWikiDocument confxDoc = createMock(XWikiDocument.class);
     Document confDoc = createMock(Document.class);
-    expect(xwiki.getDocument(eq(artSpace + ".BlogConfig"), same(context)))
-        .andReturn(confxDoc).atLeastOnce();
-    expect(xwiki.getDocument(eq(artSpace + ".Article"), same(context))).andReturn(xdoc)
-        .atLeastOnce();
+    expect(xwiki.getDocument(eq(blogConfigDocRef), same(context))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(articleDocRef), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(articleFN), same(context))).andReturn(xdoc).atLeastOnce();
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("ArtSpace"))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(blogServiceMock.getBlogDocRefByBlogSpace(eq("ArtSpace"))).andReturn(
+        blogConfigDocRef).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq(artSpace), eq(""), 
         same(context))).andReturn("de").once();
     expect(confDoc.hasProgrammingRights()).andReturn(true).atLeastOnce();
     expect(confDoc.hasAccessLevel((String)anyObject())).andReturn(true).atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
-    expect(xdoc.newDocument(same(context))).andReturn(doc);
+    expect(xdoc.newDocument(same(context))).andReturn(doc).atLeastOnce();
     BaseObject obj = new BaseObject();
-    obj.setName(artSpace + ".Article");
+    obj.setDocumentReference(articleDocRef);
     obj.setStringValue("lang", "de");
     obj.setDateValue("publishdate", new Date(0, 11, 31));
     obj.setDateValue("archivedate", new Date(10, 0, 1));
@@ -99,43 +107,38 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef);
     expect(xdoc.getXObjects(eq(articleClassRef))).andReturn(objVec);
-    DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace, "Bla");
     expect(xdoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
-    replay(confDoc, confxDoc, xdoc, xwiki);
+    replayAll(confDoc, confxDoc, xdoc);
     List<Article> result = plugin.getBlogArticles(artSpace, "", "de", true, false,
         false, true, true, true, true, false, true, true, context);
     assertEquals(1, result.size());
-    verify(confDoc, confxDoc, xdoc, xwiki);
+    verifyAll(confDoc, confxDoc, xdoc);
   }
 
   @Test
   public void testGetBlogArticles_getArchivedArticles_notYetArchived(
       ) throws XWikiException {
     String artSpace = "ArtSpace";
+    DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace,
+        "Article");
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
     List<Object> artName = new ArrayList<Object>();
-    artName.add(artSpace + ".Article");
-    expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context)))
-        .andReturn(artName).once();
-    List<Object> configName = new ArrayList<Object>();
-    configName.add(artSpace + ".BlogConfig");
-    expect(xwiki.search(eq(getBlogConfigHQL(artSpace)), eq(1), eq(0), same(context)))
-        .andReturn(configName).atLeastOnce();
-    expect(xwiki.exists(eq(artSpace + ".BlogConfig"), same(context))).andReturn(true)
-        .atLeastOnce();
+    String articleFN = artSpace + ".Article";
+    artName.add(articleFN);
+    expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context))
+        ).andReturn(artName).once();
     XWikiDocument confxDoc = createMock(XWikiDocument.class);
     Document confDoc = createMock(Document.class);
-    expect(xwiki.getDocument(eq(artSpace + ".BlogConfig"), same(context)))
-        .andReturn(confxDoc).atLeastOnce();
-    expect(xwiki.getDocument(eq(artSpace + ".Article"), same(context))).andReturn(xdoc)
-        .atLeastOnce();
+    expect(xwiki.getDocument(eq(articleFN), same(context))).andReturn(xdoc).atLeastOnce();
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("ArtSpace"))).andReturn(confxDoc
+        ).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq(artSpace), eq(""), 
         same(context))).andReturn("de").once();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc);
     BaseObject obj = new BaseObject();
-    obj.setName(artSpace + ".Article");
+    obj.setDocumentReference(articleDocRef);
     obj.setStringValue("lang", "de");
     obj.setDateValue("publishdate", new Date(8089, 0, 1));
     obj.setDateValue("archivedate", new Date(8099, 11, 31));
@@ -149,38 +152,41 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef);
     expect(xdoc.getXObjects(eq(articleClassRef))).andReturn(objVec);
-    DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace, "Bla");
     expect(xdoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xdoc.getSpace()).andReturn(artSpace).atLeastOnce();
-    replay(confDoc, confxDoc, xdoc, xwiki);
+    replayAll(confDoc, confxDoc, xdoc);
     List<Article> result = plugin.getBlogArticles(artSpace, "", "de", true, false,
         false, true, true, true, true, false, true, true, context);
     assertEquals("0 Articles expected, but received " + result.size(), 0, result.size());
-    verify(confDoc, confxDoc, xdoc, xwiki);
+    verifyAll(confDoc, confxDoc, xdoc);
   }
 
   @Test
   public void testGetBlogArticles_getArchivedArticles_archiveBeforePublish(
       ) throws XWikiException {
     String artSpace = "ArtSpace";
+    DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace,
+        "Article");
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
     List<Object> artName = new ArrayList<Object>();
-    artName.add(artSpace + ".Article");
-    expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context)))
-        .andReturn(artName).once();
-    List<Object> configName = new ArrayList<Object>();
-    configName.add(artSpace + ".BlogConfig");
-    expect(xwiki.search(eq(getBlogConfigHQL(artSpace)), eq(1), eq(0), same(context)))
-        .andReturn(configName).atLeastOnce();
-    expect(xwiki.exists(eq(artSpace + ".BlogConfig"), same(context))).andReturn(true)
-        .atLeastOnce();
+    String articleFN = artSpace + ".Article";
+    artName.add(articleFN);
+    expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context))
+        ).andReturn(artName).once();
+    DocumentReference blogConfigDocRef = new DocumentReference(context.getDatabase(),
+        artSpace, "BlogConfig");
     XWikiDocument confxDoc = createMock(XWikiDocument.class);
     Document confDoc = createMock(Document.class);
-    expect(xwiki.getDocument(eq(artSpace + ".BlogConfig"), same(context)))
-        .andReturn(confxDoc).atLeastOnce();
-    expect(xwiki.getDocument(eq(artSpace + ".Article"), same(context))).andReturn(xdoc)
-        .atLeastOnce();
+    expect(xwiki.getDocument(eq(blogConfigDocRef), same(context))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(articleDocRef), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(articleFN), same(context))).andReturn(xdoc).atLeastOnce();
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("ArtSpace"))).andReturn(confxDoc
+      ).atLeastOnce();
+    expect(blogServiceMock.getBlogDocRefByBlogSpace(eq("ArtSpace"))).andReturn(
+        blogConfigDocRef).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq(artSpace), eq(""), 
         same(context))).andReturn("de").once();
     expect(confDoc.hasProgrammingRights()).andReturn(true).atLeastOnce();
@@ -188,7 +194,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc);
     BaseObject obj = new BaseObject();
-    obj.setName(artSpace + ".Article");
+    obj.setDocumentReference(articleDocRef);
     obj.setStringValue("lang", "de");
     obj.setDateValue("publishdate", new Date(8099, 11, 31));
     obj.setDateValue("archivedate", new Date(0, 0, 1));
@@ -202,38 +208,41 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef);
     expect(xdoc.getXObjects(eq(articleClassRef))).andReturn(objVec);
-    DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace, "Bla");
     expect(xdoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xdoc.getSpace()).andReturn(artSpace).atLeastOnce();
-    replay(confDoc, confxDoc, xdoc, xwiki);
+    replayAll(confDoc, confxDoc, xdoc);
     List<Article> result = plugin.getBlogArticles(artSpace, "", "de", true, false,
         false, true, true, true, true, false, true, true, context);
     assertEquals(1, result.size());
-    verify(confDoc, confxDoc, xdoc, xwiki);
+    verifyAll(confDoc, confxDoc, xdoc);
   }
 
   @Test
   public void testGetBlogArticles_getArchivedArticles_archiveBeforePublishBeforeToday(
       ) throws XWikiException {
     String artSpace = "ArtSpace";
+    DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace,
+        "Article");
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
     List<Object> artName = new ArrayList<Object>();
-    artName.add(artSpace + ".Article");
-    expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context)))
-        .andReturn(artName).once();
-    List<Object> configName = new ArrayList<Object>();
-    configName.add(artSpace + ".BlogConfig");
-    expect(xwiki.search(eq(getBlogConfigHQL(artSpace)), eq(1), eq(0), same(context)))
-        .andReturn(configName).atLeastOnce();
-    expect(xwiki.exists(eq(artSpace + ".BlogConfig"), same(context))).andReturn(true)
-        .atLeastOnce();
+    String articleFN = artSpace + ".Article";
+    artName.add(articleFN);
+    expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context))
+        ).andReturn(artName).once();
+    DocumentReference blogConfigDocRef = new DocumentReference(context.getDatabase(),
+        artSpace, "BlogConfig");
     XWikiDocument confxDoc = createMock(XWikiDocument.class);
     Document confDoc = createMock(Document.class);
-    expect(xwiki.getDocument(eq(artSpace + ".BlogConfig"), same(context)))
-        .andReturn(confxDoc).atLeastOnce();
-    expect(xwiki.getDocument(eq(artSpace + ".Article"), same(context))).andReturn(xdoc)
-        .atLeastOnce();
+    expect(xwiki.getDocument(eq(blogConfigDocRef), same(context))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(articleDocRef), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(articleFN), same(context))).andReturn(xdoc).atLeastOnce();
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("ArtSpace"))).andReturn(confxDoc
+      ).atLeastOnce();
+    expect(blogServiceMock.getBlogDocRefByBlogSpace(eq("ArtSpace"))).andReturn(
+        blogConfigDocRef).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq(artSpace), eq(""), 
         same(context))).andReturn("de").once();
     expect(confDoc.hasProgrammingRights()).andReturn(true).atLeastOnce();
@@ -241,7 +250,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc);
     BaseObject obj = new BaseObject();
-    obj.setName(artSpace + ".Article");
+    obj.setDocumentReference(articleDocRef);
     obj.setStringValue("lang", "de");
     obj.setDateValue("publishdate", new Date(10, 11, 31));
     obj.setDateValue("archivedate", new Date(0, 0, 1));
@@ -255,44 +264,41 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef);
     expect(xdoc.getXObjects(eq(articleClassRef))).andReturn(objVec);
-    DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace, "Bla");
     expect(xdoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xdoc.getSpace()).andReturn(artSpace).atLeastOnce();
-    replay(confDoc, confxDoc, xdoc, xwiki);
+    replayAll(confDoc, confxDoc, xdoc);
     List<Article> result = plugin.getBlogArticles(artSpace, "", "de", true, false,
         false, true, true, true, true, false, true, true, context);
     assertEquals(1, result.size());
-    verify(confDoc, confxDoc, xdoc, xwiki);
+    verifyAll(confDoc, confxDoc, xdoc);
   }
 
   @Test
   public void testGetBlogArticles_getArchivedArticles_noArchiveDateSet(
       ) throws XWikiException {
     String artSpace = "ArtSpace";
+    DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace,
+        "Article");
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
     List<Object> artName = new ArrayList<Object>();
-    artName.add(artSpace + ".Article");
-    expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context)))
-        .andReturn(artName).once();
-    List<Object> configName = new ArrayList<Object>();
-    configName.add(artSpace + ".BlogConfig");
-    expect(xwiki.search(eq(getBlogConfigHQL(artSpace)), eq(1), eq(0), same(context)))
-        .andReturn(configName).atLeastOnce();
-    expect(xwiki.exists(eq(artSpace + ".BlogConfig"), same(context))).andReturn(true)
-        .atLeastOnce();
+    String articleFN = artSpace + ".Article";
+    artName.add(articleFN);
+    expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context))
+        ).andReturn(artName).once();
+    DocumentReference blogConfigDocRef = new DocumentReference(context.getDatabase(),
+        artSpace, "BlogConfig");
     XWikiDocument confxDoc = createMock(XWikiDocument.class);
     Document confDoc = createMock(Document.class);
-    expect(xwiki.getDocument(eq(artSpace + ".BlogConfig"), same(context)))
-        .andReturn(confxDoc).atLeastOnce();
-    expect(xwiki.getDocument(eq(artSpace + ".Article"), same(context))).andReturn(xdoc)
-        .atLeastOnce();
+    expect(xwiki.getDocument(eq(articleFN), same(context))).andReturn(xdoc).atLeastOnce();
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("ArtSpace"))).andReturn(confxDoc
+      ).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq(artSpace), eq(""), 
         same(context))).andReturn("de").once();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
     expect(xdoc.newDocument(same(context))).andReturn(doc);
     BaseObject obj = new BaseObject();
-    obj.setName(artSpace + ".Article");
+    obj.setDocumentReference(articleDocRef);
     obj.setStringValue("lang", "de");
     obj.setDateValue("publishdate", new Date(9999, 11, 31));
     obj.setDateValue("archivedate", null);
@@ -306,21 +312,20 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(
         articleClassRef);
     expect(xdoc.getXObjects(eq(articleClassRef))).andReturn(objVec);
-    DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace, "Bla");
     expect(xdoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xdoc.getSpace()).andReturn(artSpace).atLeastOnce();
-    replay(confDoc, confxDoc, xdoc, xwiki);
+    replayAll(confDoc, confxDoc, xdoc);
     List<Article> result = plugin.getBlogArticles(artSpace, "", "de", true, false,
         false, true, true, true, true, false, true, true, context);
     assertEquals(0, result.size());
-    verify(confDoc, confxDoc, xdoc, xwiki);
+    verifyAll(confDoc, confxDoc, xdoc);
   }
   
   @Test
   public void testGetNeighbourArticle_next() throws XWikiException {
     context.setLanguage("de");
     Article article = createMock(Article.class);
-    expect(article.getDocName()).andReturn("Space.Article2").anyTimes();
+    expect(article.getDocName()).andReturn("Space.Article2").atLeastOnce();
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
     List<Object> artName = new ArrayList<Object>();
@@ -328,26 +333,34 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     artName.add("Space.Article2");
     artName.add("Space.Article3");
     artName.add("Space.Article4");
-    expect(xwiki.search(eq(getAllArticlesHQL("Space")), same(context)))
-        .andReturn(artName).once();
-    List<Object> configName = new ArrayList<Object>();
-    configName.add("Space.BlogConfig");
-    expect(xwiki.search(eq(getBlogConfigHQL("Space")), eq(1), eq(0), same(context)))
-        .andReturn(configName).atLeastOnce();
-    expect(xwiki.exists(eq("Space.BlogConfig"), same(context))).andReturn(true)
-        .atLeastOnce();
+    expect(xwiki.search(eq(getAllArticlesHQL("Space")), same(context))
+        ).andReturn(artName).once();
     XWikiDocument confxDoc = createMock(XWikiDocument.class);
     Document confDoc = createMock(Document.class);
-    expect(xwiki.getDocument(eq("Space.BlogConfig"), same(context)))
-        .andReturn(confxDoc).atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article1"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article2"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article3"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
+    DocumentReference blogConfigDocRef = new DocumentReference(context.getDatabase(),
+        "Space", "BlogConfig");
+    expect(xwiki.getDocument(eq(blogConfigDocRef), same(context))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("Space"))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(blogServiceMock.getBlogDocRefByBlogSpace(eq("Space"))).andReturn(
+        blogConfigDocRef).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article1")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article1"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article2")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article2"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article3")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article3"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article4")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("Space"), eq(""), 
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
@@ -366,18 +379,18 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expect(xdoc.getSpace()).andReturn("Space").atLeastOnce();
     expect(confDoc.hasProgrammingRights()).andReturn(true).atLeastOnce();
     expect(confDoc.hasAccessLevel((String)anyObject())).andReturn(true).atLeastOnce();
-    replay(article, confDoc, confxDoc, xdoc, xwiki);
+    replayAll(article, confDoc, confxDoc, xdoc);
     Article next = plugin.getNeighbourArticle(article, true, context);
     assertNotNull(next);
     assertEquals("Space.Article3", next.getDocName());
-    verify(article, confDoc, confxDoc, xdoc, xwiki);
+    verifyAll(article, confDoc, confxDoc, xdoc);
   }
   
   @Test
   public void testGetNeighbourArticle_next_last() throws XWikiException {
     context.setLanguage("de");
     Article article = createMock(Article.class);
-    expect(article.getDocName()).andReturn("Space.Article4").anyTimes();
+    expect(article.getDocName()).andReturn("Space.Article4").atLeastOnce();
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
     List<Object> artName = new ArrayList<Object>();
@@ -385,26 +398,34 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     artName.add("Space.Article2");
     artName.add("Space.Article3");
     artName.add("Space.Article4");
-    expect(xwiki.search(eq(getAllArticlesHQL("Space")), same(context)))
-        .andReturn(artName).once();
-    List<Object> configName = new ArrayList<Object>();
-    configName.add("Space.BlogConfig");
-    expect(xwiki.search(eq(getBlogConfigHQL("Space")), eq(1), eq(0), same(context)))
-        .andReturn(configName).atLeastOnce();
-    expect(xwiki.exists(eq("Space.BlogConfig"), same(context))).andReturn(true)
-        .atLeastOnce();
+    expect(xwiki.search(eq(getAllArticlesHQL("Space")), same(context))
+        ).andReturn(artName).once();
     XWikiDocument confxDoc = createMock(XWikiDocument.class);
     Document confDoc = createMock(Document.class);
-    expect(xwiki.getDocument(eq("Space.BlogConfig"), same(context)))
-        .andReturn(confxDoc).atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article1"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article2"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article3"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
+    DocumentReference blogConfigDocRef = new DocumentReference(context.getDatabase(),
+        "Space", "BlogConfig");
+    expect(xwiki.getDocument(eq(blogConfigDocRef), same(context))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("Space"))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(blogServiceMock.getBlogDocRefByBlogSpace(eq("Space"))).andReturn(
+        blogConfigDocRef).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article1")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article1"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article2")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article2"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article3")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article3"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article4")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("Space"), eq(""), 
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
@@ -423,18 +444,18 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expect(xdoc.getSpace()).andReturn("Space").atLeastOnce();
     expect(confDoc.hasProgrammingRights()).andReturn(true).atLeastOnce();
     expect(confDoc.hasAccessLevel((String)anyObject())).andReturn(true).atLeastOnce();
-    replay(article, confDoc, confxDoc, xdoc, xwiki);
+    replayAll(article, confDoc, confxDoc, xdoc);
     Article next = plugin.getNeighbourArticle(article, true, context);
     assertNotNull(next);
     assertEquals("Space.Article1", next.getDocName());
-    verify(article, confDoc, confxDoc, xdoc, xwiki);
+    verifyAll(article, confDoc, confxDoc, xdoc);
   }
   
   @Test
   public void testGetNeighbourArticle_prev() throws XWikiException {
     context.setLanguage("de");
     Article article = createMock(Article.class);
-    expect(article.getDocName()).andReturn("Space.Article3").anyTimes();
+    expect(article.getDocName()).andReturn("Space.Article3").atLeastOnce();
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
     List<Object> artName = new ArrayList<Object>();
@@ -442,26 +463,34 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     artName.add("Space.Article2");
     artName.add("Space.Article3");
     artName.add("Space.Article4");
-    expect(xwiki.search(eq(getAllArticlesHQL("Space")), same(context)))
-        .andReturn(artName).once();
-    List<Object> configName = new ArrayList<Object>();
-    configName.add("Space.BlogConfig");
-    expect(xwiki.search(eq(getBlogConfigHQL("Space")), eq(1), eq(0), same(context)))
-        .andReturn(configName).atLeastOnce();
-    expect(xwiki.exists(eq("Space.BlogConfig"), same(context))).andReturn(true)
-        .atLeastOnce();
+    expect(xwiki.search(eq(getAllArticlesHQL("Space")), same(context))
+        ).andReturn(artName).once();
     XWikiDocument confxDoc = createMock(XWikiDocument.class);
     Document confDoc = createMock(Document.class);
-    expect(xwiki.getDocument(eq("Space.BlogConfig"), same(context)))
-        .andReturn(confxDoc).atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article1"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article2"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article3"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
+    DocumentReference blogConfigDocRef = new DocumentReference(context.getDatabase(),
+        "Space", "BlogConfig");
+    expect(xwiki.getDocument(eq(blogConfigDocRef), same(context))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("Space"))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(blogServiceMock.getBlogDocRefByBlogSpace(eq("Space"))).andReturn(
+        blogConfigDocRef).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article1")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article1"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article2")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article2"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article3")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article3"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article4")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("Space"), eq(""), 
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
@@ -480,18 +509,18 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expect(xdoc.getSpace()).andReturn("Space").atLeastOnce();
     expect(confDoc.hasProgrammingRights()).andReturn(true).atLeastOnce();
     expect(confDoc.hasAccessLevel((String)anyObject())).andReturn(true).atLeastOnce();
-    replay(article, confDoc, confxDoc, xdoc, xwiki);
+    replayAll(article, confDoc, confxDoc, xdoc);
     Article next = plugin.getNeighbourArticle(article, false, context);
     assertNotNull(next);
     assertEquals("Space.Article2", next.getDocName());
-    verify(article, confDoc, confxDoc, xdoc, xwiki);
+    verifyAll(article, confDoc, confxDoc, xdoc);
   }
   
   @Test
   public void testGetNeighbourArticle_prev_first() throws XWikiException {
     context.setLanguage("de");
     Article article = createMock(Article.class);
-    expect(article.getDocName()).andReturn("Space.Article1").anyTimes();
+    expect(article.getDocName()).andReturn("Space.Article1").atLeastOnce();
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
     List<Object> artName = new ArrayList<Object>();
@@ -499,26 +528,34 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     artName.add("Space.Article2");
     artName.add("Space.Article3");
     artName.add("Space.Article4");
-    expect(xwiki.search(eq(getAllArticlesHQL("Space")), same(context)))
-        .andReturn(artName).once();
-    List<Object> configName = new ArrayList<Object>();
-    configName.add("Space.BlogConfig");
-    expect(xwiki.search(eq(getBlogConfigHQL("Space")), eq(1), eq(0), same(context)))
-        .andReturn(configName).atLeastOnce();
-    expect(xwiki.exists(eq("Space.BlogConfig"), same(context))).andReturn(true)
-        .atLeastOnce();
+    expect(xwiki.search(eq(getAllArticlesHQL("Space")), same(context))
+        ).andReturn(artName).once();
     XWikiDocument confxDoc = createMock(XWikiDocument.class);
     Document confDoc = createMock(Document.class);
-    expect(xwiki.getDocument(eq("Space.BlogConfig"), same(context)))
-        .andReturn(confxDoc).atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article1"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article2"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article3"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
-    expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc)
-    .atLeastOnce();
+    DocumentReference blogConfigDocRef = new DocumentReference(context.getDatabase(),
+        "Space", "BlogConfig");
+    expect(xwiki.getDocument(eq(blogConfigDocRef), same(context))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq("Space"))).andReturn(confxDoc
+        ).atLeastOnce();
+    expect(blogServiceMock.getBlogDocRefByBlogSpace(eq("Space"))).andReturn(
+        blogConfigDocRef).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article1")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article1"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article2")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article2"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article3")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article3"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
+    expect(xwiki.getDocument(eq(getDocRef("Space","Article4")), same(context))).andReturn(
+        xdoc).atLeastOnce();
+    expect(xwiki.getDocument(eq("Space.Article4"), same(context))).andReturn(xdoc
+        ).atLeastOnce();
     expect(xwiki.getSpacePreference(eq("default_language"), eq("Space"), eq(""), 
         same(context))).andReturn("de").atLeastOnce();
     expect(confxDoc.newDocument(same(context))).andReturn(confDoc).atLeastOnce();
@@ -537,11 +574,11 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expect(xdoc.getSpace()).andReturn("Space").atLeastOnce();
     expect(confDoc.hasProgrammingRights()).andReturn(true).atLeastOnce();
     expect(confDoc.hasAccessLevel((String)anyObject())).andReturn(true).atLeastOnce();
-    replay(article, confDoc, confxDoc, xdoc, xwiki);
+    replayAll(article, confDoc, confxDoc, xdoc);
     Article next = plugin.getNeighbourArticle(article, false, context);
     assertNotNull(next);
     assertEquals("Space.Article4", next.getDocName());
-    verify(article, confDoc, confxDoc, xdoc, xwiki);
+    verifyAll(article, confDoc, confxDoc, xdoc);
   }
   
   @Test
@@ -562,9 +599,9 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         .andThrow(new XWikiException());
     expect(messageTool.get(eq("cel_newsletter_subscriber_invalid"))).andReturn(
         "invalid").once();
-    replay(context, messageTool, xwiki);
+    replayAll(context, messageTool);
     assertEquals(result, plugin.batchImportReceivers(false, importData, nl, context));
-    verify(context, messageTool, xwiki);
+    verifyAll(context, messageTool);
   }
   
   @Test
@@ -602,9 +639,9 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     expectLastCall();
     expect(messageTool.get(eq("cel_newsletter_subscriber_active"))).andReturn(
         "active").once();
-    replay(context, doc1, messageTool, nlDoc, xwiki);
+    replayAll(context, doc1, messageTool, nlDoc);
     assertEquals(result, plugin.batchImportReceivers(false, importData, nl, context));
-    verify(context, doc1, messageTool, nlDoc, xwiki);
+    verifyAll(context, doc1, messageTool, nlDoc);
   }
   
   @Test
@@ -642,9 +679,9 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         "inactive").anyTimes();
     xwiki.saveDocument(same(doc1), same(context));
     expectLastCall();
-    replay(context, doc1, messageTool, nlDoc, xwiki);
+    replayAll(context, doc1, messageTool, nlDoc);
     assertEquals(result, plugin.batchImportReceivers(true, importData, nl, context));
-    verify(context, doc1, messageTool, nlDoc, xwiki);
+    verifyAll(context, doc1, messageTool, nlDoc);
   }
   
   @Test
@@ -680,10 +717,10 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         eq(nl), eq(false))).andReturn(obj).times(2);
     expect(messageTool.get(eq("cel_newsletter_subscriber_inactive"))).andReturn(
         "inactive").anyTimes();
-    replay(context, doc1, messageTool, nlDoc, xwiki);
+    replayAll(context, doc1, messageTool, nlDoc);
     assertEquals(result, plugin.batchImportReceivers(false, importData, nl, context));
     assertEquals(0, obj.getIntValue("isactive"));
-    verify(context, doc1, messageTool, nlDoc, xwiki);
+    verifyAll(context, doc1, messageTool, nlDoc);
   }
   
   @Test
@@ -725,9 +762,9 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
         .times(2);
     expect(messageTool.get(eq("cel_newsletter_subscriber_inactive"))).andReturn(
         "inactive").once();
-    replay(context, doc1, messageTool, nlDoc, xwiki);
+    replayAll(context, doc1, messageTool, nlDoc);
     assertEquals(result, plugin.batchImportReceivers(true, importData, nl, context));
-    verify(context, doc1, messageTool, nlDoc, xwiki);
+    verifyAll(context, doc1, messageTool, nlDoc);
   }
 
   @Test
@@ -793,6 +830,22 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
   //*************************************************************************************
   // HELPER
   //*************************************************************************************
+
+  
+  private void replayAll(Object ... mocks) {
+    replay(xwiki, blogServiceMock);
+    replay(mocks);
+  }
+
+  private void verifyAll(Object ... mocks) {
+    verify(xwiki, blogServiceMock);
+    verify(mocks);
+  }
+
+  private DocumentReference getDocRef(String spaceName, String pageName) {
+    return new DocumentReference(context.getDatabase(), spaceName, pageName);
+  }
+
   private Vector<BaseObject> getArticleObjVect(int i) {
     Vector<BaseObject> objVec = new Vector<BaseObject>();
     BaseObject obj = new BaseObject();
