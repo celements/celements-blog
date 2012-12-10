@@ -67,6 +67,10 @@ public class BlogPlugin extends XWikiDefaultPlugin{
     return "celementsblog";
   }
 
+  /**
+   * @deprecated since 1.4 use BlogService.getBlogPageByBlogSpace instead
+   */
+  @Deprecated
   public XWikiDocument getBlogPageByBlogSpace(String blogSpaceName,
       XWikiContext context) throws XWikiException{
     return BlogUtils.getInstance(
