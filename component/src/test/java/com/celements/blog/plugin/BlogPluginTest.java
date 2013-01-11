@@ -773,6 +773,9 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
     assertEquals("xpo+bedo@credo.ch", plugin.extractEmailFromString("xpo+bedo@credo.ch"));
     assertEquals("aco@bla.tra", plugin.extractEmailFromString("H. Meier <aco@bla.tra>"));
     assertEquals("aco@bla.tra", plugin.extractEmailFromString("wucht aco@bla.tra trala"));
+    assertEquals("myName.Meier-Mueller@mail.com", plugin.extractEmailFromString("myName.Meier-Mueller@mail.com"));
+    assertEquals("Meier_Mueller@mail.com", plugin.extractEmailFromString("Meier_Mueller@mail.com"));
+    assertEquals("Meier.Mueller@mail.com", plugin.extractEmailFromString("Meier.Mueller@mail.com"));
   }
 
   @Test
@@ -800,6 +803,9 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase{
   @Test
   public void testGetContainsEmailRegex() {
     assertTrue("myName@mail.com".matches(plugin.getContainsEmailRegex()));
+    assertTrue("myName.Meier@mail.com".matches(plugin.getContainsEmailRegex()));
+    assertTrue("myName.Meier-Mueller@mail.com".matches(plugin.getContainsEmailRegex()));
+    assertTrue("myName+test@mail.com".matches(plugin.getContainsEmailRegex()));
     assertFalse("Nice meaningless text.".matches(plugin.getContainsEmailRegex()));
   }
   

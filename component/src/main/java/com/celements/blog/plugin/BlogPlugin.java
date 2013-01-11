@@ -413,7 +413,7 @@ public class BlogPlugin extends XWikiDefaultPlugin{
   }
 
   String getContainsEmailRegex() {
-    return ".*?([\\w+\\.]+[@][\\w\\-]+([.][\\w\\-]+)+).*";
+    return ".*?([\\w+\\.\\-\\_]+[@][\\w\\-\\_]+([.][\\w\\-\\_]+)+).*";
   }
   
   public String subscribeNewsletter(boolean inactiveWithoutMail, Map<String, String> 
