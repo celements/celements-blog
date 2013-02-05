@@ -1,5 +1,6 @@
-    #set($articleBlogMoreLinkParams = "$!articleBlogMoreLinkParams")
-    #set($bentrydoc = $xwiki.getDocument($article.getDocumentReference()))
+  #set($articleBlogMoreLinkParams = "$!articleBlogMoreLinkParams")
+  #set($bentrydoc = $xwiki.getDocument($article.getDocumentReference()))
+  #if("$!bentrydoc" != '')
     #set($creationDate = '')
     #set($creationDateStr = '')
     #set($creationDate = $article.getPublishDate())
@@ -88,3 +89,6 @@
 #parse('celMacros/blogArticleSubscribeBar.vm')
     #end
     </div> <!-- article_abstract -->
+#else
+  <!-- not enough rights on $services.model.serialize($article.getDocumentReference()) --> 
+#end
