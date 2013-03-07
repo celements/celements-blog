@@ -176,7 +176,7 @@ public class BlogClasses extends AbstractClassCollection {
         false, "plain|wysiwyg", "select");
     needsUpdate |= bclass.addTextField("blogspace", "blogspace", 30);
     needsUpdate |= bclass.addStaticListField("viewtype", "viewtype", 1,
-        false, "extract|full", "select");
+        false, "title|extract|full", "select");
     needsUpdate |= bclass.addBooleanField("has_comments", "has_comments",
         "yesno");
     needsUpdate |= bclass.addNumberField(MAX_NUM_CHARS_FIELD, "max number of characters"

@@ -39,49 +39,47 @@
     #end
     #set($fullTextLink = "$xwiki.getURL($article.getDocName(),'view', $articleBlogMoreLinkParams)")
     <div class="article_title $!{article.getTitleLang($language)} h1">
-    #if("$!viewtype" == 'extract')<a class='article_link' href="$fullTextLink">#end
+    #if(("$!viewtype" == 'extract') || ("$!viewtype" == 'title'))<a class='article_link' href="$fullTextLink">#end
     $article.getTitle($language)
-    #if("$!viewtype" == 'extract')</a>#end</div>
-    <div class="text $!{article.getExtractLang($language, $viewtypefull)}">
-    #if("$!viewtype" == 'extract')
-      #set($viewtypefull = false)
-    #elseif("$!viewtype" == 'full')
-      #set($viewtypefull = true)
-    #end
-    #set($content = $article.getExtract("$language", $viewtypefull))
-    #if($article.hasMoreLink("$language", $viewtypefull))
-      #if($article.hasMoreLinkDots("$language", $viewtypefull))
-        #set($content = "$content ...")
+    #if(("$!viewtype" == 'extract') || ("$!viewtype" == 'title'))</a>#end</div>
+    #if("$!viewtype" != 'title')
+      <div class="text $!{article.getExtractLang($language, $viewtypefull)}">
+      #set($viewtypefull = ("$!viewtype" == 'full'))
+      #set($content = $article.getExtract("$language", $viewtypefull))
+      #if($article.hasMoreLink("$language", $viewtypefull))
+        #if($article.hasMoreLinkDots("$language", $viewtypefull))
+          #set($content = "$content ...")
+        #end
+        <!-- moreLink: $language , $msg.get('cel_rls_blog_article_more') -->
+        #set($content = "$content <a class='article_link' href='$xwiki.getURL($article.getDocName(),'view', $articleBlogMoreLinkParams)'>$msg.get('cel_rls_blog_article_more')</a>")
       #end
-      <!-- moreLink: $language , $msg.get('cel_rls_blog_article_more') -->
-      #set($content = "$content <a class='article_link' href='$xwiki.getURL($article.getDocName(),'view', $articleBlogMoreLinkParams)'>$msg.get('cel_rls_blog_article_more')</a>")
-    #end
-    $xwiki.renderText($content, $bentrydoc)
-    #if($has_comments)
-      #if($viewtypefull)
+      $xwiki.renderText($content, $bentrydoc)
+      #if($has_comments)
+        #if($viewtypefull)
 #set($inline = true)
 #set($articleDoc = $xwiki.getDocument($article.getDocumentReference()))
 #parse('celMacros/getInlineBlogComments.vm')
-      #else
-      <div class="comment">
-      <a class='article_link' href="$fullTextLink">
-      #set($comment_obj = $!bentrydoc.getObjects('XWiki.XWikiComments'))
-      #set($commentCount = 0)
-      #if("$!comment_obj" != '')
-        #foreach($comment in $comment_obj)
-          #set($commentCount = $commentCount + 1)
+        #else
+        <div class="comment">
+        <a class='article_link' href="$fullTextLink">
+        #set($comment_obj = $!bentrydoc.getObjects('XWiki.XWikiComments'))
+        #set($commentCount = 0)
+        #if("$!comment_obj" != '')
+          #foreach($comment in $comment_obj)
+            #set($commentCount = $commentCount + 1)
+          #end
         #end
+        #if($commentCount == 1)
+          $commentCount $adminMsg.get('cel_tm_comment')
+        #else
+          $commentCount $adminMsg.get('cel_tm_comments')
+        #end
+        </a>
+        </div> ## comment
+        #end ## no full view
       #end
-      #if($commentCount == 1)
-        $commentCount $adminMsg.get('cel_tm_comment')
-      #else
-        $commentCount $adminMsg.get('cel_tm_comments')
-      #end
-      </a>
-      </div>
-    #end ## no full view
-    #end
-    </div> <!-- article_content -->
+      </div> <!-- article_content -->
+    #end ## if("$!viewtype" != 'title')
     <div class="clearleft"><!-- required:floating images --></div>
     #if(($article.getDocName().indexOf("$!{spacename}.") != 0) && $article.isSubscribable() && $article.isFromSubscribableBlog("$blogDoc.getFullName()"))
       #set($blogSaveArticle = $bentrydoc)
