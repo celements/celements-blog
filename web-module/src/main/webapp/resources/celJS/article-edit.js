@@ -4,19 +4,25 @@ Event.observe(window, 'load', function(){
   $('edit').observe('submit', setObjectValues);
 });
 
-function setObjectValues(){
-  var archivedate = $$('.archivedate_hidden_deflang')[0].value;
-  $$('.archivedate_hidden_langs').each(function(elem) {
-    elem.value = archivedate;
-  });
-  
-  var publishdate = $$('.publishdate_hidden_deflang')[0].value;
-  $$('.publishdate_hidden_langs').each(function(elem) {
-    elem.value = publishdate;
-  });
-  
-  var subscribable = $$('.isSubscribable_hidden_deflang')[0].value;
-  $$('.isSubscribable_hidden_langs').each(function(elem) {
-    elem.value = subscribable;
-  });
-}
+function setObjectValues() {
+  if ($$('.archivedate_hidden_deflang').size() > 0) {
+    var archivedate = $$('.archivedate_hidden_deflang')[0].value;
+    $$('.archivedate_hidden_langs').each(function(elem) {
+      elem.value = archivedate;
+    });
+  }
+
+  if ($$('.publishdate_hidden_deflang').size() > 0) {
+    var publishdate = $$('.publishdate_hidden_deflang')[0].value;
+    $$('.publishdate_hidden_langs').each(function(elem) {
+      elem.value = publishdate;
+    });
+  }
+
+  if ($$('.isSubscribable_hidden_deflang').size() > 0) {
+    var subscribable = $$('.isSubscribable_hidden_deflang')[0].value;
+    $$('.isSubscribable_hidden_langs').each(function(elem) {
+      elem.value = subscribable;
+    });
+  }
+};
