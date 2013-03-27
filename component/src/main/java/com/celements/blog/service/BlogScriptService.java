@@ -14,12 +14,16 @@ import org.xwiki.script.service.ScriptService;
 import com.celements.blog.plugin.NewsletterReceivers;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component("celblog")
 public class BlogScriptService implements ScriptService {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       BlogScriptService.class);
+
+  @Requirement
+  BlogService blogService;
 
   @Requirement
   Execution execution;
@@ -42,6 +46,14 @@ public class BlogScriptService implements ScriptService {
           + "] has no admin rights.");
     }
     return Collections.emptyList();
+  }
+
+  public DocumentReference getBlogDocRefByBlogSpace(String blogSpaceName) {
+    XWikiDocument blogPageByBlogSpace = blogService.getBlogPageByBlogSpace(blogSpaceName); 
+    if (blogPageByBlogSpace != null) {
+      return blogPageByBlogSpace.getDocumentReference();
+    }
+    return null;
   }
 
 }
