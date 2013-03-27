@@ -3,8 +3,13 @@ $context.setCacheDuration(0)
 #if("$!renderDocument" != '')
   #set($blogDoc = $renderDocument)
 #end
+#if("$!pageDoc.documentReference" != '')
+#set($theDoc = $xwiki.getDocument($pageDoc.documentReference))
+#else
+#set($theDoc = $doc)
+#end
 #if("$!blogDoc" ==  '')
-#set($blogDoc = $doc)
+#set($blogDoc = $theDoc)
 #end
 #if("$!suppressSubscribeable" == '')
   #set($suppressSubscribeable = false)
@@ -15,7 +20,7 @@ $context.setCacheDuration(0)
 #set($isarchive = (("$request.archive" == '1') || ("$cel_redParams_Map.get('archive')" == '1')))
 #if("$!blogTitle" == '')
 #if($isarchive)
-#set($titleDoc = $doc)
+#set($titleDoc = $theDoc)
 #else
 #set($titleDoc = $blogDoc)
 #end
