@@ -23,7 +23,7 @@ public class BlogScriptService implements ScriptService {
       BlogScriptService.class);
 
   @Requirement
-  BlogService blogService;
+  IBlogServiceRole blogService;
 
   @Requirement
   Execution execution;
