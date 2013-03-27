@@ -51,6 +51,11 @@ public class BlogPluginApi extends Api {
     return plugin;
   }
 
+  /**
+   * @deprecated since 1.9 blog-web release - instead use getBlogDocRefByBlogSpace
+   *             in celBlog script service
+   */
+  @Deprecated
   public Document getBlogPageByBlogSpace(String blogSpaceName) throws XWikiException {
     XWikiDocument blogPageByBlogSpace = plugin.getBlogPageByBlogSpace(blogSpaceName,
         context);
