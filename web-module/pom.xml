@@ -29,7 +29,6 @@
     <version>2.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.celements</groupId>
   <artifactId>blog-web</artifactId>
   <packaging>war</packaging>
   <name>Blog Web-Module</name>
