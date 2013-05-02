@@ -5,6 +5,8 @@ $context.setCacheDuration(0)
 #end
 #if("$!pageDoc.documentReference" != '')
 #set($theDoc = $xwiki.getDocument($pageDoc.documentReference))
+#elseif("$!celldoc" != '')
+#set($theDoc = $celldoc)
 #else
 #set($theDoc = $doc)
 #end
