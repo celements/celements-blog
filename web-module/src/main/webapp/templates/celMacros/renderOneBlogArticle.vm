@@ -7,8 +7,7 @@
     #if("$!creationDate" != '')
       #set($blog_dateFormat = $msg.get('cel_blog_dateformat'))
       #if("$!blog_dateFormat" == '')
-      ##TODO i18n issue: we must use java DateFormat for given language.
-      #set($blog_dateFormat = "dd. MMMM, yyyy")
+      #set($blog_dateFormat = "long_date")
       #end
       #set($creationDateStr = $datetool.format($blog_dateFormat, $creationDate, $services.celementsweb.getLocal($language)))
     #end
