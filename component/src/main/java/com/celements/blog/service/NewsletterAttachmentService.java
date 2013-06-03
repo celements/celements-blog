@@ -48,8 +48,8 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
     for (String tag : imgTags) {
       String url = tag.replaceAll(".*src=\"/?(download/)?(.*?)\\?.*?\".*", "$2");
       String imgFullname = url.replaceAll("^(.*)/(.*)/(.*)$", "$1.$2;$3");
-      content = content.replaceAll(tag.replaceAll(".*src=\"(.*?)\".*", "$1"), 
-          getImageURL(imgFullname, true));
+      String replStr = Pattern.quote(tag.replaceAll(".*src=\"(.*?)\".*", "$1"));
+      content = content.replaceAll(replStr, getImageURL(imgFullname, true));
     }
     return content;
   }
