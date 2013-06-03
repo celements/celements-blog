@@ -10,9 +10,9 @@ import com.xpn.xwiki.api.Attachment;
 public interface INewsletterAttachmentServiceRole {
   public String embedImagesInContent(String content);
   
-  String getImageURL(String imgFullname, boolean embedImage);
+  public String getImageURL(String imgFullname, boolean embedImage);
   
-  void addAttachment(String attFullname);
+  public void addAttachment(String attFullname);
   
-  List<Attachment> getAttachmentList(boolean includeImages);
+  public List<Attachment> getAttachmentList(boolean includeImages);
 }
