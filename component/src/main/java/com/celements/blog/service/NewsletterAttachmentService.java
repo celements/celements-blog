@@ -35,7 +35,7 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
   IWebUtilsService webUtils;
 
   public String embedImagesInContent(String content) {
-    Pattern pattern = Pattern.compile("<img (^>)*");
+    Pattern pattern = Pattern.compile("<img .*?>");
     Matcher matcher = pattern.matcher(content);
     Set<String> images = new HashSet<String>();
     while (matcher.find()) {
