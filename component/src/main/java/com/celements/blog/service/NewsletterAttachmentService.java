@@ -1,5 +1,6 @@
 package com.celements.blog.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -76,22 +77,25 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
     if(!includingImages) {
       param = "nlEmbedNoImgAttList";
     }
-    return getAttachmentList(param);
+    return getAttachmentList(param, false);
   }
   
   @SuppressWarnings("unchecked")
-  List<Attachment> getAttachmentList(String param) {
+  List<Attachment> getAttachmentList(String param, boolean create) {
     Object contextVal = getVcontext().get(param);
-    List<Attachment> embedLsit = null;
+    List<Attachment> embedList = null;
     if((contextVal instanceof List<?>) && !((List<Attachment>)contextVal).isEmpty() 
         && (((List<Attachment>)contextVal).get(0) instanceof Attachment)){
-      embedLsit = (List<Attachment>)contextVal;
+      embedList = (List<Attachment>)contextVal;
     }
-    return embedLsit;
+    if((embedList == null) && create) {
+      embedList = new ArrayList<Attachment>();
+    }
+    return embedList;
   }
   
   void extendAttachmentList(Attachment att, String param) {
-    List<Attachment> attList = getAttachmentList(param);
+    List<Attachment> attList = getAttachmentList(param, true);
     attList.add(att);
     getVcontext().put(param, attList);
   }
