@@ -20,7 +20,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
 
 @Component
 public class NewsletterAttachmentService implements INewsletterAttachmentServiceRole {
