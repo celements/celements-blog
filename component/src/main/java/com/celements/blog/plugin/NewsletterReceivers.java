@@ -337,8 +337,8 @@ public class NewsletterReceivers {
     String content = renderCommand.renderCelementsDocument(doc.getDocumentReference(),
         "view");
     content = Utils.replacePlaceholders(content, context);
-    //TODO where can this be configured? (embed images in mail or just as URL)
-    if(true) {
+    if(getContext().getWiki().getXWikiPreferenceAsInt("newsletter_embed_all_images", 
+        "celements.newsletter.embedAllImages", 0, getContext()) == 1) {
       content = ((NewsletterAttachmentService)Utils.getComponent(
           NewsletterAttachmentService.class)).embedImagesInContent(content);
     }
