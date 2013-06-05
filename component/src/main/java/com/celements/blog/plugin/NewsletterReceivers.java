@@ -32,6 +32,7 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.service.NewsletterAttachmentService;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
@@ -332,12 +333,15 @@ public class NewsletterReceivers {
     if((baseURL != null) && !"".equals(baseURL.trim())){
       header = "<base href='" + baseURL + "' />\n";
     }
-    
     renderCommand.setDefaultPageType("RichText");
     String content = renderCommand.renderCelementsDocument(doc.getDocumentReference(),
         "view");
     content = Utils.replacePlaceholders(content, context);
-
+    if(getContext().getWiki().getXWikiPreferenceAsInt("newsletter_embed_all_images", 
+        "celements.newsletter.embedAllImages", 0, getContext()) == 1) {
+      content = ((NewsletterAttachmentService)Utils.getComponent(
+          NewsletterAttachmentService.class)).embedImagesInContent(content);
+    }
     String footer = context.getMessageTool().get("cel_newsletter_html_footer_message",
         Arrays.asList("_NEWSLETTEREMAILADRESSKEY_"));
     footer = footer.replaceAll("_NEWSLETTEREMAILADRESSKEY_", doc.getExternalURL("view",
@@ -361,6 +365,8 @@ public class NewsletterReceivers {
     sender.setHtmlContent(htmlContent, false);
     sender.setTextContent(textContent);
     sender.setOthers(otherHeader);
+    sender.setAttachments(((NewsletterAttachmentService)Utils.getComponent(
+          NewsletterAttachmentService.class)).getAttachmentList(true));
     return sender.sendMail();
   }
   
