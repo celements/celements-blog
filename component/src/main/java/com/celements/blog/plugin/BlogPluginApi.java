@@ -26,11 +26,14 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.celements.blog.service.INewsletterAttachmentServiceRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 public class BlogPluginApi extends Api {
 
@@ -202,6 +205,21 @@ public class BlogPluginApi extends Api {
   
   public Article getNextArticle(Article article) {
     return plugin.getNeighbourArticle(article, true, context);
+  }
+  
+  public String getImageURL(String imgFullname, boolean embedImage) {
+    return ((INewsletterAttachmentServiceRole)Utils.getComponent(
+        INewsletterAttachmentServiceRole.class)).getImageURL(imgFullname, embedImage);
+  }
+  
+  void addAttachment(String attFullname) {
+    ((INewsletterAttachmentServiceRole)Utils.getComponent(
+        INewsletterAttachmentServiceRole.class)).addAttachment(attFullname);
+  }
+  
+  List<Attachment> getAttachmentList(boolean includeImages) {
+    return ((INewsletterAttachmentServiceRole)Utils.getComponent(
+        INewsletterAttachmentServiceRole.class)).getAttachmentList(includeImages);
   }
 
 }

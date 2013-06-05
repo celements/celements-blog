@@ -36,11 +36,13 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.blog.service.IBlogServiceRole;
+import com.celements.blog.service.INewsletterAttachmentServiceRole;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Property;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -466,13 +468,15 @@ public class BlogPlugin extends XWikiDefaultPlugin{
       vcontext.put("email", email);
       XWikiDocument emailContentDoc = context.getWiki()
           .getDocument("Tools.NewsletterSubscriptionActivation", context);
+      BaseObject blogConf = blogDoc.getObject("Celements2.BlogConfigClass");
+      boolean embedImages = blogConf.getIntValue("newsletterEmbedImages", 0) == 1;
+      vcontext.put("embedImages", embedImages);
       String emailContent = emailContentDoc.getTranslatedContent(context);
       String htmlContent = context.getWiki().getRenderingEngine().interpretText(
           emailContent, context.getDoc(), context);
       String emailTitle = emailContentDoc.getTranslatedDocument(context).getTitle();
       String renderedTitle = context.getWiki().getRenderingEngine().interpretText(
           emailTitle, context.getDoc(), context);
-      BaseObject blogConf = blogDoc.getObject("Celements2.BlogConfigClass");
       String from = "";
       String reply = "";
       if(blogConf != null) {
@@ -488,13 +492,18 @@ public class BlogPlugin extends XWikiDefaultPlugin{
       CelementsWebPluginApi celementsweb = (CelementsWebPluginApi)context.getWiki()
           .getPluginApi("celementsweb", context);
       celementsweb.getPlugin().sendMail(from, reply, email, null, null, renderedTitle, 
-          htmlContent, "", null, null, context);
+          htmlContent, "", getAllAttachmentsList(), null, context);
     } else {
       LOGGER.error("No newsletter activation Mail sent for '" + email + "'. No " +
           "Mailcontent found in Tools.NewsletterSubscriptionActivation");
     }
   }
-  
+
+  List<Attachment> getAllAttachmentsList() {
+    return ((INewsletterAttachmentServiceRole)Utils.getComponent(
+        INewsletterAttachmentServiceRole.class)).getAttachmentList(true);
+  }
+
   String getActivationKey(BaseObject obj, String docName) {
     String key = docName + "|" + obj.getNumber();
     MessageDigest digest = null;
