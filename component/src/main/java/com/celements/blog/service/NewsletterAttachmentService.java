@@ -46,8 +46,9 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
   
   String embedImagesInContent(String content, Set<String> imgTags) {
     for (String tag : imgTags) {
-      String url = tag.replaceAll(".*src=\"/?(download/)?(.*?)\\?.*?\".*", "$2");
-      String imgFullname = url.replaceAll("^(.*)/(.*)/(.*)$", "$1.$2;$3");
+      String strippedTag = tag.replaceAll(".*src=\"(.*?)\\?.*?\".*", "$1");
+      String imgFullname = strippedTag.replaceAll("((http://)?[a-zA-Z0-9\\.-_]*)?/?" +
+          "(download)?/(.*)/(.*)/(.*?)", "$4.$5;$6");
       String replStr = Pattern.quote(tag.replaceAll(".*src=\"(.*?)\".*", "$1"));
       content = content.replaceAll(replStr, getImageURL(imgFullname, true));
     }

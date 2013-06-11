@@ -147,6 +147,50 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
   }
   
   @Test
+  public void testEmbedImagesInContent_inner_externalURLwww() throws XWikiException {
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
+        "Img");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiAttachment att = new XWikiAttachment();
+    expect(doc.getAttachment(eq("file.jpg"))).andReturn(att).once();
+    expect(doc.clone()).andReturn(doc).once();
+    expect(xwiki.getDocument(eq(docRef), same(getContext()))).andReturn(doc).once();
+    String imgTag = "<img class=\"abc\" src=\"www.test.com/download/Test/Img/file.jpg?" +
+        "bla=123\" />";
+    String content = "Test text with " + imgTag + " image included";
+    Set<String> tags = new HashSet<String>();
+    tags.add(imgTag);
+    replay(doc, xwiki);
+    String result = service.embedImagesInContent(content, tags);
+    verify(doc, xwiki);
+    assertTrue(result, result.contains("src=\"cid:file.jpg\""));
+    assertFalse(result, result.contains("/download/"));
+    assertFalse(result, result.contains("www"));
+  }
+  
+  @Test
+  public void testEmbedImagesInContent_inner_externalURLhttp() throws XWikiException {
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
+        "Img");
+    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiAttachment att = new XWikiAttachment();
+    expect(doc.getAttachment(eq("file.jpg"))).andReturn(att).once();
+    expect(doc.clone()).andReturn(doc).once();
+    expect(xwiki.getDocument(eq(docRef), same(getContext()))).andReturn(doc).once();
+    String imgTag = "<img class=\"abc\" src=\"http://www.test.com/download/Test/Img/" +
+        "file.jpg?bla=123\" />";
+    String content = "Test text with " + imgTag + " image included";
+    Set<String> tags = new HashSet<String>();
+    tags.add(imgTag);
+    replay(doc, xwiki);
+    String result = service.embedImagesInContent(content, tags);
+    verify(doc, xwiki);
+    assertTrue(result, result.contains("src=\"cid:file.jpg\""));
+    assertFalse(result, result.contains("/download/"));
+    assertFalse(result, result.contains("http"));
+  }
+  
+  @Test
   public void testAddAttachment() throws XWikiException {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
         "Img");
