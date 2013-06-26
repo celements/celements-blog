@@ -1,3 +1,4 @@
+$celementsweb.addExtJSfileOnce(':celJS/stopDblClick.js')
 <div class="cel_newsletterImport">
 <h1>Newsletter Emailadressen Import: Aktiv-Liste</h1>
 <br/>
@@ -19,6 +20,6 @@ $xwiki.parseTemplate("celMacros/newsletterImportResult.vm")
   <br/>
   <textarea style="width:500px; height:150px; background: #98FB98" name="batchImportData"></textarea>
   <br/><br/>
-  <input type="submit" value="Importieren" />
+  <input class="submitButton" type="submit" value="Importieren" />
 </form>
 </div>
