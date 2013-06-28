@@ -1,5 +1,6 @@
-com.celements.migrator.NewsletterReceiversToLowerCaseMigrator
 com.celements.blog.plugin.BlogClasses
 com.celements.blog.service.BlogScriptService
 com.celements.blog.service.BlogService
 com.celements.blog.service.NewsletterAttachmentService
+com.celements.migrator.NewsletterReceiversToLowerCaseMigrator
+com.celements.migrator.NewsletterReceiversRemoveDoublesMigrator
