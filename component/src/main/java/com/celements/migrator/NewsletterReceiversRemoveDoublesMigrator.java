@@ -68,18 +68,31 @@ public class NewsletterReceiversRemoveDoublesMigrator
             BaseObject recObj = recDoc.getXObject(recObjRef);
             String recMail = recObj.getStringValue("email");
             int isActive = recObj.getIntValue("isactive", 0);
-            if(receiversMap.containsKey(recMail)) {
-              int duplActive = (Integer)receiversMap.get(recMail)[0];
-              XWikiDocument duplDoc = (XWikiDocument)receiversMap.get(recMail)[1];
-              if((isActive == 1) || (duplActive != 1)) {
-                context.getWiki().deleteDocument(recDoc, context);
+            if(!"".equals(recMail)) {
+              String recSubscr = recObj.getStringValue("subscribed");
+              String recKey = recMail + "," + recSubscr;
+              if(receiversMap.containsKey(recKey)) {
+                int duplActive = (Integer)receiversMap.get(recKey)[0];
+                XWikiDocument duplDoc = (XWikiDocument)receiversMap.get(recKey)[1];
+                if(!recDoc.getDocumentReference().equals(duplDoc.getDocumentReference())) {
+                  if((isActive == 1) || (duplActive != 1)) {
+                    recDoc.removeXObject(recObj);
+                    context.getWiki().saveDocument(recDoc, context);
+                  } else {
+                    duplDoc.removeXObject((BaseObject)receiversMap.get(recKey)[2]);
+                    context.getWiki().saveDocument(duplDoc, context);
+                    receiversMap.put(recMail + "," + recSubscr, new Object[]{isActive, 
+                        recDoc, recObj});
+                  }
+                }
+                LOGGER.info("Remove duplicate of " + recMail + " - " + recSubscr);
               } else {
-                context.getWiki().deleteDocument(duplDoc, context);
-                receiversMap.put(recMail, new Object[]{isActive, recDoc});
+                receiversMap.put(recMail + "," + recSubscr, new Object[]{isActive, 
+                    recDoc, recObj});
               }
-              LOGGER.info("Remove duplicate of " + recMail);
             } else {
-              receiversMap.put(recMail, new Object[]{isActive, recDoc});
+              LOGGER.info("Empty NewsletterReceiver found on doc " + 
+                  recDoc.getDocumentReference());
             }
           }
         }
@@ -108,7 +121,7 @@ public class NewsletterReceiversRemoveDoublesMigrator
    * use: http://www.wolframalpha.com
    */
   public XWikiDBVersion getVersion() {
-    return new XWikiDBVersion(1274);
+    return new XWikiDBVersion(1275);
   }
 
 }
