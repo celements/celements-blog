@@ -77,10 +77,10 @@ public class NewsletterReceiversRemoveDoublesMigrator
                 if(!recDoc.getDocumentReference().equals(duplDoc.getDocumentReference())) {
                   if((isActive == 1) || (duplActive != 1)) {
                     recDoc.removeXObject(recObj);
-                    context.getWiki().saveDocument(recDoc, context);
+                    context.getWiki().saveDocument(recDoc, "Removed douplicate", context);
                   } else {
                     duplDoc.removeXObject((BaseObject)receiversMap.get(recKey)[2]);
-                    context.getWiki().saveDocument(duplDoc, context);
+                    context.getWiki().saveDocument(duplDoc, "Removed douplicate", context);
                     receiversMap.put(recMail + "," + recSubscr, new Object[]{isActive, 
                         recDoc, recObj});
                   }
