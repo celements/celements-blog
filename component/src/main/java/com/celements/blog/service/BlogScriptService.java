@@ -11,6 +11,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.blog.plugin.EmailAddressDate;
 import com.celements.blog.plugin.NewsletterReceivers;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -37,7 +38,27 @@ public class BlogScriptService implements ScriptService {
       try {
         NewsletterReceivers newsletterReceivers = new NewsletterReceivers(
             getContext().getWiki().getDocument(blogDocRef, getContext()), getContext());
-        return newsletterReceivers.getAddresses();
+        List<String> addresses = newsletterReceivers.getAddresses();
+        Collections.sort(addresses);
+        return addresses;
+      } catch (XWikiException exp) {
+        LOGGER.error("Failed to get Blog document for [" + blogDocRef + "].", exp);
+      }
+    } else {
+      LOGGER.info("getAddresses failed because user [" + getContext().getUser()
+          + "] has no admin rights.");
+    }
+    return Collections.emptyList();
+  }
+
+  public List<EmailAddressDate> getAddressesOrderedByDate(DocumentReference blogDocRef) {
+    if (getContext().getWiki().getRightService().hasAdminRights(getContext())) {
+      try {
+        NewsletterReceivers newsletterReceivers = new NewsletterReceivers(
+            getContext().getWiki().getDocument(blogDocRef, getContext()), getContext());
+        List<EmailAddressDate> addresses = newsletterReceivers.getAddressesOrderByDate();
+        Collections.sort(addresses);
+        return addresses;
       } catch (XWikiException exp) {
         LOGGER.error("Failed to get Blog document for [" + blogDocRef + "].", exp);
       }

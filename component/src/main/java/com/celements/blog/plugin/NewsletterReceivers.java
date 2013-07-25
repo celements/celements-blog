@@ -31,8 +31,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import com.celements.blog.service.INewsletterAttachmentServiceRole;
+import com.celements.common.classes.IClassCollectionRole;
 import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
@@ -60,7 +64,8 @@ public class NewsletterReceivers {
   private List<String[]> groupUsers = new ArrayList<String[]>();
   private List<String[]> users = new ArrayList<String[]>();
   private List<String> addresses = new ArrayList<String>();
-  
+  private List<EmailAddressDate> emailAddressDateList = new ArrayList<EmailAddressDate>();
+
   //TODO ADD UNIT TESTS!!!
   public NewsletterReceivers(XWikiDocument blogDoc, XWikiContext context
       ) throws XWikiException{
@@ -79,6 +84,7 @@ public class NewsletterReceivers {
           if(isMail && active && (!allAddresses.contains(address))) {
             addresses.add(address);
             allAddresses.add(address);
+            emailAddressDateList.add(new EmailAddressDate(address, blogDoc.getDate()));
             LOGGER.info("reveiver added: " + address);
           } else {
             if(context.getWiki().exists(receiverAdr, context)){
@@ -88,24 +94,49 @@ public class NewsletterReceivers {
         }
       }
     }
-    String hql = "select nr.email from Celements.NewsletterReceiverClass as nr " +
-        "where nr.isactive='1' " +
-        "and subscribed='" + blogDoc.getFullName() + "'";
-    List<String> nlRegAddresses = context.getWiki().search(hql, context);
-    if(nlRegAddresses != null) {
-      LOGGER.info("Found " + nlRegAddresses.size() + " Celements.NewsletterReceiverClass"
-          + " object-subscriptions for blog " + blogDoc.getFullName());
-      for (String address : nlRegAddresses) {
-        address = address.toLowerCase();
-        if(!allAddresses.contains(address)) {
-          addresses.add(address);
-          allAddresses.add(address);
-          LOGGER.info("reveiver added: " + address);
+    String xwql = "from doc.object(Celements.NewsletterReceiverClass) as nr "
+        + "where nr.isactive = '1' and nr.subscribed = :subscribed";
+//    String hql = "select nr.email,doc.date from Celements.NewsletterReceiverClass as nr, "
+//        + " XWikiDocument as doc "
+//        + "where doc.fullName = "
+//        + " nr.isactive='1' "
+//        + "and subscribed='" + blogDoc.getFullName() + "'";
+//    List<String> nlRegAddresses = context.getWiki().search(hql, context);
+    DocumentReference receverClassRef = getBlogClasses().getNewsletterReceiverClassRef(
+        getContext().getDatabase());
+    try {
+      List<String> nlRegReceiverList = Utils.getComponent(QueryManager.class).createQuery(
+          xwql, Query.XWQL).bindValue("subscribed", blogDoc.getFullName()).execute();
+      if(nlRegReceiverList != null) {
+        LOGGER.info("Found " + nlRegReceiverList.size()
+            + " Celements.NewsletterReceiverClass" + " object-subscriptions for blog "
+            + blogDoc.getFullName());
+        for (String nlRegReceiverFN : nlRegReceiverList) {
+          XWikiDocument receiverDoc = getContext().getWiki().getDocument(nlRegReceiverFN,
+              getContext());
+          List<BaseObject> recieverObjs = receiverDoc.getXObjects(receverClassRef);
+          for(BaseObject receiverObj : recieverObjs) {
+            String address = receiverObj.getStringValue("email");
+            address = address.toLowerCase();
+            if(!allAddresses.contains(address)) {
+              addresses.add(address);
+              allAddresses.add(address);
+              emailAddressDateList.add(new EmailAddressDate(address, blogDoc.getDate()));
+              LOGGER.info("reveiver added: " + address);
+            }
+          }
         }
       }
+    } catch (QueryException exp) {
+      LOGGER.error("Failed to execute newsletter receiver xwql [" + xwql + "].", exp);
     }
   }
   
+  private BlogClasses getBlogClasses() {
+    return (BlogClasses)Utils.getComponent(IClassCollectionRole.class,
+        "celements.celBlogClasses");
+  }
+
   private void parseDocument(String address, String type, XWikiContext context
       ) throws XWikiException {
     XWikiDocument recDoc = context.getWiki().getDocument(address, context);
@@ -433,7 +464,11 @@ public class NewsletterReceivers {
   public List<String> getAddresses() {
     return addresses;
   }
-  
+
+  public List<EmailAddressDate> getAddressesOrderByDate() {
+    return emailAddressDateList;
+  }
+
   public int getNrOfReceivers(){
     return allAddresses.size();
   }
