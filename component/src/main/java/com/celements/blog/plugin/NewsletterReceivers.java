@@ -121,7 +121,7 @@ public class NewsletterReceivers {
             if(!allAddresses.contains(address)) {
               addresses.add(address);
               allAddresses.add(address);
-              emailAddressDateList.add(new EmailAddressDate(address, blogDoc.getDate()));
+              emailAddressDateList.add(new EmailAddressDate(address, receiverDoc.getDate()));
               LOGGER.info("reveiver added: " + address);
             }
           }
