@@ -370,8 +370,7 @@ public class NewsletterReceivers {
     content = Utils.replacePlaceholders(content, context);
     if(getContext().getWiki().getXWikiPreferenceAsInt("newsletter_embed_all_images", 
         "celements.newsletter.embedAllImages", 0, getContext()) == 1) {
-      content = ((INewsletterAttachmentServiceRole)Utils.getComponent(
-          INewsletterAttachmentServiceRole.class)).embedImagesInContent(content);
+      content = getNewsletterAttachmentService().embedImagesInContent(content);
     }
     String footer = context.getMessageTool().get("cel_newsletter_html_footer_message",
         Arrays.asList("_NEWSLETTEREMAILADRESSKEY_"));
@@ -384,23 +383,26 @@ public class NewsletterReceivers {
   private int sendMail(String from, String replyTo, String to, String subject,
       String baseURL, String htmlContent, String textContent, XWikiContext context
       ) throws XWikiException {
-    if((to != null) && (to.trim().length() == 0)){ to = null; }
-    Map<String, String> otherHeader = new HashMap<String, String>();
-    otherHeader.put("Content-Location", baseURL);
-    
-    CelSendMail sender = new CelSendMail(getContext());
-    sender.setFrom(from);
-    sender.setReplyTo(replyTo);
-    sender.setTo(to);
-    sender.setSubject(subject);
-    sender.setHtmlContent(htmlContent, false);
-    sender.setTextContent(textContent);
-    sender.setOthers(otherHeader);
-    sender.setAttachments(((INewsletterAttachmentServiceRole)Utils.getComponent(
-          INewsletterAttachmentServiceRole.class)).getAttachmentList(true));
-    return sender.sendMail();
+    try {
+      if((to != null) && (to.trim().length() == 0)){ to = null; }
+      Map<String, String> otherHeader = new HashMap<String, String>();
+      otherHeader.put("Content-Location", baseURL);
+      
+      CelSendMail sender = new CelSendMail(getContext());
+      sender.setFrom(from);
+      sender.setReplyTo(replyTo);
+      sender.setTo(to);
+      sender.setSubject(subject);
+      sender.setHtmlContent(htmlContent, false);
+      sender.setTextContent(textContent);
+      sender.setOthers(otherHeader);
+      sender.setAttachments(getNewsletterAttachmentService().getAttachmentList(true));
+      return sender.sendMail();
+    } finally {
+      getNewsletterAttachmentService().clearAttachmentList();
+    }
   }
-  
+
   private void setNewsletterSentObject(XWikiDocument doc, String from, String replyTo,
       String subject, int nrOfSent, boolean isTest, XWikiContext context
       ) throws XWikiException {
@@ -482,4 +484,9 @@ public class NewsletterReceivers {
         "xwikicontext");
   }
 
+  private INewsletterAttachmentServiceRole getNewsletterAttachmentService() {
+    return (INewsletterAttachmentServiceRole)Utils.getComponent(
+          INewsletterAttachmentServiceRole.class);
+  }
+  
 }

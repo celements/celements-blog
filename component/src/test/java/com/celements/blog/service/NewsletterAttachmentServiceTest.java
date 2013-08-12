@@ -31,8 +31,7 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
   @Before
   public void setUp_NewsletterAttachmentServiceTest() throws Exception {
     getContext().put("vcontext", new VelocityContext());
-    xwiki = createMock(XWiki.class);
-    getContext().setWiki(xwiki);
+    xwiki = getWikiMock();
     service = new NewsletterAttachmentService();
     service.execution = Utils.getComponent(Execution.class);
     service.webUtils = Utils.getComponent(IWebUtilsService.class);
@@ -82,15 +81,15 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
   @Test
   public void testGetImageURL_notEmbedded() throws XWikiException {
     String expectedResult = "/download/Test/Img/file.jpg";
-    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
     XWikiAttachment att = new XWikiAttachment();
     expect(doc.getAttachment(eq("file.jpg"))).andReturn(att).anyTimes();
     expect(doc.getAttachmentURL(eq("file.jpg"), eq("download") , same(getContext()))
         ).andReturn(expectedResult).once();
     expect(xwiki.getDocument(eq("Test.Img"), same(getContext()))).andReturn(doc).once();
-    replay(doc, xwiki);
+    replayDefault();
     assertTrue(service.getImageURL("Test.Img;file.jpg", false).startsWith(expectedResult));
-    verify(doc, xwiki);
+    verifyDefault();
   }
   
   @Test
@@ -98,30 +97,30 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
         "Img");
     String expectedResult = "cid:file.jpg";
-    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
     XWikiAttachment att = new XWikiAttachment();
     expect(doc.getAttachment(eq("file.jpg"))).andReturn(att).anyTimes();
     expect(doc.clone()).andReturn(doc).once();
     expect(xwiki.getDocument(eq(docRef), same(getContext()))).andReturn(doc).once();
-    replay(doc, xwiki);
+    replayDefault();
     assertEquals(expectedResult, service.getImageURL("Test.Img;file.jpg", true));
-    verify(doc, xwiki);
+    verifyDefault();
   }
   
   @Test
   public void testEmbedImagesInContent() throws XWikiException {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
         "Img");
-    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
     XWikiAttachment att = new XWikiAttachment();
     expect(doc.getAttachment(eq("file.jpg"))).andReturn(att).once();
     expect(doc.clone()).andReturn(doc).once();
     expect(xwiki.getDocument(eq(docRef), same(getContext()))).andReturn(doc).once();
     String imgTag = "<img class=\"abc\" src=\"/download/Test/Img/file.jpg?bla=123\" />";
     String content = "Test text with " + imgTag + " image included";
-    replay(doc, xwiki);
+    replayDefault();
     String result = service.embedImagesInContent(content);
-    verify(doc, xwiki);
+    verifyDefault();
     assertTrue(result, result.contains("src=\"cid:file.jpg\""));
     assertFalse(result, result.contains("/download/"));
   }
@@ -130,7 +129,7 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
   public void testEmbedImagesInContent_inner() throws XWikiException {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
         "Img");
-    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
     XWikiAttachment att = new XWikiAttachment();
     expect(doc.getAttachment(eq("file.jpg"))).andReturn(att).once();
     expect(doc.clone()).andReturn(doc).once();
@@ -139,9 +138,9 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
     String content = "Test text with " + imgTag + " image included";
     Set<String> tags = new HashSet<String>();
     tags.add(imgTag);
-    replay(doc, xwiki);
+    replayDefault();
     String result = service.embedImagesInContent(content, tags);
-    verify(doc, xwiki);
+    verifyDefault();
     assertTrue(result, result.contains("src=\"cid:file.jpg\""));
     assertFalse(result, result.contains("/download/"));
   }
@@ -150,7 +149,7 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
   public void testEmbedImagesInContent_inner_externalURLwww() throws XWikiException {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
         "Img");
-    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
     XWikiAttachment att = new XWikiAttachment();
     expect(doc.getAttachment(eq("file.jpg"))).andReturn(att).once();
     expect(doc.clone()).andReturn(doc).once();
@@ -160,9 +159,9 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
     String content = "Test text with " + imgTag + " image included";
     Set<String> tags = new HashSet<String>();
     tags.add(imgTag);
-    replay(doc, xwiki);
+    replayDefault();
     String result = service.embedImagesInContent(content, tags);
-    verify(doc, xwiki);
+    verifyDefault();
     assertTrue(result, result.contains("src=\"cid:file.jpg\""));
     assertFalse(result, result.contains("/download/"));
     assertFalse(result, result.contains("www"));
@@ -172,7 +171,7 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
   public void testEmbedImagesInContent_inner_externalURLhttp() throws XWikiException {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
         "Img");
-    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
     XWikiAttachment att = new XWikiAttachment();
     expect(doc.getAttachment(eq("file.jpg"))).andReturn(att).once();
     expect(doc.clone()).andReturn(doc).once();
@@ -182,9 +181,9 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
     String content = "Test text with " + imgTag + " image included";
     Set<String> tags = new HashSet<String>();
     tags.add(imgTag);
-    replay(doc, xwiki);
+    replayDefault();
     String result = service.embedImagesInContent(content, tags);
-    verify(doc, xwiki);
+    verifyDefault();
     assertTrue(result, result.contains("src=\"cid:file.jpg\""));
     assertFalse(result, result.contains("/download/"));
     assertFalse(result, result.contains("http"));
@@ -194,14 +193,14 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
   public void testAddAttachment() throws XWikiException {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
         "Img");
-    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
     XWikiAttachment att = new XWikiAttachment();
     expect(doc.getAttachment(eq("file.pdf"))).andReturn(att).once();
     expect(doc.clone()).andReturn(doc).once();
     expect(xwiki.getDocument(eq(docRef), same(getContext()))).andReturn(doc).once();
-    replay(doc, xwiki);
+    replayDefault();
     service.addAttachment("Test.Img;file.pdf");
-    verify(doc, xwiki);
+    verifyDefault();
     List<Attachment> atts = service.getAttachmentList(false);
     assertNotNull(atts);
     assertEquals(1, atts.size());
@@ -221,14 +220,56 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
   public void testGetAttachmentForFullname() throws XWikiException {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
         "Img");
-    XWikiDocument doc = createMock(XWikiDocument.class);
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
     XWikiAttachment att = new XWikiAttachment();
     expect(doc.getAttachment(eq("file.jpg"))).andReturn(att).once();
     expect(doc.clone()).andReturn(doc).once();
     expect(xwiki.getDocument(eq(docRef), same(getContext()))).andReturn(doc).once();
-    replay(doc, xwiki);
+    replayDefault();
     assertEquals(att.getFilename(), service.getAttachmentForFullname("Test.Img;file.jpg"
         ).getFilename());
-    verify(doc, xwiki);
+    verifyDefault();
   }
+
+  @Test
+  public void testClearAttachmentList() throws XWikiException {
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
+        "Img");
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiAttachment att = new XWikiAttachment();
+    expect(doc.getAttachment(eq("file.pdf"))).andReturn(att).once();
+    expect(doc.clone()).andReturn(doc).once();
+    expect(xwiki.getDocument(eq(docRef), same(getContext()))).andReturn(doc).once();
+    replayDefault();
+    service.addAttachment("Test.Img;file.pdf");
+    service.clearAttachmentList();
+    verifyDefault();
+    List<Attachment> atts = service.getAttachmentList(false);
+    assertTrue("clearAttachmentList must clear the list.", (atts == null)
+        || atts.isEmpty());
+    List<Attachment> atts2 = service.getAttachmentList(true);
+    assertTrue("clearAttachmentList must clear both list.", (atts2 == null)
+        || atts2.isEmpty());
+  }
+  
+  @Test
+  public void testClearAttachmentList_add_afterClear() throws XWikiException {
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Test", 
+        "Img");
+    XWikiDocument doc = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiAttachment att = new XWikiAttachment();
+    expect(doc.getAttachment(eq("file.pdf"))).andReturn(att).atLeastOnce();
+    expect(doc.clone()).andReturn(doc).atLeastOnce();
+    expect(xwiki.getDocument(eq(docRef), same(getContext()))).andReturn(doc).atLeastOnce(
+        );
+    replayDefault();
+    service.addAttachment("Test.Img;file.pdf");
+    service.clearAttachmentList();
+    service.addAttachment("Test.Img;file.pdf");
+    verifyDefault();
+    List<Attachment> atts = service.getAttachmentList(false);
+    assertNotNull(atts);
+    assertEquals(1, atts.size());
+  }
+  
 }

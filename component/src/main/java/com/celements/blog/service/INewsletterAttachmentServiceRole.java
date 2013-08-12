@@ -15,4 +15,7 @@ public interface INewsletterAttachmentServiceRole {
   public void addAttachment(String attFullname);
   
   public List<Attachment> getAttachmentList(boolean includeImages);
+
+  public void clearAttachmentList();
+
 }
