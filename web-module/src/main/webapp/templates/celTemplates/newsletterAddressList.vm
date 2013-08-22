@@ -16,9 +16,9 @@
 
 ##Aktive Emailadresse
 #if ("$!orderByDate" == "1")
-	#set($emailActiveList = $services.celblog.getAddresses($services.model.resolveDocument($blogname)))
-#else
 	#set($emailActiveList = $services.celblog.getAddressesOrderedByDate($services.model.resolveDocument($blogname)))
+#else
+	#set($emailActiveList = $services.celblog.getAddresses($services.model.resolveDocument($blogname)))
 #end
 #set($activeCount = $emailActiveList.size())
 
@@ -44,13 +44,13 @@
 <strong>Aktive ($activeCount):</strong><br/>
 <textarea name="active" id="textarea_active" cols="60" rows="30">
 #foreach($emailAdr in $emailActiveList)
-    #if ("$!orderByDate" == "1")    
-        $emailAdr.getEmailAdr()&#09;$datetool.format('dd.MM.yyyy HH:mm', $emailAdr.getChangeDate())   
-    #else        
-        $emailAdr
-    #end
+#if ("$!orderByDate" == "1")
+$emailAdr.getEmailAdr()&#09;$datetool.format('dd.MM.yyyy HH:mm', $emailAdr.getChangeDate())
+#else
+$emailAdr
 #end
- </textarea>	
+#end
+</textarea>	
 </div>
 
 <br/>
@@ -59,14 +59,14 @@
 <strong>Inaktive ($inactiveCount):</strong><br/>
 <textarea name="inactive" id="textarea_inactive" cols="60" rows="30">
 #foreach($mailDocName in $emailInactiveDocNameList)
-    #set($mailDoc = $xwiki.getDocument($mailDocName))
-    #set($mailObj = $mailDoc.getObject('Celements.NewsletterReceiverClass', 'subscribed', "${blogname}", false))
-    #set($emailAdr = "$!mailObj.getProperty('email').getValue()")
-	#if ("$!orderByDate" == "1")
-		$emailAdr&#09;$datetool.format('dd.MM.yyyy HH:mm', $mailDoc.date)  
-	#else
-		$emailAdr
-	#end
+#set($mailDoc = $xwiki.getDocument($mailDocName))
+#set($mailObj = $mailDoc.getObject('Celements.NewsletterReceiverClass', 'subscribed', "${blogname}", false))
+#set($emailAdr = "$!mailObj.getProperty('email').getValue()")
+#if ("$!orderByDate" == "1")
+$emailAdr&#09;$datetool.format('dd.MM.yyyy HH:mm', $mailDoc.date)  
+#else
+$emailAdr
+#end
 #end
 </textarea>
 
