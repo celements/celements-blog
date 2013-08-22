@@ -3,30 +3,72 @@
   #set($blogname = $doc.getFullName())
 #end
 
+#set($blogstr = "%$blogname%")
+
+#set($orderByDate = $request.orderByDate)
+#if ("$!orderByDate" == "1")
+	#set($sortText = "Alphabetisch sortieren")
+	#set($orderByDateParam = "0")
+#else
+	#set($sortText = "Nach Datum sortieren")
+	#set($orderByDateParam = "1")
+#end
+
+##Aktive Emailadresse
+#if ("$!orderByDate" == "1")
+	#set($emailActiveList = $services.celblog.getAddresses($services.model.resolveDocument($blogname)))
+#else
+	#set($emailActiveList = $services.celblog.getAddressesOrderedByDate($services.model.resolveDocument($blogname)))
+#end
+#set($activeCount = $emailActiveList.size())
+
+
+##Inaktive Emailadresse
+#if ("$!orderByDate" == "1")
+	#set($xwql = "from doc.object('Celements.NewsletterReceiverClass') as nr where nr.isactive='0' and nr.subscribed like '${blogstr}' order by doc.date desc")
+#else
+	#set($xwql = "from doc.object('Celements.NewsletterReceiverClass') as nr where nr.isactive='0' and nr.subscribed like '${blogstr}' order by nr.email")
+#end
+#set($emailInactiveDocNameList = $services.query.xwql($xwql).execute())
+#set($inactiveCount = $emailInactiveDocNameList.size())
+
+
 <div class="cel_newsletterImport">
-<h1>Newsletter Emailadressen</h1>
+
+<h1>Newsletter Emailadressen 
+<span style="font-size: 10px;"><a href='$doc.getURL("view","xpage=overlay&conf=NewsletterAddressList&xredirect=${request.xredirect}&orderByDate=${orderByDateParam}")'>$sortText</a>
+</span>
+</h1>
 <br/>
 <div style="float: left;">
-<strong>Aktive:</strong><br/>
-<textarea name="active" id="textarea_active" cols="45" rows="30">
-#set($blogstr = "%$blogname%")
-#foreach($emailAdr in $services.celblog.getAddresses($services.model.resolveDocument($blogname)))
-$emailAdr
+<strong>Aktive ($activeCount):</strong><br/>
+<textarea name="active" id="textarea_active" cols="60" rows="30">
+#foreach($emailAdr in $emailActiveList)
+    #if ("$!orderByDate" == "1")    
+        $emailAdr.getEmailAdr()&#09;$datetool.format('dd.MM.yyyy HH:mm', $emailAdr.getChangeDate())   
+    #else        
+        $emailAdr
+    #end
 #end
-</textarea>
+ </textarea>	
 </div>
+
+<br/>
+
 <div style="float: left;padding-left:10px;">
-<strong>Inaktive:</strong><br/>
-#set($xwql = "from doc.object('Celements.NewsletterReceiverClass') as nr where nr.isactive='0' and nr.subscribed like '${blogstr}'")
-<textarea name="inactive" id="textarea_inactive" cols="45" rows="30">
-##set($hql = "select nr.email from Celements.NewsletterReceiverClass as nr where nr.isactive='0' and nr.subscribed like '${blogstr}'")
-##foreach($emailAdr in $xwiki.search($hql))
-#foreach($mailDocName in $services.query.xwql($xwql).execute())
-#set($mailDoc = $xwiki.getDocument($mailDocName))
-#set($mailObj = $mailDoc.getObject('Celements.NewsletterReceiverClass', 'subscribed', "${blogname}", false))
-#set($emailAdr = "$!mailObj.getProperty('email').getValue()")
-$emailAdr
+<strong>Inaktive ($inactiveCount):</strong><br/>
+<textarea name="inactive" id="textarea_inactive" cols="60" rows="30">
+#foreach($mailDocName in $emailInactiveDocNameList)
+    #set($mailDoc = $xwiki.getDocument($mailDocName))
+    #set($mailObj = $mailDoc.getObject('Celements.NewsletterReceiverClass', 'subscribed', "${blogname}", false))
+    #set($emailAdr = "$!mailObj.getProperty('email').getValue()")
+	#if ("$!orderByDate" == "1")
+		$emailAdr&#09;$datetool.format('dd.MM.yyyy HH:mm', $mailDoc.date)  
+	#else
+		$emailAdr
+	#end
 #end
 </textarea>
+
 </div>
 </div>
