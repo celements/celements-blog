@@ -25,6 +25,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 public class NewsletterAttachmentService implements INewsletterAttachmentServiceRole {
 
+  public static final String DEFAULT_NL_NO_IMG_ATT_LIST = "nlEmbedNoImgAttList";
+
+  public static final String DEFAULT_NL_ATTACHMENT_LIST = "nlEmbedAttList";
+
   private static final Log LOGGER = LogFactory.getFactory().getInstance(
       NewsletterAttachmentService.class);
   
@@ -59,7 +63,8 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
     String imgURL = "";
     AttachmentURLCommand attURL = new AttachmentURLCommand();
     if(embedImage) {
-      extendAttachmentList(getAttachmentForFullname(imgFullname), "nlEmbedAttList");
+      extendAttachmentList(getAttachmentForFullname(imgFullname),
+          DEFAULT_NL_ATTACHMENT_LIST);
       imgURL = "cid:" + attURL.getAttachmentName(imgFullname);
     } else {
       imgURL = attURL.getAttachmentURL(imgFullname, "download", getContext());
@@ -69,14 +74,14 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
 
   public void addAttachment(String attFullname) {
     Attachment att = getAttachmentForFullname(attFullname);
-    extendAttachmentList(att, "nlEmbedAttList");
-    extendAttachmentList(att, "nlEmbedNoImgAttList");
+    extendAttachmentList(att, DEFAULT_NL_ATTACHMENT_LIST);
+    extendAttachmentList(att, DEFAULT_NL_NO_IMG_ATT_LIST);
   }
   
   public List<Attachment> getAttachmentList(boolean includingImages) {
-    String param = "nlEmbedAttList";
+    String param = DEFAULT_NL_ATTACHMENT_LIST;
     if(!includingImages) {
-      param = "nlEmbedNoImgAttList";
+      param = DEFAULT_NL_NO_IMG_ATT_LIST;
     }
     return getAttachmentList(param, false);
   }
@@ -123,4 +128,16 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
   VelocityContext getVcontext() {
     return (VelocityContext)(getContext().get("vcontext"));
   }
+
+  public void clearAttachmentList() {
+    clearAttachmentList(DEFAULT_NL_ATTACHMENT_LIST);
+    clearAttachmentList(DEFAULT_NL_NO_IMG_ATT_LIST);
+  }
+
+  public void clearAttachmentList(String param) {
+    if (getVcontext().containsKey(param)) {
+      getVcontext().remove(param);
+    }
+  }
+
 }
