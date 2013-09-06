@@ -42,7 +42,7 @@ $deflang_obj.set('lang', "$default_language")
 <div class="articleEdit blog_$!blogPageDoc pt_$celementsweb.getPageType($blogPageDoc.fullName).getPageType()">
 <div id="con_titblock" class="titleblock">$adminMsg.get('cel_tm_article_edit')</div><!-- IE6 -->
 
-#parse('Macros/includeRTELanguageSelect.vm')
+#parse('celMacros/includeRTELanguageSelect.vm')
 
 #set($artsub_obj = $!doc.getObject("Celements2.BlogArticleSubscribableClass"))
 #set($xredirect = "$!request.xredirect")
