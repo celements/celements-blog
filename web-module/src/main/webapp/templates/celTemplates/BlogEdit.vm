@@ -117,8 +117,5 @@
 	#else
 	#set($red = "${space}.WebHome")
 	#end
-	<div id="con_cancelButton" class="buttonblock">
-		<input type="button" value="$adminMsg.get('cel_cancel')" onclick="window.location.href='$xwiki.getURL($red,'view')'" class="cancelButton"/>
-	</div>
 	</form>
 #end ## #if($changed && $complete)
