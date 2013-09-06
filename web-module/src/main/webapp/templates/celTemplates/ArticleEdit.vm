@@ -2,6 +2,13 @@ $celementsweb.addExtJSfileOnce(':celJS/article-edit.js')
 #set($id = $!context.getRequest().get('id'))
 #set($blogeditor = $!context.getRequest().get('blogeditor'))
 #set($deflang_obj = $doc.getObject('XWiki.ArticleClass','lang',"$default_language"))
+#if("$!deflang_obj" == '')
+#set($deflang_obj = $doc.getObject('XWiki.ArticleClass','lang',""))
+#if("$!deflang_obj" == '')
+#set($deflang_obj = $doc.newObject('XWiki.ArticleClass'))
+#end
+$deflang_obj.set('lang', "$default_language")
+#end
 #set($all_objs = [])
 #foreach($sobj in $doc.getObjects('XWiki.ArticleClass'))
   #if("$sobj.getProperty('lang').getValue()" != "$default_language")
@@ -43,10 +50,12 @@ $xwiki.includeForm('celements2web:Macros.includeRTELanguageSelect', false)
 #set($xredirect = $doc.getURL('view'))
 #end
 <div id="cel_blog_article_editor" class="c3_scrollable">
-<form id="articleform" method="post" action="$doc.getURL('save')">
-	<input type="hidden" id="formeditxred" name="xredirect" value="$!xredirect" />
-	<input type="hidden" name="xnotification" value="$!xnotification" />
-	<input type="hidden" name="template" value="$!request.template" />
+<form id="articleform" method="post" action="?" onsubmit="cancelCancelEdit()">
+<input type="hidden" name="xpage" value="celements_ajax" />
+<input type="hidden" name="ajax_mode" value="saveDocumentWithValidation" />
+<input type="hidden" name="createIfNotExists" value="true" />
+<input type="hidden" name="template" value="$!request.get('template')" />
+<input type="hidden" name="xredirect" value="$!request.get('xredirect')" />
 	## all article data is in the object. Therefore no translations of main doc needed.
     <input type="hidden" name="language" value="$!default_language" />
 	#foreach($class in $doc.xWikiClasses)
