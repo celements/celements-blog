@@ -40,7 +40,13 @@ $deflang_obj.set('lang', "$default_language")
 <!-- start visible content -->
   #set($blogPageDoc = $xwiki.celementsblog.getBlogPageByBlogSpace("$doc.space"))
 <div class="articleEdit blog_$!blogPageDoc pt_$celementsweb.getPageType($blogPageDoc.fullName).getPageType()">
-<div id="con_titblock" class="titleblock">$adminMsg.get('cel_tm_article_edit')</div><!-- IE6 -->
+<div id="con_titblock" class="titleblock">
+#if($doc.isNew())
+$adminMsg.get('cel_tm_article_create')
+#else
+$adminMsg.get('cel_tm_article_edit')
+#end
+</div><!-- IE6 -->
 
 #parse('celMacros/includeRTELanguageSelect.vm')
 
