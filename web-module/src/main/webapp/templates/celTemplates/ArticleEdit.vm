@@ -98,9 +98,12 @@ $deflang_obj.set('lang', "$default_language")
 	#if("$!blogeditor" != '')
 	<input type="hidden" name="XWiki.ArticleClass_${obj.number}_blogeditor" value="$!blogeditor" />
 	#end
-	#if("$!has_comments" != '')
-	<input type="hidden" name="XWiki.ArticleClass_${obj.number}_hasComments" value="$!has_comments" />
-	#end
+    #if("$!has_comments" != '')
+    <input type="hidden" name="XWiki.ArticleClass_${obj.number}_hasComments" value="$!has_comments" />
+    #end
+    #if("$!obj.getPropety('lang').getValue()" != '')
+    <input type="hidden" name="XWiki.ArticleClass_${obj.number}_lang" value="$!obj.getPropety('lang').getValue()" />
+    #end
 	<div id="con_newsTitleEdit" class="editblock">$adminMsg.get('cel_tm_title'):
 		<input name='XWiki.ArticleClass_${obj.number}_title' type='text' class="fullwidth" value="$!xwiki.getFormEncoded($!obj.getProperty('title').getValue())" onfocus="setFocus('con_newsTitleEdit');" onblur="removeFocus('con_newsTitleEdit');"/>
 	</div><!-- IE6 -->
