@@ -1,9 +1,9 @@
 $celementsweb.addExtJSfileOnce(':celJS/article-edit.js')
 #set($id = $!context.getRequest().get('id'))
 #set($blogeditor = $!context.getRequest().get('blogeditor'))
-#set($deflang_obj = $doc.getObject('XWiki.ArticleClass','lang',"$default_language"))
+#set($deflang_obj = $doc.getObject('XWiki.ArticleClass', 'lang', "$default_language", false))
 #if("$!deflang_obj" == '')
-#set($deflang_obj = $doc.getObject('XWiki.ArticleClass','lang',""))
+#set($deflang_obj = $doc.getObject('XWiki.ArticleClass', 'lang', "", false))
 #if("$!deflang_obj" == '')
 #set($deflang_obj = $doc.newObject('XWiki.ArticleClass'))
 #end
@@ -37,6 +37,15 @@ $deflang_obj.set('lang', "$default_language")
   #set($hasWysiwigEditor = '')
 #end
 #set($obj = $doc.getObject("XWiki.ArticleClass", "lang", "$language", false))
+#if("$!obj" == '')
+#if("$language" == "$default_language")
+#set($obj = $deflang_obj)
+#else
+#set($obj = $doc.newObject('XWiki.ArticleClass'))
+$obj.set('lang', "$language")
+#set($nooutput = $all_objs.add($obj))
+#end
+#end
 <!-- start visible content -->
   #set($blogPageDoc = $xwiki.celementsblog.getBlogPageByBlogSpace("$doc.space"))
 <div class="articleEdit blog_$!blogPageDoc pt_$celementsweb.getPageType($blogPageDoc.fullName).getPageType()">
@@ -65,7 +74,7 @@ $adminMsg.get('cel_tm_article_edit')
 	## all article data is in the object. Therefore no translations of main doc needed.
     <input type="hidden" name="language" value="$!default_language" />
 	#foreach($class in $doc.xWikiClasses)
-	#set( $nb = $doc.getObjectNumbers("${class.name}"))
+	#set($nb = $doc.getObjectNumbers("${class.name}"))
 	<input type="hidden" name="${class.name}_nb" value="$nb" />
   #end
 	#if("$!blogeditor" != '')
@@ -107,8 +116,8 @@ $adminMsg.get('cel_tm_article_edit')
     #if("$!has_comments" != '')
     <input type="hidden" name="XWiki.ArticleClass_${obj.number}_hasComments" value="$!has_comments" />
     #end
-    #if("$!obj.getPropety('lang').getValue()" != '')
-    <input type="hidden" name="XWiki.ArticleClass_${obj.number}_lang" value="$!obj.getPropety('lang').getValue()" />
+    #if("$!obj.getProperty('lang').getValue()" != '')
+    <input type="hidden" name="XWiki.ArticleClass_${obj.number}_lang" value="$!obj.getProperty('lang').getValue()" />
     #end
 	<div id="con_newsTitleEdit" class="editblock">$adminMsg.get('cel_tm_title'):
 		<input name='XWiki.ArticleClass_${obj.number}_title' type='text' class="fullwidth" value="$!xwiki.getFormEncoded($!obj.getProperty('title').getValue())" onfocus="setFocus('con_newsTitleEdit');" onblur="removeFocus('con_newsTitleEdit');"/>
