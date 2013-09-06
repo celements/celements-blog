@@ -42,7 +42,8 @@ $xwiki.includeForm('celements2web:Macros.includeRTELanguageSelect', false)
 #if("$!xredirect" == '')
 #set($xredirect = $doc.getURL('view'))
 #end
-<form id="edit" method="post" action="$doc.getURL('save')" style="height:500px;overflow:auto;overflow-x:hidden;">
+<div id="cel_blog_article_editor" class="c3_scrollable">
+<form id="articleform" method="post" action="$doc.getURL('save')">
 	<input type="hidden" id="formeditxred" name="xredirect" value="$!xredirect" />
 	<input type="hidden" name="xnotification" value="$!xnotification" />
 	<input type="hidden" name="template" value="$!request.template" />
@@ -135,4 +136,5 @@ $xwiki.includeForm('celements2web:Macros.includeRTELanguageSelect', false)
 	</div><!-- IE6 -->
 	#end
 </form><!-- IE6 -->
+</div><!-- IE6 --> ## cel_blog_article_editor
 </div><!-- IE6 -->
