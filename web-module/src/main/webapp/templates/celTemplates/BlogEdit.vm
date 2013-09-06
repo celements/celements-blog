@@ -58,7 +58,7 @@
 ##
 	<!-- load Blog Edit into Content Tab -->
 	<div id="con_titblock" class="titleblock">$adminMsg.get('cel_tm_blog_edit')</div>
-	<form id="articleform" method="post" action="$cur_doc.getURL('save')">
+	<form id="blogform" method="post" action="$cur_doc.getURL('save')">
 	<input type="hidden" name="xredirect" value="$cur_doc.getURL('edit','changed=1')$!{migrateme}" />
 	<input type="hidden" name="Celements2.BlogConfigClass_nb"   value="0" />
 #if($celementsweb.getPageType($doc.fullName).hasPageTitle())
