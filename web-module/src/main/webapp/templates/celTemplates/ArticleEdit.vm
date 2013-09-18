@@ -65,10 +65,14 @@ $adminMsg.get('cel_tm_article_edit')
 #set($xredirect = $doc.getURL('view'))
 #end
 <div id="cel_blog_article_editor" class="c3_scrollable">
+#if($services.celementsweb.useNewButtons())
 <form id="articleform" method="post" action="?" onsubmit="cancelCancelEdit()">
 <input type="hidden" name="xpage" value="celements_ajax" />
 <input type="hidden" name="ajax_mode" value="saveDocumentWithValidation" />
 <input type="hidden" name="createIfNotExists" value="true" />
+#else
+<form id="edit" method="post" action="$doc.getURL('save')" onsubmit="cancelCancelEdit()">
+#end
 <input type="hidden" name="template" value="$!request.get('template')" />
 <input type="hidden" name="xredirect" value="$!request.get('xredirect')" />
 	## all article data is in the object. Therefore no translations of main doc needed.
