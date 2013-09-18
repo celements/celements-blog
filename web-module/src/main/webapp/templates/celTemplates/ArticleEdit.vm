@@ -9,10 +9,14 @@ $celementsweb.addExtJSfileOnce(':celJS/article-edit.js')
 #end
 $deflang_obj.set('lang', "$default_language")
 #end
+#set($articleTransList = [])
 #set($all_objs = [])
 #foreach($sobj in $doc.getObjects('XWiki.ArticleClass'))
   #if("$sobj.getProperty('lang').getValue()" != "$default_language")
     #set($nooutput = $all_objs.add($sobj))
+  #end
+  #if(("$!sobj.getProperty('lang').getValue()" != '') && ("$!sobj.getProperty('content').getValue()" != ''))
+    #set($!devnull = $!articleTransList.add($sobj.getProperty('lang').getValue()))
   #end
 #end
 #if(("$!blogeditor" == '') && $!deflang_obj.getProperty('blogeditor') && ("$!deflang_obj.getProperty('blogeditor').getValue()" != ''))
@@ -57,6 +61,7 @@ $adminMsg.get('cel_tm_article_edit')
 #end
 </div><!-- IE6 -->
 
+#set($docTransList = $articleTransList)
 #parse('celMacros/includeRTELanguageSelect.vm')
 
 #set($artsub_obj = $!doc.getObject("Celements2.BlogArticleSubscribableClass"))
