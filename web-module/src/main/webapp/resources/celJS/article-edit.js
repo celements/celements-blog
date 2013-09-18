@@ -1,7 +1,8 @@
 Event.observe(window, 'load', function(){
   setObjectValues();
-  $('edit').observe('click', setObjectValues);
-  $('edit').observe('submit', setObjectValues);
+  var formElem = $('articleform') || $('edit');
+  formElem.observe('click', setObjectValues);
+  formElem.observe('submit', setObjectValues);
 });
 
 function setObjectValues() {
