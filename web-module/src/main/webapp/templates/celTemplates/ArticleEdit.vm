@@ -15,7 +15,7 @@ $deflang_obj.set('lang', "$default_language")
   #if("$sobj.getProperty('lang').getValue()" != "$default_language")
     #set($nooutput = $all_objs.add($sobj))
   #end
-  #if(("$!sobj.getProperty('lang').getValue()" != '') && ("$!sobj.getProperty('content').getValue()" != ''))
+  #if(("$!sobj.getProperty('lang').getValue()" != '') && !$xwiki.celementsweb.isEmptyRTEString("$sobj.getProperty('content').getValue()"))
     #set($!devnull = $!articleTransList.add($sobj.getProperty('lang').getValue()))
   #end
 #end
