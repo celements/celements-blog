@@ -1,4 +1,3 @@
-{pre}
 ## INPUT $blogArticleSubscriptionObj, $blogSaveArticle, $blogSaveSpace
 #set($articleDoc = $xwiki.getDocument("$!request.get('article')"))
 #set($subscriberSpace = "$!request.get('subscriber')")
@@ -52,4 +51,3 @@
 #else
 <!--  Abo needs edit  right -->
 #end
-{/pre}
