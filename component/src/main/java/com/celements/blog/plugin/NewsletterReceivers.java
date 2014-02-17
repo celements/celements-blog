@@ -63,6 +63,7 @@ public class NewsletterReceivers {
   private List<String[]> groups = new ArrayList<String[]>();
   private List<String[]> groupUsers = new ArrayList<String[]>();
   private List<String[]> users = new ArrayList<String[]>();
+  private List<String[]> addrLangs = new ArrayList<String[]>(); 
   private List<String> addresses = new ArrayList<String>();
   private List<EmailAddressDate> emailAddressDateList = new ArrayList<EmailAddressDate>();
 
@@ -97,6 +98,8 @@ public class NewsletterReceivers {
         LOGGER.info("Found " + nlRegReceiverList.size()
             + " Celements.NewsletterReceiverClass" + " object-subscriptions for blog "
             + blogDoc.getFullName());
+        String blogSpace = blogDoc.getXObject(getBlogClasses().getBlogConfigClassRef(
+            getContext().getDatabase())).getStringValue("blogspace");
         for (String nlRegReceiverFN : nlRegReceiverList) {
           XWikiDocument receiverDoc = getContext().getWiki().getDocument(nlRegReceiverFN,
               getContext());
@@ -105,7 +108,12 @@ public class NewsletterReceivers {
             String address = receiverObj.getStringValue("email");
             address = address.toLowerCase();
             if(!allAddresses.contains(address)) {
-              addresses.add(address);
+              String language = receiverObj.getStringValue("language");
+              if (getWebUtilsService().getAllowedLanguages(blogSpace).contains(language)) {
+                addrLangs.add(new String[]{"XWiki.XWikiGuest", address, language});
+              } else {
+                addresses.add(address);
+              }
               allAddresses.add(address);
               emailAddressDateList.add(new EmailAddressDate(address, receiverDoc.getDate()));
               LOGGER.info("reveiver added: " + address);
@@ -298,6 +306,7 @@ public class NewsletterReceivers {
     ArrayList<String[]> allUserMailPairs = new ArrayList<String[]>();
     allUserMailPairs.addAll(groupUsers);
     allUserMailPairs.addAll(users);
+    allUserMailPairs.addAll(addrLangs);
     String defaultLanguage = getWebUtilsService().getDefaultLanguage();
     for (String address : addresses) {
       String mailUser = "XWiki.XWikiGuest";

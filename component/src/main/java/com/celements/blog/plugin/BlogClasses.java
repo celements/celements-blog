@@ -112,6 +112,7 @@ public class BlogClasses extends AbstractClassCollection {
     bclass.setXClassReference(newsletterReceiverClassRef);
     
     needsUpdate |= bclass.addTextField("email", "E-Mail", 30);
+    needsUpdate |= bclass.addTextField("language", "Language code (ISO 639-1)", 30);
     needsUpdate |= bclass.addBooleanField("isactive", "Is Active", "yesno");
     needsUpdate |= bclass.addTextField("subscribed", "Subscribed to Newsletter(s) - " +
         "separated by ','", 30);
