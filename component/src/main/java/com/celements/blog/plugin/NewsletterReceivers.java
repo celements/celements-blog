@@ -229,7 +229,8 @@ public class NewsletterReceivers {
           String email = userObj.getStringValue("email");
           if(email.trim().length() > 0){
             allUserMailPairs = new ArrayList<String[]>();
-            String language = getUserAdminLanguage(user, getDefaultLanguage());
+            String language = getUserAdminLanguage(user, getWebUtilsService(
+                ).getDefaultLanguage());
             allUserMailPairs.add(new String[]{user, email, language });
           }
         }
@@ -297,8 +298,7 @@ public class NewsletterReceivers {
     ArrayList<String[]> allUserMailPairs = new ArrayList<String[]>();
     allUserMailPairs.addAll(groupUsers);
     allUserMailPairs.addAll(users);
-    //TODO use webUtilsServices as soon as available
-    String defaultLanguage = getDefaultLanguage();
+    String defaultLanguage = getWebUtilsService().getDefaultLanguage();
     for (String address : addresses) {
       String mailUser = "XWiki.XWikiGuest";
       String language = defaultLanguage;
@@ -316,11 +316,6 @@ public class NewsletterReceivers {
       allUserMailPairs.add(new String[] { mailUser, address, language });
     }
     return allUserMailPairs;
-  }
-
-  private String getDefaultLanguage() {
-    return getContext().getWiki().getSpacePreference("default_language",
-        getContext());
   }
 
   private String getUserAdminLanguage(String mailUser, String defaultLanguage) {
