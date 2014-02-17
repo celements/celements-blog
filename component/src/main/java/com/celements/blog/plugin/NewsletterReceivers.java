@@ -66,34 +66,20 @@ public class NewsletterReceivers {
   private List<String> addresses = new ArrayList<String>();
   private List<EmailAddressDate> emailAddressDateList = new ArrayList<EmailAddressDate>();
 
-  //TODO ADD UNIT TESTS!!!
+  @Deprecated
   public NewsletterReceivers(XWikiDocument blogDoc, XWikiContext context
       ) throws XWikiException{
-    List<BaseObject> objs = blogDoc.getObjects("Celements2.ReceiverEMail");
-    LOGGER.debug("objs.size = " + (objs != null?objs.size():0));
-    if(objs != null){
-      for (BaseObject obj : objs) {
-        LOGGER.debug("obj: " + obj);
-        if(obj != null){
-          String receiverAdr = obj.getStringValue("email");
-          String address = receiverAdr.toLowerCase();
-          boolean active = (obj.getIntValue("is_active") == 1);
-          boolean isMail = address.matches(
-              "[\\w\\.]{1,}[@][\\w\\-\\.]{1,}([.]([\\w\\-\\.]{1,})){1,3}$");
-          String type = obj.getStringValue("address_type");
-          if(isMail && active && (!allAddresses.contains(address))) {
-            addresses.add(address);
-            allAddresses.add(address);
-            emailAddressDateList.add(new EmailAddressDate(address, blogDoc.getDate()));
-            LOGGER.info("reveiver added: " + address);
-          } else {
-            if(context.getWiki().exists(receiverAdr, context)){
-              parseDocument(receiverAdr, type, context);
-            }
-          }
-        }
-      }
-    }
+    addReceiverEMail(blogDoc);
+    addNewsletterReceiver(blogDoc);
+  }
+
+  //TODO ADD UNIT TESTS!!!
+  public NewsletterReceivers(XWikiDocument blogDoc) throws XWikiException{
+    addReceiverEMail(blogDoc);
+    addNewsletterReceiver(blogDoc);
+  }
+
+  void addNewsletterReceiver(XWikiDocument blogDoc) throws XWikiException {
     String xwql = "from doc.object(Celements.NewsletterReceiverClass) as nr "
         + "where nr.isactive = '1' and nr.subscribed = :subscribed";
 //    String hql = "select nr.email,doc.date from Celements.NewsletterReceiverClass as nr, "
@@ -129,6 +115,35 @@ public class NewsletterReceivers {
       }
     } catch (QueryException exp) {
       LOGGER.error("Failed to execute newsletter receiver xwql [" + xwql + "].", exp);
+    }
+  }
+
+  void addReceiverEMail(XWikiDocument blogDoc) throws XWikiException {
+    List<BaseObject> objs = blogDoc.getXObjects(getBlogClasses().getReceiverEMailClassRef(
+        getContext().getDatabase()));
+    LOGGER.debug("objs.size = " + (objs != null?objs.size():0));
+    if(objs != null){
+      for (BaseObject obj : objs) {
+        LOGGER.debug("obj: " + obj);
+        if(obj != null){
+          String receiverAdr = obj.getStringValue("email");
+          String address = receiverAdr.toLowerCase();
+          boolean active = (obj.getIntValue("is_active") == 1);
+          boolean isMail = address.matches(
+              "[\\w\\.]{1,}[@][\\w\\-\\.]{1,}([.]([\\w\\-\\.]{1,})){1,3}$");
+          String type = obj.getStringValue("address_type");
+          if(isMail && active && (!allAddresses.contains(address))) {
+            addresses.add(address);
+            allAddresses.add(address);
+            emailAddressDateList.add(new EmailAddressDate(address, blogDoc.getDate()));
+            LOGGER.info("reveiver added: " + address);
+          } else {
+            if(getContext().getWiki().exists(receiverAdr, getContext())){
+              parseDocument(receiverAdr, type, getContext());
+            }
+          }
+        }
+      }
     }
   }
   
