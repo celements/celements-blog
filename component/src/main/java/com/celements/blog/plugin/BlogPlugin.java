@@ -422,6 +422,7 @@ public class BlogPlugin extends XWikiDefaultPlugin{
       request, XWikiContext context) throws XWikiException{
     XWiki wiki = context.getWiki();
     boolean subscribed = false;
+    boolean needsSave = false;
     String email = request.get("emailadresse");
     email = email.toLowerCase();
     String docName = getSubscriberDocName(email, context);
@@ -439,12 +440,21 @@ public class BlogPlugin extends XWikiDefaultPlugin{
         obj.setIntValue("isactive", 0);
       }
       obj.setStringValue("subscribed", blogDoc.getFullName());
-      wiki.saveDocument(receiverDoc, context);
+      needsSave = true;
       LOGGER.info("new ReceiverObj is " + obj);
       subscribed = true;
     }
+    if((obj != null) && (request.get("language") != null) 
+        && (request.get("language").length() > 0) 
+        && (!request.get("language").equals(obj.getStringValue("language")))) {
+      obj.setStringValue("language", request.get("language"));
+      needsSave = true;
+    }
     if((obj != null) && (obj.getIntValue("isactive") == 1) && inactiveWithoutMail) {
       obj.setIntValue("isactive", 0);
+      needsSave = true;
+    }
+    if(needsSave) {
       wiki.saveDocument(receiverDoc, context);
     }
     LOGGER.trace("getStringValue: " + obj.getStringValue("subscribed"));
