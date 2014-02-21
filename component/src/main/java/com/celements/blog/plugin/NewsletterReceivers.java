@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -109,8 +110,16 @@ public class NewsletterReceivers {
             address = address.toLowerCase();
             if(!allAddresses.contains(address)) {
               String language = receiverObj.getStringValue("language");
+              String firstname = "";
+              String name = "";
+              BaseObject contactObj = receiverDoc.getXObject(new DocumentReference(
+                  getContext().getWiki().getDatabase(), "Celements", "ContactClass"));
+              if (contactObj != null) {
+                firstname = contactObj.getStringValue("firstname");
+                name = contactObj.getStringValue("lastname");
+              }
               if (getWebUtilsService().getAllowedLanguages(blogSpace).contains(language)) {
-                addrLangs.add(new String[]{"XWiki.XWikiGuest", address, language});
+                addrLangs.add(new String[]{"XWiki.XWikiGuest", address, language, firstname, name});
               } else {
                 addresses.add(address);
               }
@@ -168,8 +177,10 @@ public class NewsletterReceivers {
     if(userObj != null){
       String email = userObj.getStringValue("email").toLowerCase();
       String language = userObj.getStringValue("admin_language");
+      String firstname = userObj.getStringValue("first_name");
+      String name = userObj.getStringValue("last_name");
       if((email.trim().length() > 0) && (!allAddresses.contains(email))){
-        users.add(new String[]{recDoc.getFullName(), email, language});
+        users.add(new String[]{recDoc.getFullName(), email, language, firstname, name});
         allAddresses.add(email);
       }
     } else if((groupObjs != null) && (groupObjs.size() > 0)){
@@ -191,10 +202,12 @@ public class NewsletterReceivers {
           if(groupUserObj != null){
             String email = groupUserObj.getStringValue("email").toLowerCase();
             String language = groupUserObj.getStringValue("admin_language");
+            String firstname = groupUserObj.getStringValue("first_name");
+            String name = groupUserObj.getStringValue("last_name");
             if((email.trim().length() > 0) && (!allAddresses.contains(email))){
               usersInGroup++;
               allAddresses.add(email);
-              groupUsers.add(new String[]{userDocName, email, language});
+              groupUsers.add(new String[]{userDocName, email, language, firstname, name});
             }
           }
         }
@@ -237,9 +250,10 @@ public class NewsletterReceivers {
           String email = userObj.getStringValue("email");
           if(email.trim().length() > 0){
             allUserMailPairs = new ArrayList<String[]>();
-            String language = getUserAdminLanguage(user, getWebUtilsService(
+            String[] userFields = getUserAdminLanguage(user, getWebUtilsService(
                 ).getDefaultLanguage());
-            allUserMailPairs.add(new String[]{user, email, language });
+            allUserMailPairs.add((String[])ArrayUtils.add(new String[]{user, email }, 
+                userFields));
           }
         }
       } else {
@@ -256,6 +270,9 @@ public class NewsletterReceivers {
         context.setUser(userMailPair[0]);
         String language = userMailPair[2];
         context.setLanguage(language);
+        vcontext.put("firstname", userMailPair[3]);
+        vcontext.put("name", userMailPair[4]);
+        vcontext.put("email", userMailPair[1]);
         vcontext.put("language", language);
         vcontext.put("admin_language", language);
         XWikiMessageTool msgTool = WebUtils.getInstance().getMessageTool(language,
@@ -310,7 +327,7 @@ public class NewsletterReceivers {
     String defaultLanguage = getWebUtilsService().getDefaultLanguage();
     for (String address : addresses) {
       String mailUser = "XWiki.XWikiGuest";
-      String language = defaultLanguage;
+      String[] userFields = new String[] { defaultLanguage, "", "" };
       String addrUser = null;
       try {
         addrUser = userNameForUserDataCmd.getUsernameForUserData(address, "email",
@@ -320,15 +337,18 @@ public class NewsletterReceivers {
       }
       if((addrUser != null) && (addrUser.length() > 0)) {
         mailUser = addrUser;
-        language = getUserAdminLanguage(mailUser, defaultLanguage);
+        userFields = getUserAdminLanguage(mailUser, defaultLanguage);
       }
-      allUserMailPairs.add(new String[] { mailUser, address, language });
+      allUserMailPairs.add((String[])ArrayUtils.addAll(new String[] { mailUser, address },
+          userFields));
     }
     return allUserMailPairs;
   }
 
-  private String getUserAdminLanguage(String mailUser, String defaultLanguage) {
+  private String[] getUserAdminLanguage(String mailUser, String defaultLanguage) {
     String userLanguage = defaultLanguage;
+    String firstname = "";
+    String name = "";
     try {
       DocumentReference userDocRef = getWebUtilsService().resolveDocumentReference(
           mailUser);
@@ -340,11 +360,13 @@ public class NewsletterReceivers {
       if ((userAdminLanguage != null) && !"".equals(userAdminLanguage)) {
         userLanguage = userAdminLanguage;
       }
+      firstname = mailUserObj.getStringValue("first_name");
+      name = mailUserObj.getStringValue("last_name");
     } catch (XWikiException exp) {
       LOGGER.error("Exception getting userdoc to find admin-language ['" + mailUser
           + "]'.", exp);
     }
-    return userLanguage;
+    return new String[] { userLanguage, firstname, name };
   }
 
   private String getUnsubscribeFooter(String emailAddress,
@@ -383,6 +405,11 @@ public class NewsletterReceivers {
     if((baseURL != null) && !"".equals(baseURL.trim())){
       header = "<base href='" + baseURL + "' />\n";
     }
+    DocumentReference headerRef = new DocumentReference(getContext().getWiki(
+        ).getDatabase(), "LocalMacros", "NewsletterHTMLheader");
+    if(getContext().getWiki().exists(headerRef, context)) {
+      header += renderCommand.renderDocument(headerRef, "view");
+    }
     renderCommand.setDefaultPageType("RichText");
     String content = renderCommand.renderCelementsDocument(doc.getDocumentReference(),
         "view");
@@ -391,10 +418,14 @@ public class NewsletterReceivers {
         "celements.newsletter.embedAllImages", 0, getContext()) == 1) {
       content = getNewsletterAttachmentService().embedImagesInContent(content);
     }
-    String footer = context.getMessageTool().get("cel_newsletter_html_footer_message",
-        Arrays.asList("_NEWSLETTEREMAILADRESSKEY_"));
-    footer = footer.replaceAll("_NEWSLETTEREMAILADRESSKEY_", doc.getExternalURL("view",
-        context));
+    String footer = "";
+    DocumentReference footerRef = new DocumentReference(getContext().getWiki(
+        ).getDatabase(), "LocalMacros", "NewsletterHTMLfooter");
+    if(getContext().getWiki().exists(footerRef, context)) {
+      footer += renderCommand.renderDocument(footerRef, "view") + "\n";
+    }
+    footer += context.getMessageTool().get("cel_newsletter_html_footer_message",
+        Arrays.asList(doc.getExternalURL("view", context)));
     
     return header + content + footer;
   }
