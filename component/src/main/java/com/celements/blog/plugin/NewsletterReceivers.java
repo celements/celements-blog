@@ -410,6 +410,8 @@ public class NewsletterReceivers {
     if(getContext().getWiki().exists(headerRef, context)) {
       LOGGER.debug("Additional header found.");
       header += renderCommand.renderDocument(headerRef, "view");
+    } else {
+      LOGGER.debug("No additional header. Doc does not exist: " + headerRef);
     }
     renderCommand.setDefaultPageType("RichText");
     String content = renderCommand.renderCelementsDocument(doc.getDocumentReference(),
@@ -425,6 +427,8 @@ public class NewsletterReceivers {
     if(getContext().getWiki().exists(footerRef, context)) {
       LOGGER.debug("Additional footer found.");
       footer += renderCommand.renderDocument(footerRef, "view") + "\n";
+    } else {
+      LOGGER.debug("No additional footer. Doc does not exist: " + footerRef);
     }
     footer += context.getMessageTool().get("cel_newsletter_html_footer_message",
         Arrays.asList(doc.getExternalURL("view", context)));
