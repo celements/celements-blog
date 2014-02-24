@@ -252,7 +252,7 @@ public class NewsletterReceivers {
             allUserMailPairs = new ArrayList<String[]>();
             String[] userFields = getUserAdminLanguage(user, getWebUtilsService(
                 ).getDefaultLanguage());
-            allUserMailPairs.add((String[])ArrayUtils.add(new String[]{user, email }, 
+            allUserMailPairs.add((String[])ArrayUtils.addAll(new String[]{user, email }, 
                 userFields));
           }
         }
