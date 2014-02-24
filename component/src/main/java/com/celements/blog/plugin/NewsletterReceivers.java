@@ -408,6 +408,7 @@ public class NewsletterReceivers {
     DocumentReference headerRef = new DocumentReference(getContext().getWiki(
         ).getDatabase(), "LocalMacros", "NewsletterHTMLheader");
     if(getContext().getWiki().exists(headerRef, context)) {
+      LOGGER.debug("Additional header found.");
       header += renderCommand.renderDocument(headerRef, "view");
     }
     renderCommand.setDefaultPageType("RichText");
@@ -422,11 +423,13 @@ public class NewsletterReceivers {
     DocumentReference footerRef = new DocumentReference(getContext().getWiki(
         ).getDatabase(), "LocalMacros", "NewsletterHTMLfooter");
     if(getContext().getWiki().exists(footerRef, context)) {
+      LOGGER.debug("Additional footer found.");
       footer += renderCommand.renderDocument(footerRef, "view") + "\n";
     }
     footer += context.getMessageTool().get("cel_newsletter_html_footer_message",
         Arrays.asList(doc.getExternalURL("view", context)));
-    
+    LOGGER.debug("Header: [" + header + "]");
+    LOGGER.debug("Footer: [" + footer + "]");
     return header + content + footer;
   }
 
