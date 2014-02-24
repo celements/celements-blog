@@ -405,8 +405,8 @@ public class NewsletterReceivers {
     if((baseURL != null) && !"".equals(baseURL.trim())){
       header = "<base href='" + baseURL + "' />\n";
     }
-    DocumentReference headerRef = new DocumentReference(getContext().getWiki(
-        ).getDatabase(), "LocalMacros", "NewsletterHTMLheader");
+    DocumentReference headerRef = getWebUtilsService().resolveDocumentReference(
+        "LocalMacros.NewsletterHTMLheader");
     if(getContext().getWiki().exists(headerRef, context)) {
       LOGGER.debug("Additional header found.");
       header += renderCommand.renderDocument(headerRef, "view");
@@ -422,8 +422,8 @@ public class NewsletterReceivers {
       content = getNewsletterAttachmentService().embedImagesInContent(content);
     }
     String footer = "";
-    DocumentReference footerRef = new DocumentReference(getContext().getWiki(
-        ).getDatabase(), "LocalMacros", "NewsletterHTMLfooter");
+    DocumentReference footerRef = getWebUtilsService().resolveDocumentReference(
+        "LocalMacros.NewsletterHTMLfooter");
     if(getContext().getWiki().exists(footerRef, context)) {
       LOGGER.debug("Additional footer found.");
       footer += renderCommand.renderDocument(footerRef, "view") + "\n";
