@@ -409,7 +409,10 @@ public class NewsletterReceivers {
         "LocalMacros.NewsletterHTMLheader");
     if(getContext().getWiki().exists(headerRef, context)) {
       LOGGER.debug("Additional header found.");
+      LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
+      LOGGER.debug("context=" + context);
       header += renderCommand.renderDocument(headerRef, "view");
+      LOGGER.debug("Additional header rendered.");
     } else {
       LOGGER.debug("No additional header. Doc does not exist: " + headerRef);
     }
@@ -426,7 +429,10 @@ public class NewsletterReceivers {
         "LocalMacros.NewsletterHTMLfooter");
     if(getContext().getWiki().exists(footerRef, context)) {
       LOGGER.debug("Additional footer found.");
+      LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
+      LOGGER.debug("context=" + context);
       footer += renderCommand.renderDocument(footerRef, "view") + "\n";
+      LOGGER.debug("Additional footer rendered.");
     } else {
       LOGGER.debug("No additional footer. Doc does not exist: " + footerRef);
     }
