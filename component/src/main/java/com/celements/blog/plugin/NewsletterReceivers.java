@@ -282,8 +282,11 @@ public class NewsletterReceivers {
         vcontext.put("adminMsg", msgTool);
 
         if(wiki.checkAccess("view", doc, context)){
+          String senderContextLang = context.getLanguage();
+          context.setLanguage(language);
           String htmlContent = getHtmlContent(doc, baseURL, context);
           htmlContent += getUnsubscribeFooter(userMailPair[1], doc, context);
+          context.setLanguage(senderContextLang);
           
           String textContent = context.getMessageTool().get(
               "cel_newsletter_text_only_message", Arrays.asList(
