@@ -409,22 +409,22 @@ public class NewsletterReceivers {
     if((baseURL != null) && !"".equals(baseURL.trim())){
       header = "<base href='" + baseURL + "' />\n";
     }
+    String renderLang = context.getLanguage();
     DocumentReference headerRef = getWebUtilsService().resolveDocumentReference(
         "LocalMacros.NewsletterHTMLheader");
     if(getContext().getWiki().exists(headerRef, context)) {
       LOGGER.debug("Additional header found.");
       LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
       LOGGER.debug("context=" + context);
-      header += renderCommand.renderDocument(headerRef, context.getLanguage());
+      header += renderCommand.renderDocument(headerRef, renderLang);
       LOGGER.debug("Additional header rendered.");
     } else {
       LOGGER.debug("No additional header. Doc does not exist: " + headerRef);
     }
     renderCommand.setDefaultPageType("RichText");
-    LOGGER.debug("rendering content in " + context.getLanguage());
+    LOGGER.debug("rendering content in " + renderLang);
     String content = renderCommand.renderCelementsDocument(doc.getDocumentReference(),
-        context.getLanguage(), "view");
-    LOGGER.debug("language after rendering content is " + context.getLanguage());
+        renderLang, "view");
     content = Utils.replacePlaceholders(content, context);
     if(getContext().getWiki().getXWikiPreferenceAsInt("newsletter_embed_all_images", 
         "celements.newsletter.embedAllImages", 0, getContext()) == 1) {
@@ -437,7 +437,7 @@ public class NewsletterReceivers {
       LOGGER.debug("Additional footer found.");
       LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
       LOGGER.debug("context=" + context);
-      footer += renderCommand.renderDocument(footerRef, context.getLanguage()) + "\n";
+      footer += renderCommand.renderDocument(footerRef, renderLang) + "\n";
       LOGGER.debug("Additional footer rendered.");
     } else {
       LOGGER.debug("No additional footer. Doc does not exist: " + footerRef);
