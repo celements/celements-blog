@@ -267,6 +267,7 @@ public class NewsletterReceivers {
       Object origMsgTool = vcontext.get("msg");
       Object origAdminMsgTool = vcontext.get("adminMsg");
       for (String[] userMailPair : allUserMailPairs) {
+        LOGGER.debug("userMailPair: " + ArrayUtils.toString(userMailPair));
         context.setUser(userMailPair[0]);
         String language = userMailPair[2];
         context.setLanguage(language);
