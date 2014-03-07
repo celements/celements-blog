@@ -421,8 +421,10 @@ public class NewsletterReceivers {
       LOGGER.debug("No additional header. Doc does not exist: " + headerRef);
     }
     renderCommand.setDefaultPageType("RichText");
+    LOGGER.debug("rendering content in " + context.getLanguage());
     String content = renderCommand.renderCelementsDocument(doc.getDocumentReference(),
         context.getLanguage(), "view");
+    LOGGER.debug("language after rendering content is " + context.getLanguage());
     content = Utils.replacePlaceholders(content, context);
     if(getContext().getWiki().getXWikiPreferenceAsInt("newsletter_embed_all_images", 
         "celements.newsletter.embedAllImages", 0, getContext()) == 1) {
