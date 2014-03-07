@@ -415,7 +415,7 @@ public class NewsletterReceivers {
       LOGGER.debug("Additional header found.");
       LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
       LOGGER.debug("context=" + context);
-      header += renderCommand.renderDocument(headerRef, "view");
+      header += renderCommand.renderDocument(headerRef, context.getLanguage());
       LOGGER.debug("Additional header rendered.");
     } else {
       LOGGER.debug("No additional header. Doc does not exist: " + headerRef);
@@ -437,7 +437,7 @@ public class NewsletterReceivers {
       LOGGER.debug("Additional footer found.");
       LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
       LOGGER.debug("context=" + context);
-      footer += renderCommand.renderDocument(footerRef, "view") + "\n";
+      footer += renderCommand.renderDocument(footerRef, context.getLanguage()) + "\n";
       LOGGER.debug("Additional footer rendered.");
     } else {
       LOGGER.debug("No additional footer. Doc does not exist: " + footerRef);
