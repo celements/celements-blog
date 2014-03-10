@@ -421,8 +421,9 @@ public class NewsletterReceivers {
     } else {
       LOGGER.debug("No additional header. Doc does not exist: " + headerRef);
     }
-    renderCommand.setDefaultPageType("RichText");
     LOGGER.debug("rendering content in " + renderLang);
+    context.setLanguage(renderLang);
+    renderCommand.setDefaultPageType("RichText");
     String content = renderCommand.renderCelementsDocument(doc.getDocumentReference(),
         renderLang, "view");
     content = Utils.replacePlaceholders(content, context);
@@ -434,6 +435,7 @@ public class NewsletterReceivers {
     DocumentReference footerRef = getWebUtilsService().resolveDocumentReference(
         "LocalMacros.NewsletterHTMLfooter");
     if(getContext().getWiki().exists(footerRef, context)) {
+      context.setLanguage(renderLang);
       LOGGER.debug("Additional footer found.");
       LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
       LOGGER.debug("context=" + context);
