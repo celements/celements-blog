@@ -267,6 +267,7 @@ public class NewsletterReceivers {
       Object origMsgTool = vcontext.get("msg");
       Object origAdminMsgTool = vcontext.get("adminMsg");
       for (String[] userMailPair : allUserMailPairs) {
+        LOGGER.debug("userMailPair: " + ArrayUtils.toString(userMailPair));
         context.setUser(userMailPair[0]);
         String language = userMailPair[2];
         context.setLanguage(language);
@@ -274,6 +275,7 @@ public class NewsletterReceivers {
         vcontext.put("name", userMailPair[4]);
         vcontext.put("email", userMailPair[1]);
         vcontext.put("language", language);
+        vcontext.put("newsletter_language", language);
         vcontext.put("admin_language", language);
         XWikiMessageTool msgTool = WebUtils.getInstance().getMessageTool(language,
             getContext());
@@ -281,8 +283,11 @@ public class NewsletterReceivers {
         vcontext.put("adminMsg", msgTool);
 
         if(wiki.checkAccess("view", doc, context)){
+          String senderContextLang = context.getLanguage();
+          context.setLanguage(language);
           String htmlContent = getHtmlContent(doc, baseURL, context);
           htmlContent += getUnsubscribeFooter(userMailPair[1], doc, context);
+          context.setLanguage(senderContextLang);
           
           String textContent = context.getMessageTool().get(
               "cel_newsletter_text_only_message", Arrays.asList(
@@ -405,17 +410,23 @@ public class NewsletterReceivers {
     if((baseURL != null) && !"".equals(baseURL.trim())){
       header = "<base href='" + baseURL + "' />\n";
     }
+    String renderLang = context.getLanguage();
     DocumentReference headerRef = getWebUtilsService().resolveDocumentReference(
         "LocalMacros.NewsletterHTMLheader");
     if(getContext().getWiki().exists(headerRef, context)) {
       LOGGER.debug("Additional header found.");
-      header += renderCommand.renderDocument(headerRef, "view");
+      LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
+      LOGGER.debug("context=" + context);
+      header += renderCommand.renderDocument(headerRef, renderLang);
+      LOGGER.debug("Additional header rendered.");
     } else {
       LOGGER.debug("No additional header. Doc does not exist: " + headerRef);
     }
+    LOGGER.debug("rendering content in " + renderLang);
+    context.setLanguage(renderLang);
     renderCommand.setDefaultPageType("RichText");
     String content = renderCommand.renderCelementsDocument(doc.getDocumentReference(),
-        "view");
+        renderLang, "view");
     content = Utils.replacePlaceholders(content, context);
     if(getContext().getWiki().getXWikiPreferenceAsInt("newsletter_embed_all_images", 
         "celements.newsletter.embedAllImages", 0, getContext()) == 1) {
@@ -425,8 +436,12 @@ public class NewsletterReceivers {
     DocumentReference footerRef = getWebUtilsService().resolveDocumentReference(
         "LocalMacros.NewsletterHTMLfooter");
     if(getContext().getWiki().exists(footerRef, context)) {
+      context.setLanguage(renderLang);
       LOGGER.debug("Additional footer found.");
-      footer += renderCommand.renderDocument(footerRef, "view") + "\n";
+      LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
+      LOGGER.debug("context=" + context);
+      footer += renderCommand.renderDocument(footerRef, renderLang) + "\n";
+      LOGGER.debug("Additional footer rendered.");
     } else {
       LOGGER.debug("No additional footer. Doc does not exist: " + footerRef);
     }
