@@ -275,6 +275,7 @@ public class NewsletterReceivers {
         vcontext.put("name", userMailPair[4]);
         vcontext.put("email", userMailPair[1]);
         vcontext.put("language", language);
+        vcontext.put("newsletter_language", language);
         vcontext.put("admin_language", language);
         XWikiMessageTool msgTool = WebUtils.getInstance().getMessageTool(language,
             getContext());
