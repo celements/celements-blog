@@ -1,8 +1,13 @@
 #set($blogSpace = "$!request.get('space')")
 #if($xwiki.isMultiLingual())
-	#set($defObj = $doc.getObject("XWiki.ArticleClass", "lang", $!{default_language}, false))
-	#set($obj = $doc.getObject("XWiki.ArticleClass","lang",$language))
-	#if(("$!obj" == '') || ($!obj.getProperty('content').getValue() == ""))
+    #set($defObj = $doc.getObject("XWiki.ArticleClass", "lang", $!{default_language}, false))
+    #set($newsletterObj = $doc.getObject("XWiki.ArticleClass", "lang", $!{newsletter_language}, false))
+    #if(("$!newsletter_language" != '') && ("$!newsletterObj" != '') && ($!newsletterObj.getProperty('content').getValue() != ""))
+      #set($obj = $newsletterObj)
+    #else
+      #set($obj = $doc.getObject("XWiki.ArticleClass","lang",$language, false))
+    #end
+    #if(("$!obj" == '') || ($!obj.getProperty('content').getValue() == ""))
 		#set($obj = $defObj)
 	#end
 #else
