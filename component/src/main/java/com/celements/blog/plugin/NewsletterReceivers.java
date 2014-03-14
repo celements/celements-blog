@@ -277,8 +277,7 @@ public class NewsletterReceivers {
         vcontext.put("language", language);
         vcontext.put("newsletter_language", language);
         vcontext.put("admin_language", language);
-        XWikiMessageTool msgTool = WebUtils.getInstance().getMessageTool(language,
-            getContext());
+        XWikiMessageTool msgTool = getWebUtilsService().getMessageTool(language);
         vcontext.put("msg", msgTool);
         vcontext.put("adminMsg", msgTool);
 
@@ -286,12 +285,12 @@ public class NewsletterReceivers {
           String senderContextLang = context.getLanguage();
           context.setLanguage(language);
           String htmlContent = getHtmlContent(doc, baseURL, context);
+          context.setLanguage(language);
           htmlContent += getUnsubscribeFooter(userMailPair[1], doc, context);
           context.setLanguage(senderContextLang);
-          
-          String textContent = context.getMessageTool().get(
-              "cel_newsletter_text_only_message", Arrays.asList(
-                  "_NEWSLETTEREMAILADRESSKEY_"));
+          XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
+          String textContent = messageTool.get("cel_newsletter_text_only_message", 
+              Arrays.asList("_NEWSLETTEREMAILADRESSKEY_"));
           textContent = textContent.replaceAll("_NEWSLETTEREMAILADRESSKEY_",
               doc.getExternalURL("view", context));
           textContent += getUnsubscribeFooter(userMailPair[1], doc, context);
@@ -305,8 +304,9 @@ public class NewsletterReceivers {
               + " has no view rights on this Document.");
           List<String> params = new ArrayList<String>();
           params.add(doc.toString());
-          result.add(new String[]{userMailPair[1], context.getMessageTool(
-              ).get("cel_blog_newsletter_receiver_no_rights", params)});
+          XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
+          result.add(new String[]{userMailPair[1], messageTool.get(
+              "cel_blog_newsletter_receiver_no_rights", params)});
         }
       
       }
@@ -379,9 +379,10 @@ public class NewsletterReceivers {
     String unsubscribeFooter = "";
     if(!"".equals(getUnsubscribeLink(blogDocument.getSpace(), emailAddress,
         context))) {
-      unsubscribeFooter = context.getMessageTool().get(
-          "cel_newsletter_unsubscribe_footer", Arrays.asList("_NEWSLETTEREMAILADRESSKEY_"
-              )); 
+      XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(
+          context.getLanguage());
+      unsubscribeFooter = messageTool.get("cel_newsletter_unsubscribe_footer", 
+          Arrays.asList("_NEWSLETTEREMAILADRESSKEY_"));
       unsubscribeFooter = unsubscribeFooter.replaceAll(
           "_NEWSLETTEREMAILADRESSKEY_", getUnsubscribeLink(
               blogDocument.getSpace(), emailAddress, context));
@@ -445,7 +446,8 @@ public class NewsletterReceivers {
     } else {
       LOGGER.debug("No additional footer. Doc does not exist: " + footerRef);
     }
-    footer += context.getMessageTool().get("cel_newsletter_html_footer_message",
+    XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(renderLang);
+    footer += messageTool.get("cel_newsletter_html_footer_message",
         Arrays.asList(doc.getExternalURL("view", context)));
     LOGGER.debug("Header: [" + header + "]");
     LOGGER.debug("Footer: [" + footer + "]");
