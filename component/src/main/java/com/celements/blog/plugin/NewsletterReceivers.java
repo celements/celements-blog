@@ -289,9 +289,7 @@ public class NewsletterReceivers {
           context.setLanguage(senderContextLang);
           XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
           String textContent = messageTool.get("cel_newsletter_text_only_message", 
-              Arrays.asList("_NEWSLETTEREMAILADRESSKEY_"));
-          textContent = textContent.replaceAll("_NEWSLETTEREMAILADRESSKEY_",
-              doc.getExternalURL("view", context));
+              Arrays.asList(doc.getExternalURL("view", context)));
           textContent += getUnsubscribeFooter(userMailPair[1], doc, context);
           
           int singleResult = sendMail(from, replyTo, userMailPair[1], subject,
@@ -381,10 +379,8 @@ public class NewsletterReceivers {
       XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(
           context.getLanguage());
       unsubscribeFooter = messageTool.get("cel_newsletter_unsubscribe_footer", 
-          Arrays.asList("_NEWSLETTEREMAILADRESSKEY_"));
-      unsubscribeFooter = unsubscribeFooter.replaceAll(
-          "_NEWSLETTEREMAILADRESSKEY_", getUnsubscribeLink(
-              blogDocument.getSpace(), emailAddress, context));
+          Arrays.asList(getUnsubscribeLink(blogDocument.getSpace(), emailAddress, 
+              context)));
     }
     return unsubscribeFooter;
   }
