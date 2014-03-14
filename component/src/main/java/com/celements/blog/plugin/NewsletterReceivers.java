@@ -42,7 +42,6 @@ import com.celements.rendering.RenderCommand;
 import com.celements.web.plugin.cmd.CelSendMail;
 import com.celements.web.plugin.cmd.UserNameForUserDataCommand;
 import com.celements.web.service.IWebUtilsService;
-import com.celements.web.utils.WebUtils;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -412,12 +411,16 @@ public class NewsletterReceivers {
       header = "<base href='" + baseURL + "' />\n";
     }
     String renderLang = context.getLanguage();
+    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+    XWikiMessageTool msgTool = getWebUtilsService().getMessageTool(renderLang);
     DocumentReference headerRef = getWebUtilsService().resolveDocumentReference(
         "LocalMacros.NewsletterHTMLheader");
     if(getContext().getWiki().exists(headerRef, context)) {
       LOGGER.debug("Additional header found.");
       LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
       LOGGER.debug("context=" + context);
+      vcontext.put("msg", msgTool);
+      vcontext.put("adminMsg", msgTool);
       header += renderCommand.renderDocument(headerRef, renderLang);
       LOGGER.debug("Additional header rendered.");
     } else {
@@ -426,6 +429,8 @@ public class NewsletterReceivers {
     LOGGER.debug("rendering content in " + renderLang);
     context.setLanguage(renderLang);
     renderCommand.setDefaultPageType("RichText");
+    vcontext.put("msg", msgTool);
+    vcontext.put("adminMsg", msgTool);
     String content = renderCommand.renderCelementsDocument(doc.getDocumentReference(),
         renderLang, "view");
     content = Utils.replacePlaceholders(content, context);
@@ -441,6 +446,8 @@ public class NewsletterReceivers {
       LOGGER.debug("Additional footer found.");
       LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
       LOGGER.debug("context=" + context);
+      vcontext.put("msg", msgTool);
+      vcontext.put("adminMsg", msgTool);
       footer += renderCommand.renderDocument(footerRef, renderLang) + "\n";
       LOGGER.debug("Additional footer rendered.");
     } else {
