@@ -266,46 +266,10 @@ public class NewsletterReceivers {
       Object origMsgTool = vcontext.get("msg");
       Object origAdminMsgTool = vcontext.get("adminMsg");
       for (String[] userMailPair : allUserMailPairs) {
-        LOGGER.debug("userMailPair: " + ArrayUtils.toString(userMailPair));
-        context.setUser(userMailPair[0]);
-        String language = userMailPair[2];
-        context.setLanguage(language);
-        vcontext.put("firstname", userMailPair[3]);
-        vcontext.put("name", userMailPair[4]);
-        vcontext.put("email", userMailPair[1]);
-        vcontext.put("language", language);
-        vcontext.put("newsletter_language", language);
-        vcontext.put("admin_language", language);
-        XWikiMessageTool msgTool = getWebUtilsService().getMessageTool(language);
-        vcontext.put("msg", msgTool);
-        vcontext.put("adminMsg", msgTool);
-
-        if(wiki.checkAccess("view", doc, context)){
-          String senderContextLang = context.getLanguage();
-          context.setLanguage(language);
-          String htmlContent = getHtmlContent(doc, baseURL, context);
-          context.setLanguage(language);
-          htmlContent += getUnsubscribeFooter(userMailPair[1], doc, context);
-          context.setLanguage(senderContextLang);
-          XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
-          String textContent = messageTool.get("cel_newsletter_text_only_message", 
-              Arrays.asList(doc.getExternalURL("view", context)));
-          textContent += getUnsubscribeFooter(userMailPair[1], doc, context);
-          
-          int singleResult = sendMail(from, replyTo, userMailPair[1], subject,
-              baseURL, htmlContent, textContent, context);
-          result.add(new String[]{userMailPair[1], Integer.toString(singleResult)});
-          if(singleResult == 0){ successfullySent++; }
-        } else {
-          LOGGER.warn("Tried to send " + doc + " to user " + userMailPair[0] + " which"
-              + " has no view rights on this Document.");
-          List<String> params = new ArrayList<String>();
-          params.add(doc.toString());
-          XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
-          result.add(new String[]{userMailPair[1], messageTool.get(
-              "cel_blog_newsletter_receiver_no_rights", params)});
-        }
-      
+        String[] sendResult = sendNewsletterToOneReceiver(from, replyTo, subject,
+            doc, baseURL, userMailPair, context);
+        if("0".equals(sendResult[1])){ successfullySent++; }
+        result.add(sendResult);
       }
       context.setUser(origUser);
       context.setLanguage(origLanguage);
@@ -318,6 +282,52 @@ public class NewsletterReceivers {
           context);
     }
     
+    return result;
+  }
+
+  String[] sendNewsletterToOneReceiver(String from, String replyTo, String subject, 
+      XWikiDocument doc, String baseURL, String[] userMailPair,
+      XWikiContext context) throws XWikiException {
+    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+    String[] result;
+    LOGGER.debug("userMailPair: " + ArrayUtils.toString(userMailPair));
+    context.setUser(userMailPair[0]);
+    String language = userMailPair[2];
+    context.setLanguage(language);
+    vcontext.put("firstname", userMailPair[3]);
+    vcontext.put("name", userMailPair[4]);
+    vcontext.put("email", userMailPair[1]);
+    vcontext.put("language", language);
+    vcontext.put("newsletter_language", language);
+    vcontext.put("admin_language", language);
+    XWikiMessageTool msgTool = getWebUtilsService().getMessageTool(language);
+    vcontext.put("msg", msgTool);
+    vcontext.put("adminMsg", msgTool);
+
+    if(context.getWiki().checkAccess("view", doc, context)){
+      String senderContextLang = context.getLanguage();
+      context.setLanguage(language);
+      String htmlContent = getHtmlContent(doc, baseURL, context);
+      context.setLanguage(language);
+      htmlContent += getUnsubscribeFooter(userMailPair[1], doc, context);
+      context.setLanguage(senderContextLang);
+      XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
+      String textContent = messageTool.get("cel_newsletter_text_only_message", 
+          Arrays.asList(doc.getExternalURL("view", context)));
+      textContent += getUnsubscribeFooter(userMailPair[1], doc, context);
+      
+      int singleResult = sendMail(from, replyTo, userMailPair[1], subject,
+          baseURL, htmlContent, textContent, context);
+      result = new String[]{userMailPair[1], Integer.toString(singleResult)};
+    } else {
+      LOGGER.warn("Tried to send " + doc + " to user " + userMailPair[0] + " which"
+          + " has no view rights on this Document.");
+      List<String> params = new ArrayList<String>();
+      params.add(doc.toString());
+      XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
+      result = new String[]{userMailPair[1], messageTool.get(
+          "cel_blog_newsletter_receiver_no_rights", params)};
+    }
     return result;
   }
 
