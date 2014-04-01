@@ -68,6 +68,9 @@ public class NewsletterReceivers {
   private List<String> addresses = new ArrayList<String>();
   private List<EmailAddressDate> emailAddressDateList = new ArrayList<EmailAddressDate>();
 
+  //use only if you inject the receivers!
+  public NewsletterReceivers() { }
+  
   @Deprecated
   public NewsletterReceivers(XWikiDocument blogDoc, XWikiContext context
       ) throws XWikiException{

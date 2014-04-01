@@ -206,8 +206,8 @@ public class BlogPluginApi extends Api {
       DocumentReference contentDocRef, String baseURL) {
     try {
       XWikiDocument contentDoc = context.getWiki().getDocument(contentDocRef, context);
-      return getNewsletterReceivers().sendNewsletterToInjectedReceiverList(receivers, from, 
-          replyTo, subject, contentDoc, baseURL);
+      return new NewsletterReceivers().sendNewsletterToInjectedReceiverList(receivers, 
+          from, replyTo, subject, contentDoc, baseURL);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception sending Newsletter to injected list", xwe);
     }
