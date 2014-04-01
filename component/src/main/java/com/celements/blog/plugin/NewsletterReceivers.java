@@ -288,23 +288,23 @@ public class NewsletterReceivers {
   
   public List<String[]> sendNewsletterToInjectedReceiverList(
       List<DocumentReference> receivers, String from, String replyTo, String subject, 
-      XWikiDocument contentDoc, String baseURL, XWikiContext context) {
+      XWikiDocument contentDoc, String baseURL) {
     List<String[]> results = Collections.emptyList();
     if((receivers != null) && (receivers.size() > 0)) {
       results = new ArrayList<String[]>();
       for(DocumentReference receiverDocRef : receivers) {
         try {
-          XWikiDocument receiverDoc = context.getWiki().getDocument(receiverDocRef, 
-              context);
+          XWikiDocument receiverDoc = getContext().getWiki().getDocument(receiverDocRef, 
+              getContext());
           BaseObject receiverObj = receiverDoc.getXObject(new DocumentReference(
-              context.getDatabase(), "Celements", "NewsletterReceiverClass"));
+              getContext().getDatabase(), "Celements", "NewsletterReceiverClass"));
           if(receiverObj.getIntValue("isactive") == 1) {
             String[] recData = new String[]{ "XWiki.XWikiGuest", 
                 receiverObj.getStringValue("email"), receiverObj.getStringValue(
                 "language"), "", "" };
             LOGGER.warn("Sending newsletter via injected list to [" + recData[1] + "]");
             sendNewsletterToOneReceiver(from, replyTo, subject, contentDoc, baseURL, 
-                recData, context);
+                recData, getContext());
           }
         } catch (XWikiException xwe) {
           LOGGER.error("Newsletter send via injected list failed", xwe);
