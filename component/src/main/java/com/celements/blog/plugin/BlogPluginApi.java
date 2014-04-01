@@ -19,12 +19,14 @@
  */
 package com.celements.blog.plugin;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.blog.service.INewsletterAttachmentServiceRole;
 import com.xpn.xwiki.XWikiContext;
@@ -197,6 +199,19 @@ public class BlogPluginApi extends Api {
   
   public List<String[]> sendArticleByMail() throws XWikiException {
     return getNewsletterReceivers().sendArticleByMail(context);
+  }
+  
+  public List<String[]> sendNewsletterToInjectedReceiverList(
+      List<DocumentReference> receivers, String from, String replyTo, String subject, 
+      DocumentReference contentDocRef, String baseURL) {
+    try {
+      XWikiDocument contentDoc = context.getWiki().getDocument(contentDocRef, context);
+      return getNewsletterReceivers().sendNewsletterToInjectedReceiverList(receivers, from, 
+          replyTo, subject, contentDoc, baseURL);
+    } catch (XWikiException xwe) {
+      LOGGER.error("Exception sending Newsletter to injected list", xwe);
+    }
+    return Collections.emptyList();
   }
   
   public Article getPreviousArticle(Article article) {

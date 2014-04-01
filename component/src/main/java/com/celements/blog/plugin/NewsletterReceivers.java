@@ -21,6 +21,7 @@ package com.celements.blog.plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -283,6 +284,34 @@ public class NewsletterReceivers {
     }
     
     return result;
+  }
+  
+  public List<String[]> sendNewsletterToInjectedReceiverList(
+      List<DocumentReference> receivers, String from, String replyTo, String subject, 
+      XWikiDocument contentDoc, String baseURL) {
+    List<String[]> results = Collections.emptyList();
+    if((receivers != null) && (receivers.size() > 0)) {
+      results = new ArrayList<String[]>();
+      for(DocumentReference receiverDocRef : receivers) {
+        try {
+          XWikiDocument receiverDoc = getContext().getWiki().getDocument(receiverDocRef, 
+              getContext());
+          BaseObject receiverObj = receiverDoc.getXObject(new DocumentReference(
+              getContext().getDatabase(), "Celements", "NewsletterReceiverClass"));
+          if(receiverObj.getIntValue("isactive") == 1) {
+            String[] recData = new String[]{ "XWiki.XWikiGuest", 
+                receiverObj.getStringValue("email"), receiverObj.getStringValue(
+                "language"), "", "" };
+            LOGGER.warn("Sending newsletter via injected list to [" + recData[1] + "]");
+            sendNewsletterToOneReceiver(from, replyTo, subject, contentDoc, baseURL, 
+                recData, getContext());
+          }
+        } catch (XWikiException xwe) {
+          LOGGER.error("Newsletter send via injected list failed", xwe);
+        }
+      }
+    }
+    return results;
   }
 
   String[] sendNewsletterToOneReceiver(String from, String replyTo, String subject, 
