@@ -15,7 +15,14 @@
   #set($timesSent = $configObj.getProperty('times_sent').getValue())
   #if(("$!timesSent" != '') && ($timesSent > 0))
     $adminMsg.get('cel_newsletter_times_sent', ["$timesSent"])
-    $adminMsg.get('cel_newsletter_last_sent', ["$configObj.getProperty('last_sender').getValue()", "$configObj.getProperty('last_sent_date').getValue()", "$configObj.getProperty('last_sent_recipients').getValue()"])
+    #set($lastSernderDoc = $xwiki.getDocument("$configObj.getProperty('last_sender').getValue()"))
+    #set($lastSender = '')
+    #if(("$!lastSernderDoc" != '') && !$lastSernderDoc.isNew())
+      #set($lastSenderObj = $lastSernderDoc.getObject('XWiki.XWikiUsers'))
+      #set($lastSender = "$!lastSenderObj.getProperty('first_name').getValue() $!lastSenderObj.getProperty('last_name').getValue() ($!{lastSenderObj.getProperty('email').getValue()})")
+    #end
+    #set($lastDate = "$datetool.format('d.M.yyyy HH:mm', $configObj.getProperty('last_sent_date').getValue()"))
+    $adminMsg.get('cel_newsletter_last_sent', [$lastSender, $lastDate, "$configObj.getProperty('last_sent_recipients').getValue()"])
   #else
     $adminMsg.get('cel_newsletter_never_sent')
   #end
