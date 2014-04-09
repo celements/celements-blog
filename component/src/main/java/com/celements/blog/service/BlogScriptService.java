@@ -38,7 +38,7 @@ public class BlogScriptService implements ScriptService {
       try {
         NewsletterReceivers newsletterReceivers = new NewsletterReceivers(
             getContext().getWiki().getDocument(blogDocRef, getContext()), getContext());
-        List<String> addresses = newsletterReceivers.getAddresses();
+        List<String> addresses = newsletterReceivers.getAllAddresses();
         Collections.sort(addresses);
         return addresses;
       } catch (XWikiException exp) {
