@@ -45,6 +45,8 @@
 <textarea name="active" id="textarea_active" cols="60" rows="30">
 #foreach($emailAdr in $emailActiveList)
 #if ("$!orderByDate" == "1")
+#set($mailDoc = $xwiki.getDocument($mailDocName))
+#set($mailObj = $mailDoc.getObject('Celements.NewsletterReceiverClass', 'subscribed', "${blogname}", false))
 #set($emailLang = "$!{mailObj.getProperty().getValue()}")
 #if("$!emailLang" == '')
   #set($emailLang = "-")
