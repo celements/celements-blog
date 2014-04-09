@@ -44,10 +44,10 @@
 <textarea name="active" id="textarea_active" cols="60" rows="30">
 #foreach($emailAdr in $emailActiveList)
 #if ("$!orderByDate" == "1")
-  #set($mailLang = '-')
-  #if("$!{emailAdr.getLanguage()}" != '')
-    #set($mailLang = "$!{emailAdr.getLanguage()}")
-  #end
+#set($mailLang = '-')##
+#if("$!{emailAdr.getLanguage()}" != '')##
+#set($mailLang = "$!{emailAdr.getLanguage()}")##
+#end##
 $emailAdr.getEmailAdr()&#09;$mailLang&#09;$datetool.format('dd.MM.yyyy HH:mm', $emailAdr.getChangeDate())
 #else
 $emailAdr
