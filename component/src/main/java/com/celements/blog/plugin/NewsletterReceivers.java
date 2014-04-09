@@ -122,12 +122,14 @@ public class NewsletterReceivers {
                 name = contactObj.getStringValue("lastname");
               }
               if (getWebUtilsService().getAllowedLanguages(blogSpace).contains(language)) {
-                addrLangs.add(new String[]{"XWiki.XWikiGuest", address, language, firstname, name});
+                addrLangs.add(new String[]{"XWiki.XWikiGuest", address, language, 
+                    firstname, name});
               } else {
                 addresses.add(address);
               }
               allAddresses.add(address);
-              emailAddressDateList.add(new EmailAddressDate(address, receiverDoc.getDate()));
+              emailAddressDateList.add(new EmailAddressDate(address, 
+                  receiverDoc.getDate(), language));
               LOGGER.info("reveiver added: " + address);
             }
           }
@@ -155,7 +157,8 @@ public class NewsletterReceivers {
           if(isMail && active && (!allAddresses.contains(address))) {
             addresses.add(address);
             allAddresses.add(address);
-            emailAddressDateList.add(new EmailAddressDate(address, blogDoc.getDate()));
+            emailAddressDateList.add(new EmailAddressDate(address, blogDoc.getDate(), null
+                ));
             LOGGER.info("reveiver added: " + address);
           } else {
             if(getContext().getWiki().exists(receiverAdr, getContext())){
@@ -185,6 +188,7 @@ public class NewsletterReceivers {
       if((email.trim().length() > 0) && (!allAddresses.contains(email))){
         users.add(new String[]{recDoc.getFullName(), email, language, firstname, name});
         allAddresses.add(email);
+        emailAddressDateList.add(new EmailAddressDate(email, recDoc.getDate(), language));
       }
     } else if((groupObjs != null) && (groupObjs.size() > 0)){
       int usersInGroup = parseGroupMembers(groupObjs, type, context);
@@ -210,6 +214,8 @@ public class NewsletterReceivers {
             if((email.trim().length() > 0) && (!allAddresses.contains(email))){
               usersInGroup++;
               allAddresses.add(email);
+              emailAddressDateList.add(new EmailAddressDate(email, userDoc.getDate(), 
+                  language));
               groupUsers.add(new String[]{userDocName, email, language, firstname, name});
             }
           }
