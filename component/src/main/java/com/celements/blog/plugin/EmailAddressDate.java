@@ -6,14 +6,16 @@ public class EmailAddressDate implements Comparable<EmailAddressDate>{
 
   private String emailAdr;
   private Date changeDate;
+  private String language;
 
-  public EmailAddressDate(String emailAdr, Date changeDate) {
+  public EmailAddressDate(String emailAdr, Date changeDate, String language) {
     this.emailAdr = emailAdr;
     if (changeDate != null) {
       this.changeDate = changeDate;
     } else {
       this.changeDate = new Date();
     }
+    this.language = language;
   }
 
   public int compareTo(EmailAddressDate emailAdrDate) {
@@ -30,5 +32,9 @@ public class EmailAddressDate implements Comparable<EmailAddressDate>{
 
   public String getEmailAdr() {
     return emailAdr;
+  }
+  
+  public String getLanguage() {
+    return language;
   }
 }
