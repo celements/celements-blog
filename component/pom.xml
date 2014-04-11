@@ -30,7 +30,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>  
   <artifactId>celements-blog</artifactId>
-  <version>1.29-SNAPSHOT</version>
+  <version>1.30-SNAPSHOT</version>
   <description>Celements Blog</description> 
   <dependencies>    
     <!-- Add here all your dependencies -->
