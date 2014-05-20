@@ -152,6 +152,9 @@ $response.setDateHeader("Last-Modified", $lastChanged.getTime())
     #end
   #end
 ## render Blog
+#if("$!maxItems" != '')
+#set($articles = $articles.subList(0, $mathtool.min($articles.size(), $maxItems)))
+#end
 #if(("$!blogTitle" != '') && !$supressBlogTitle)
 <h1 class="pageTitle">$blogTitle<!--iE6.0--></h1>
 #end
