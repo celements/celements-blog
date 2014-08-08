@@ -59,13 +59,13 @@ public class AddBlogDateValidationMigrator extends AbstractCelementsHibernateMig
     DateClass publishDateElement = (DateClass) bClass.get("publishdate");
     DateClass archiveDateElement = (DateClass) bClass.get("archivedate");
     publishDateElement.setValidationRegExp(
-        "/^(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[012])\\.([0-9]{4}) " +
-        "([01][0-9]|2[0-4])(\\:[0-5][0-9])$/");
+        "/^((0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[012])\\.([0-9]{4}) " +
+        "([01][0-9]|2[0-4])(\\:[0-5][0-9]))$/");
     publishDateElement.setValidationMessage("cel_blog_validation_publishdate");
     publishDateElement.setDateFormat("dd.MM.yyyy HH:mm");
     archiveDateElement.setValidationRegExp(
-        "/^(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[012])\\.([0-9]{4}) " +
-        "([01][0-9]|2[0-4])(\\:[0-5][0-9])$/");
+        "/^((0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[012])\\.([0-9]{4}) " +
+        "([01][0-9]|2[0-4])(\\:[0-5][0-9]))$/");
     archiveDateElement.setValidationMessage("cel_blog_validation_archivedate");
     archiveDateElement.setDateFormat("dd.MM.yyyy HH:mm");
     context.getWiki().saveDocument(doc, context);
