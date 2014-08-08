@@ -4,3 +4,4 @@ com.celements.blog.service.BlogService
 com.celements.blog.service.NewsletterAttachmentService
 com.celements.migrator.NewsletterReceiversToLowerCaseMigrator
 com.celements.migrator.NewsletterReceiversRemoveDoublesMigrator
+com.celements.migrator.AddBlogDateValidationMigrator
