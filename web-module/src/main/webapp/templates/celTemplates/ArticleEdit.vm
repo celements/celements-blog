@@ -1,4 +1,13 @@
+## includeCSSPage on this stage isn't working, because the call for this Methode is at the beginning 
+## of the Page and not in the section ArticleEdit.vm
+##$celementsweb.includeCSSPage(':celJS/jquery-datetimepicker/jquery.datetimepicker.css')
+<link rel="stylesheet" media="all" type="text/css" href="$celementsweb.getSkinFile(':celJS/jquery-datetimepicker/jquery.datetimepicker.css', 'file')" />
 $celementsweb.addExtJSfileOnce(':celJS/article-edit.js')
+$celementsweb.addExtJSfileOnce(':celJS/jquery-datetimepicker/jquery.datetimepicker.js')
+<span class='cel_lazyloadJS' style='display: none;'>celJS/jquery-datetimepicker/jquery.datetimepicker.js</span>
+<span class='cel_lazyloadJS' style='display: none;'>celJS/celTabMenu/stickBlogDateTimePicker.js</span>
+<span class='cel_lazyloadCSS' style='display: none;'>celJS/jquery-datetimepicker/jquery.datetimepicker.css</span>
+
 #set($id = $!context.getRequest().get('id'))
 #set($blogeditor = $!context.getRequest().get('blogeditor'))
 #set($deflang_obj = $doc.getObject('XWiki.ArticleClass', 'lang', "$default_language", false))
@@ -20,15 +29,15 @@ $deflang_obj.set('lang', "$default_language")
   #end
 #end
 #if(("$!blogeditor" == '') && $!deflang_obj.getProperty('blogeditor') && ("$!deflang_obj.getProperty('blogeditor').getValue()" != ''))
-	#set($blogeditor = $!deflang_obj.getProperty('blogeditor').getValue())
+    #set($blogeditor = $!deflang_obj.getProperty('blogeditor').getValue())
 #end
 #if("$!context.getRequest().get('has_comments')" == '1')
-	#set($has_comments = '1')
+    #set($has_comments = '1')
 #else
-	#set($has_comments = '0')
+    #set($has_comments = '0')
 #end
 #if(("$!has_comments" == '') && $!deflang_obj.getProperty('has_comments') && ("$!deflang_obj.getProperty('has_comments').getValue()" != ''))
-	#set($has_comments = $!deflang_obj.getProperty('has_comments').getValue())
+    #set($has_comments = $!deflang_obj.getProperty('has_comments').getValue())
 #end
 #if("$!blogeditor" == 'wysiwyg')
   #set($contextPath = ${request.contextPath})
@@ -80,13 +89,13 @@ $adminMsg.get('cel_tm_article_edit')
 #end
 <input type="hidden" name="template" value="$!request.get('template')" />
 <input type="hidden" name="xredirect" value="$!request.get('xredirect')" />
-	## all article data is in the object. Therefore no translations of main doc needed.
+    ## all article data is in the object. Therefore no translations of main doc needed.
     <input type="hidden" name="language" value="$!default_language" />
-	#foreach($class in $doc.xWikiClasses)
-	#set($nb = $doc.getObjectNumbers("${class.name}"))
-	<input type="hidden" name="${class.name}_nb" value="$nb" />
+    #foreach($class in $doc.xWikiClasses)
+    #set($nb = $doc.getObjectNumbers("${class.name}"))
+    <input type="hidden" name="${class.name}_nb" value="$nb" />
   #end
-	#if("$!blogeditor" != '')
+    #if("$!blogeditor" != '')
     #foreach($sobj in $all_objs)
       #set($editHiddenStr = "$!doc.display('publishdate', 'edit', $sobj)")
       #set($editHiddenStr = ${editHiddenStr.replaceAll('type="text"', 'type="hidden" class="publishdate_hidden_langs"')})
@@ -97,9 +106,9 @@ $adminMsg.get('cel_tm_article_edit')
       #set($editHiddenStr = ${editHiddenStr.replaceAll("type='text'", "type='hidden' class='archivedate_hidden_langs'")})
       ${editHiddenStr.replaceAll('\{/?pre\}','')}
     #end
-	## show only if article is from uptodate blog
-	## which means that $!blogeditor is <> ''
-	## IMPORTANT: the migration should take place as soon as the blog-config is edited and saved again
+    ## show only if article is from uptodate blog
+    ## which means that $!blogeditor is <> ''
+    ## IMPORTANT: the migration should take place as soon as the blog-config is edited and saved again
     #set($publishdateEditStr = '')
     #set($publishdateEditStr = $doc.display('publishdate', 'edit', $deflang_obj))
     #set($publishdateEditStr = $publishdateEditStr.replaceAll("<input", "<input class='publishdate_hidden_deflang'"))
@@ -115,22 +124,22 @@ $adminMsg.get('cel_tm_article_edit')
     #set($archivedateEditStr = $archivedateEditStr.replaceAll("<input", "<input class='archivedate_hidden_deflang'"))
     <div class="editblock">$adminMsg.get('cel_tm_archive_date') (dd/MM/yyyy HH:mm:ss): ${archivedateEditStr.replaceAll('\{/?pre\}','')}</div><!-- IE6 -->
     <br/>
-	#end
-	#if("$!id" != '')
-	<input type="hidden" name="XWiki.ArticleClass_${obj.number}_id" value="$!id" />
-	#end
-	#if("$!blogeditor" != '')
-	<input type="hidden" name="XWiki.ArticleClass_${obj.number}_blogeditor" value="$!blogeditor" />
-	#end
+    #end
+    #if("$!id" != '')
+    <input type="hidden" name="XWiki.ArticleClass_${obj.number}_id" value="$!id" />
+    #end
+    #if("$!blogeditor" != '')
+    <input type="hidden" name="XWiki.ArticleClass_${obj.number}_blogeditor" value="$!blogeditor" />
+    #end
     #if("$!has_comments" != '')
     <input type="hidden" name="XWiki.ArticleClass_${obj.number}_hasComments" value="$!has_comments" />
     #end
     #if("$!obj.getProperty('lang').getValue()" != '')
     <input type="hidden" name="XWiki.ArticleClass_${obj.number}_lang" value="$!obj.getProperty('lang').getValue()" />
     #end
-	<div id="con_newsTitleEdit" class="editblock">$adminMsg.get('cel_tm_title'):
-		<input name='XWiki.ArticleClass_${obj.number}_title' type='text' class="fullwidth" value="$!xwiki.getFormEncoded($!obj.getProperty('title').getValue())" onfocus="setFocus('con_newsTitleEdit');" onblur="removeFocus('con_newsTitleEdit');"/>
-	</div><!-- IE6 -->
+    <div id="con_newsTitleEdit" class="editblock">$adminMsg.get('cel_tm_title'):
+        <input name='XWiki.ArticleClass_${obj.number}_title' type='text' class="fullwidth" value="$!xwiki.getFormEncoded($!obj.getProperty('title').getValue())" onfocus="setFocus('con_newsTitleEdit');" onblur="removeFocus('con_newsTitleEdit');"/>
+    </div><!-- IE6 -->
     #set($blogDocument = $xwiki.celementsblog.getBlogPageByBlogSpace("$doc.space"))
     #set($blogConfig_obj = $blogDocument.getObject('Celements2.BlogConfigClass'))
     #if("$!viewtype" == '')
@@ -138,39 +147,40 @@ $adminMsg.get('cel_tm_article_edit')
     #end
     <!-- viewtype: "$blogDocument.getFullName()" - "$blogConfig_obj" - "$viewtype" -->
     #if("$!viewtype" == 'extract')
-	  <div id="con_extEdit" class="editblock">$adminMsg.get('cel_tm_extract'):     $adminMsg.get('cel_tm_extract_will_appear_on_news_page')<br />
-		  <textarea class="$!{hasWysiwigEditor} fullwidth" id='XWiki.ArticleClass_${obj.number}_extract' rows='5' name='XWiki.ArticleClass_${obj.number}_extract' onfocus="setFocus('con_extEdit');" onblur="removeFocus('con_extEdit');">$xwiki.getXMLEncoded("$!obj.getProperty('extract').getValue()")</textarea>
-	  </div><!-- IE6 -->
-	#end
+      <div id="con_extEdit" class="editblock">$adminMsg.get('cel_tm_extract'):     $adminMsg.get('cel_tm_extract_will_appear_on_news_page')<br />
+          <textarea class="$!{hasWysiwigEditor} fullwidth" id='XWiki.ArticleClass_${obj.number}_extract' rows='5' name='XWiki.ArticleClass_${obj.number}_extract' onfocus="setFocus('con_extEdit');" onblur="removeFocus('con_extEdit');">$xwiki.getXMLEncoded("$!obj.getProperty('extract').getValue()")</textarea>
+      </div><!-- IE6 -->
+    #end
     <!-- viewtype: $viewtype -->
     <div id="con_conEdit" class="editblock">$adminMsg.get('cel_tm_content'):     $adminMsg.get('cel_tm_content_will_appear_on_article_page')<br />
         <textarea class="$!{hasWysiwigEditor} fullwidth" id='XWiki.ArticleClass_${obj.number}_content' rows='15' name='XWiki.ArticleClass_${obj.number}_content' onfocus="setFocus('con_conEdit');" onblur="removeFocus('con_conEdit');">$xwiki.getXMLEncoded("$!obj.getProperty('content').getValue()")</textarea>
     </div><!-- IE6 -->
-	## TODO: replace ch.News with if(blogIsSubscribable) 
-	#set($hql = ", BaseObject as obj, StringProperty as str, IntegerProperty as int where")
-	#set($hql = "$hql obj.name=doc.fullName")
-	#set($hql = "$hql and obj.className='Celements2.BlogConfigClass'")
+    ## TODO: replace ch.News with if(blogIsSubscribable) 
+    #set($hql = ", BaseObject as obj, StringProperty as str, IntegerProperty as int where")
+    #set($hql = "$hql obj.name=doc.fullName")
+    #set($hql = "$hql and obj.className='Celements2.BlogConfigClass'")
     #set($hql = "$hql and obj.id=int.id.id")
     #set($hql = "$hql and int.id.name='is_subscribable'")
     #set($hql = "$hql and int.value='1'")
     #set($hql = "$hql and obj.id=str.id.id")
     #set($hql = "$hql and str.id.name='blogspace'")
     #set($hql = "$hql and str.value='${doc.space}'")
-	#if($xwiki.searchDocuments($hql).size() > 0)
-	<div id="con_subscriptionEdit" class="editblock">$adminMsg.get('cel_tm_subscribable')<br />
-	    #foreach($sobj in $all_objs)
-	      #set($editHiddenStr = "$!doc.display('isSubscribable', 'edit', $sobj)")
-	      #set($editHiddenStr = ${editHiddenStr.replaceAll('<select', '<select style="display:none" class="isSubscribable_hidden_langs"')})
-	      ${editHiddenStr.replaceAll('\{/?pre\}','')}
-	    #end
-		#set($isSubscribableStr = '')
+    #if($xwiki.searchDocuments($hql).size() > 0)
+    <div id="con_subscriptionEdit" class="editblock">$adminMsg.get('cel_tm_subscribable')<br />
+        #foreach($sobj in $all_objs)
+          #set($editHiddenStr = "$!doc.display('isSubscribable', 'edit', $sobj)")
+          #set($editHiddenStr = ${editHiddenStr.replaceAll('<select', '<select style="display:none" class="isSubscribable_hidden_langs"')})
+          ${editHiddenStr.replaceAll('\{/?pre\}','')}
+        #end
+        #set($isSubscribableStr = '')
         #set($isSubscribableStr = $doc.display('isSubscribable', 'edit', $deflang_obj))
         #set($isSubscribableStr = ${isSubscribableStr.replaceAll('<select', '<select class="isSubscribable_hidden_deflang"')})
         ${isSubscribableStr.replaceAll('\{/?pre\}','')}
-    ##	$adminMsg.get('yesno_1')&nbsp;&nbsp;&nbsp;<input name="Celements2.BlogArticleSubscribableClass_${artsub_obj.number}_isSubscribable" type="radio" #if($!artsub_obj.getProperty('isSubscribable').getValue() == 1) checked="checked"#end value="1" onfocus="setFocus('con_subscriptionEdit');" onblur="removeFocus('con_subscriptionEdit');"/>		
-	##	&nbsp;&nbsp;&nbsp;<input name="Celements2.BlogArticleSubscribableClass_${artsub_obj.number}_isSubscribable" type="radio" #if($!artsub_obj.getProperty('isSubscribable').getValue() == 0) checked="checked"#end value="0" onfocus="setFocus('con_subscriptionEdit');" onblur="removeFocus('con_subscriptionEdit');"/>&nbsp;&nbsp;&nbsp;$adminMsg.get('yesno_0')
-	</div><!-- IE6 -->
-	#end
+    ##  $adminMsg.get('yesno_1')&nbsp;&nbsp;&nbsp;<input name="Celements2.BlogArticleSubscribableClass_${artsub_obj.number}_isSubscribable" type="radio" #if($!artsub_obj.getProperty('isSubscribable').getValue() == 1) checked="checked"#end value="1" onfocus="setFocus('con_subscriptionEdit');" onblur="removeFocus('con_subscriptionEdit');"/>        
+    ##  &nbsp;&nbsp;&nbsp;<input name="Celements2.BlogArticleSubscribableClass_${artsub_obj.number}_isSubscribable" type="radio" #if($!artsub_obj.getProperty('isSubscribable').getValue() == 0) checked="checked"#end value="0" onfocus="setFocus('con_subscriptionEdit');" onblur="removeFocus('con_subscriptionEdit');"/>&nbsp;&nbsp;&nbsp;$adminMsg.get('yesno_0')
+    </div><!-- IE6 -->
+    #end
 </form><!-- IE6 -->
 </div><!-- IE6 --> ## cel_blog_article_editor
 </div><!-- IE6 -->
+$celementsweb.addExtJSfileOnce(':celJS/celTabMenu/stickBlogDateTimePicker.js')
