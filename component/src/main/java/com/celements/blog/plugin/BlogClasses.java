@@ -213,9 +213,13 @@ public class BlogClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addNumberField("id", "id", 30, "integer");
     needsUpdate |= bclass.addTextField("lang", "lang", 30);
     needsUpdate |= bclass.addTextField("blogeditor", "blogeditor", 30);
-    needsUpdate |= bclass.addDateField("publishdate", "publishdate", null, 0);
+    needsUpdate |= addDateField(bclass, "publishdate", "publishdate", 
+        "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(false, true), 
+        "cel_blog_validation_publishdate");    
     needsUpdate |= bclass.addBooleanField("hasComments", "hasComments", "yesno");
-    needsUpdate |= bclass.addDateField("archivedate", "archivedate", null, 0);
+    needsUpdate |= addDateField(bclass, "archivedate", "archivedate", 
+        "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(false, true), 
+        "cel_blog_validation_archivedate");
     needsUpdate |= bclass.addBooleanField("isSubscribable", "isSubscribable", "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
@@ -312,6 +316,14 @@ public class BlogClasses extends AbstractClassCollection {
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
+  }
+  
+  private String getRegexDate(boolean allowEmpty, boolean withTime) {
+    String regex = "(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[012])\\.([0-9]{4})";
+    if (withTime) {
+      regex += " ([01][0-9]|2[0-4])(\\:[0-5][0-9])";
+    }
+    return "/" + (allowEmpty ? "(^$)|" : "") + "^(" + regex + ")$" + "/";
   }
   
 }
