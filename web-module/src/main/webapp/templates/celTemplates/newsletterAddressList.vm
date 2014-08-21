@@ -1,6 +1,6 @@
 #set($blogname = $xwiki.celementsblog.getBlogPageByBlogSpace($doc.getSpace()).getFullName())
 #if (("$!{blogname}" == "") && ("$!doc.getObject('Celements2.BlogConfigClass')" != ""))
-  #set($blogname = $doc.getFullName())
+  #set($blogname = $!services.model.serialize($doc.documentReference, 'local'))
 #end
 
 #set($blogstr = "%$blogname%")
@@ -35,45 +35,50 @@
 <div class="cel_newsletterImport">
 
 <h1>Newsletter Emailadressen 
-<span style="font-size: 10px;"><a href='$doc.getURL("view","xpage=overlay&conf=NewsletterAddressList&xredirect=${request.xredirect}&orderByDate=${orderByDateParam}")'>$sortText</a>
-</span>
-</h1>
-<br/>
-<div style="float: left;">
-<strong>Aktive ($activeCount):</strong><br/>
-<textarea name="active" id="textarea_active" cols="60" rows="30">
-#foreach($emailAdr in $emailActiveList)
-#if ("$!orderByDate" == "1")
-#set($mailLang = '-')##
-#if("$!{emailAdr.getLanguage()}" != '')##
-#set($mailLang = "$!{emailAdr.getLanguage()}")##
-#end##
-$emailAdr.getEmailAdr()&#09;$mailLang&#09;$datetool.format('dd.MM.yyyy HH:mm', $emailAdr.getChangeDate())
+#if(("$!blogname" != "") && $xwiki.hasAccessLevel("edit", $context.user, $blogname))
+	<span style="font-size: 10px;"><a href='$doc.getURL("view","xpage=overlay&conf=NewsletterAddressList&xredirect=${request.xredirect}&orderByDate=${orderByDateParam}")'>$sortText</a>
+	</span>
+	</h1>
+	<br/>
+	<div style="float: left;">
+	<strong>Aktive ($activeCount):</strong><br/>
+	<textarea name="active" id="textarea_active" cols="60" rows="30">
+	#foreach($emailAdr in $emailActiveList)
+	#if ("$!orderByDate" == "1")
+	#set($mailLang = '-')##
+	#if("$!{emailAdr.getLanguage()}" != '')##
+	#set($mailLang = "$!{emailAdr.getLanguage()}")##
+	#end##
+	$emailAdr.getEmailAdr()&#09;$mailLang&#09;$datetool.format('dd.MM.yyyy HH:mm', $emailAdr.getChangeDate())
+	#else
+	$emailAdr
+	#end
+	#end
+	</textarea>  
+	</div>
+	
+	<div style="float: left;padding-left:10px;">
+	<strong>Inaktive ($inactiveCount):</strong><br/>
+	<textarea name="inactive" id="textarea_inactive" cols="60" rows="30">
+	#foreach($mailDocName in $emailInactiveDocNameList)
+	#set($mailDoc = $xwiki.getDocument($mailDocName))
+	#set($mailObj = $mailDoc.getObject('Celements.NewsletterReceiverClass', 'subscribed', "${blogname}", false))
+	#set($emailAdr = "$!mailObj.getProperty('email').getValue()")
+	#if ("$!orderByDate" == "1")
+	#set($emailLang = "$!{mailObj.getProperty('language').getValue()}")
+	#if("$!emailLang" == '')
+	  #set($emailLang = "-")
+	#end
+	$emailAdr&#09;$emailLang&#09;$datetool.format('dd.MM.yyyy HH:mm', $mailDoc.date)
+	#else
+	$emailAdr
+	#end
+	#end
+	</textarea>
+	
+	</div>
 #else
-$emailAdr
+<p>Not enough access rights.<br/>
+<a href="$xwiki.getURL('Content.login')">goto login</a></p>
 #end
-#end
-</textarea>  
-</div>
-
-<div style="float: left;padding-left:10px;">
-<strong>Inaktive ($inactiveCount):</strong><br/>
-<textarea name="inactive" id="textarea_inactive" cols="60" rows="30">
-#foreach($mailDocName in $emailInactiveDocNameList)
-#set($mailDoc = $xwiki.getDocument($mailDocName))
-#set($mailObj = $mailDoc.getObject('Celements.NewsletterReceiverClass', 'subscribed', "${blogname}", false))
-#set($emailAdr = "$!mailObj.getProperty('email').getValue()")
-#if ("$!orderByDate" == "1")
-#set($emailLang = "$!{mailObj.getProperty('language').getValue()}")
-#if("$!emailLang" == '')
-  #set($emailLang = "-")
-#end
-$emailAdr&#09;$emailLang&#09;$datetool.format('dd.MM.yyyy HH:mm', $mailDoc.date)
-#else
-$emailAdr
-#end
-#end
-</textarea>
-
-</div>
 </div>
