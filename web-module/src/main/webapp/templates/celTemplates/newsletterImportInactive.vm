@@ -23,5 +23,5 @@ $celementsweb.addExtJSfileOnce(':celJS/stopDblClick.js')
   </form>
   </div>
 #else
-<p>Not enough access rights</p>
+<p>Not enough access rights. <a href="$xwiki.getURL('Content.login')">goto login</a></p>
 #end
