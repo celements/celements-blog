@@ -175,9 +175,17 @@ public class BlogPluginApi extends Api {
     String newsletterName = context.getRequest().get("subsBlog");
 //    Removed since importing is not dangerous, sending a mail to all receivers is.
 //    if(hasProgrammingRights()) {
-      return plugin.batchImportReceivers(asInactive, importData, newsletterName, context);
+    //We do not want XWiki.Guest being able to add or change e-mail addresses
+    try {
+      if (hasAccessLevel("edit", newsletterName)) {
+        return plugin.batchImportReceivers(asInactive, importData, newsletterName,
+            context);
+      }
+    } catch (XWikiException exp) {
+      LOGGER.error("Failed to check access rights on [" + newsletterName + "]", exp);
+    }
 //    }
-//    return null;
+    return null;
   }
   
   public String subscribeNewsletter() throws XWikiException{
