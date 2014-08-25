@@ -86,6 +86,7 @@ public class BlogClasses extends AbstractClassCollection {
     getArticleClass();
     getReceiverEMailClass();
     getNewsletterConfigClass();
+    getBlogArticleSubscriptionClass();
   }
 
   public DocumentReference getNewsletterReceiverClassRef(String wikiName) {
