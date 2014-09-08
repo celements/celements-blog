@@ -43,11 +43,11 @@ public class AddBlogDateValidationMigrator extends AbstractCelementsHibernateMig
 
   /**
    * getVersion is using days since 1.1.2010 until the day of committing this
-   * migration 06.08.2014 -> 1678
-   * http://www.convertunits.com/dates/from/Jan+1,+2010/to/Aug+7,+2014
+   * migration 28.08.2014 -> 1700
+   * http://www.convertunits.com/dates/from/Jan+1,+2010/to/Aug+28,+2014
    */
   public XWikiDBVersion getVersion() {
-    return new XWikiDBVersion(1669);
+    return new XWikiDBVersion(1700);
   }
 
   @Override
