@@ -109,6 +109,7 @@ public class BlogPlugin extends XWikiDefaultPlugin{
    * @return
    * @throws XWikiException
    */
+  // TODO mark deprecated
   public List<Article> getBlogArticles(String blogArticleSpace, String subscribedBlogsStr,
       String language, boolean archiveOnly, boolean futurOnly, boolean subscribableOnly,
       boolean withArchive, boolean withFutur, boolean withSubscribable,

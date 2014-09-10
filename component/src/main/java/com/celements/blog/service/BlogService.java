@@ -1,17 +1,25 @@
 package com.celements.blog.service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
+import com.celements.blog.article.Article;
+import com.celements.blog.article.ArticleLoadException;
+import com.celements.blog.article.ArticleSearchQuery;
+import com.celements.blog.article.IArticleEngineRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -21,18 +29,22 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class BlogService implements IBlogServiceRole {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(BlogService.class);
+  
+  @Requirement
+  private ComponentManager componentManager;
 
   @Requirement
-  IWebUtilsService webUtilsService;
+  private IWebUtilsService webUtilsService;
 
   @Requirement
-  QueryManager queryManager;
+  private QueryManager queryManager;
 
   @Requirement
-  Execution execution;
+  private Execution execution;
   
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty(
+        XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   public DocumentReference getBlogDocRefByBlogSpace(String blogSpaceName) {
@@ -67,6 +79,45 @@ public class BlogService implements IBlogServiceRole {
       }
     }
     return null;
+  }
+
+  @Override
+  public List<Article> getArticles(ArticleSearchQuery query) throws ArticleLoadException {
+    List<Article> articles;
+    if (query == null) {
+      // TODO create new query
+    }
+    IArticleEngineRole engine = getArticleEngine();
+    if (engine != null) {
+      articles = Collections.unmodifiableList(engine.getArticles(query));
+    } else {
+      articles = Collections.emptyList();
+    }
+    LOGGER.info("getBlogArticles: for query '" + query + "' got " + articles.size() 
+        + " articles");
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("getBlogArticles: for query '" + query + "' got: " + articles);
+    }
+    return articles;
+  }
+
+  private IArticleEngineRole getArticleEngine() {
+    IArticleEngineRole engine = null;
+    String engineHint = getContext().getWiki().getXWikiPreference("blog_article_engine",
+        "blog.article.engine", null, getContext());
+    try {
+      Map<String, IArticleEngineRole> engineMap = componentManager.lookupMap(
+          IArticleEngineRole.class);
+      engine = engineMap.get(engineHint);
+      if (engine == null) {
+        engine = engineMap.get("default");
+      }
+    } catch (ComponentLookupException exc) {
+      LOGGER.error("Error looking up engine components", exc);
+    }
+    LOGGER.info("getBlogArticleEngine: got engine '" + engine + "' for hint '" 
+        + engineHint + "'");
+    return engine;
   }
 
 }
