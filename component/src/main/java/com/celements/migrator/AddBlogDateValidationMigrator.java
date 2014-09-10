@@ -43,11 +43,11 @@ public class AddBlogDateValidationMigrator extends AbstractCelementsHibernateMig
 
   /**
    * getVersion is using days since 1.1.2010 until the day of committing this
-   * migration 28.08.2014 -> 1700
-   * http://www.convertunits.com/dates/from/Jan+1,+2010/to/Aug+28,+2014
+   * migration 28.08.2014 -> 1713
+   * http://www.convertunits.com/dates/from/Jan+1,+2010/to/Sep+10,+2014
    */
   public XWikiDBVersion getVersion() {
-    return new XWikiDBVersion(1700);
+    return new XWikiDBVersion(1713);
   }
 
   @Override
@@ -64,7 +64,7 @@ public class AddBlogDateValidationMigrator extends AbstractCelementsHibernateMig
     publishDateElement.setValidationMessage("cel_blog_validation_publishdate");
     publishDateElement.setDateFormat("dd.MM.yyyy HH:mm");
     archiveDateElement.setValidationRegExp(
-        "/^((0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[012])\\.([0-9]{4}) " +
+        "/(^$)|^((0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[012])\\.([0-9]{4}) " +
         "([01][0-9]|2[0-4])(\\:[0-5][0-9]))$/");
     archiveDateElement.setValidationMessage("cel_blog_validation_archivedate");
     archiveDateElement.setDateFormat("dd.MM.yyyy HH:mm");

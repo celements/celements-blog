@@ -116,13 +116,13 @@ $adminMsg.get('cel_tm_article_edit')
     #if($doc.isNew())
       #set($q = '"')
       #set($d = '$')
-      #set($publishdateEditStr = $publishdateEditStr.replaceAll("(.*value=['${q}])(['${q}].*)", "${d}1${datetool.get('dd/MM/yyyy HH:mm:ss')}${d}2"))
+      #set($publishdateEditStr = $publishdateEditStr.replaceAll("(.*value=['${q}])(['${q}].*)", "${d}1${datetool.get('dd.MM.yyyy HH:mm')}${d}2"))
     #end
-    <div class="editblock">$adminMsg.get('cel_tm_publish_date') (dd/MM/yyyy HH:mm:ss): ${publishdateEditStr.replaceAll('\{/?pre\}','')}</div><!-- IE6 -->
+    <div class="editblock">$adminMsg.get('cel_tm_publish_date') (dd.MM.yyyy HH:mm): ${publishdateEditStr.replaceAll('\{/?pre\}','')}</div><!-- IE6 -->
     #set($archivedateEditStr = '')
     #set($archivedateEditStr = $doc.display('archivedate', 'edit', $deflang_obj))
     #set($archivedateEditStr = $archivedateEditStr.replaceAll("<input", "<input class='archivedate_hidden_deflang'"))
-    <div class="editblock">$adminMsg.get('cel_tm_archive_date') (dd/MM/yyyy HH:mm:ss): ${archivedateEditStr.replaceAll('\{/?pre\}','')}</div><!-- IE6 -->
+    <div class="editblock">$adminMsg.get('cel_tm_archive_date') (dd.MM.yyyy HH:mm): ${archivedateEditStr.replaceAll('\{/?pre\}','')}</div><!-- IE6 -->
     <br/>
     #end
     #if("$!id" != '')

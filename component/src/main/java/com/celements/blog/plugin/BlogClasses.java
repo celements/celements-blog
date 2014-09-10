@@ -219,7 +219,7 @@ public class BlogClasses extends AbstractClassCollection {
         "cel_blog_validation_publishdate");    
     needsUpdate |= bclass.addBooleanField("hasComments", "hasComments", "yesno");
     needsUpdate |= addDateField(bclass, "archivedate", "archivedate", 
-        "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(false, true), 
+        "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(true, true), 
         "cel_blog_validation_archivedate");
     needsUpdate |= bclass.addBooleanField("isSubscribable", "isSubscribable", "yesno");
 
