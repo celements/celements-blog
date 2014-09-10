@@ -2,8 +2,8 @@
 ## of the Page and not in the section ArticleEdit.vm
 ##$celementsweb.includeCSSPage(':celJS/jquery-datetimepicker/jquery.datetimepicker.css')
 <link rel="stylesheet" media="all" type="text/css" href="$celementsweb.getSkinFile(':celJS/jquery-datetimepicker/jquery.datetimepicker.css', 'file')" />
-$celementsweb.addExtJSfileOnce(':celJS/article-edit.js')
-$celementsweb.addExtJSfileOnce(':celJS/jquery-datetimepicker/jquery.datetimepicker.js')
+$celementsweb.addExtJSfileOnce(':celJS/article-edit.js', 'file')
+$celementsweb.addExtJSfileOnce(':celJS/jquery-datetimepicker/jquery.datetimepicker.js', 'file')
 <span class='cel_lazyloadJS' style='display: none;'>celJS/jquery-datetimepicker/jquery.datetimepicker.js</span>
 <span class='cel_lazyloadJS' style='display: none;'>celJS/celTabMenu/stickBlogDateTimePicker.js</span>
 <span class='cel_lazyloadCSS' style='display: none;'>celJS/jquery-datetimepicker/jquery.datetimepicker.css</span>
@@ -183,4 +183,4 @@ $adminMsg.get('cel_tm_article_edit')
 </form><!-- IE6 -->
 </div><!-- IE6 --> ## cel_blog_article_editor
 </div><!-- IE6 -->
-$celementsweb.addExtJSfileOnce(':celJS/celTabMenu/stickBlogDateTimePicker.js')
+$celementsweb.addExtJSfileOnce(':celJS/celTabMenu/stickBlogDateTimePicker.js', 'file')
