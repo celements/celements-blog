@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.blog.plugin;
+package com.celements.blog.article;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -30,6 +30,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.article.Article;
+import com.celements.blog.plugin.BlogClasses;
+import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.service.BlogService;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;

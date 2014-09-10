@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.article.Article;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.blog.service.INewsletterAttachmentServiceRole;
 import com.celements.web.plugin.api.CelementsWebPluginApi;
