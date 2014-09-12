@@ -18,7 +18,7 @@ import org.xwiki.query.QueryManager;
 
 import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadException;
-import com.celements.blog.article.ArticleSearchQuery;
+import com.celements.blog.article.ArticleSearchParameter;
 import com.celements.blog.article.IArticleEngineRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -82,21 +82,22 @@ public class BlogService implements IBlogServiceRole {
   }
 
   @Override
-  public List<Article> getArticles(ArticleSearchQuery query) throws ArticleLoadException {
+  public List<Article> getArticles(ArticleSearchParameter param
+      ) throws ArticleLoadException {
     List<Article> articles;
-    if (query == null) {
-      // TODO create new query
+    if (param == null) {
+      // TODO create new param
     }
     IArticleEngineRole engine = getArticleEngine();
     if (engine != null) {
-      articles = Collections.unmodifiableList(engine.getArticles(query));
+      articles = Collections.unmodifiableList(engine.getArticles(param));
     } else {
       articles = Collections.emptyList();
     }
-    LOGGER.info("getBlogArticles: for query '" + query + "' got " + articles.size() 
+    LOGGER.info("getBlogArticles: for " + param + " got " + articles.size() 
         + " articles");
     if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("getBlogArticles: for query '" + query + "' got: " + articles);
+      LOGGER.trace("getBlogArticles: for " + param + " got: " + articles);
     }
     return articles;
   }

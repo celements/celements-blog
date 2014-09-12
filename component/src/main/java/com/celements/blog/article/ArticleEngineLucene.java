@@ -11,10 +11,13 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.plugin.BlogClasses;
 import com.celements.blog.plugin.EmptyArticleException;
+import com.celements.common.classes.IClassCollectionRole;
 import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.LuceneSearchException;
 import com.celements.search.lucene.LuceneSearchResult;
+import com.celements.search.lucene.query.LuceneQueryApi;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -27,6 +30,9 @@ public class ArticleEngineLucene implements IArticleEngineRole {
   
   @Requirement
   private ILuceneSearchService searchService;
+  
+  @Requirement("celements.celBlogClasses")
+  private IClassCollectionRole blogClasses;
 
   @Requirement
   private Execution execution;
@@ -37,17 +43,18 @@ public class ArticleEngineLucene implements IArticleEngineRole {
   }
 
   @Override
-  public List<Article> getArticles(ArticleSearchQuery query) throws ArticleLoadException {
+  public List<Article> getArticles(ArticleSearchParameter param
+      ) throws ArticleLoadException {
     List<Article> articles = new ArrayList<Article>();
     LuceneSearchResult result;
-    if (query.isSkipChecks()) {
-      result = searchService.searchWithoutChecks(query.getAsLuceneQuery(), 
-          query.getSortFields(), Arrays.asList(query.getLanguage()));
+    if (param.isSkipChecks()) {
+      result = searchService.searchWithoutChecks(convertToLuceneQuery(param), 
+          param.getSortFields(), Arrays.asList(param.getLanguage()));
     } else {
-      result = searchService.search(query.getAsLuceneQuery(), query.getSortFields(), 
-          Arrays.asList(query.getLanguage()));
+      result = searchService.search(convertToLuceneQuery(param), param.getSortFields(), 
+          Arrays.asList(param.getLanguage()));
     }
-    result.setOffset(query.getOffset()).setLimit(query.getLimit());
+    result.setOffset(param.getOffset()).setLimit(param.getLimit());
     try {
       for (DocumentReference docRef : result.getResults()) {
         XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
@@ -63,6 +70,16 @@ public class ArticleEngineLucene implements IArticleEngineRole {
     } catch (XWikiException xwe) {
       throw new ArticleLoadException(xwe);
     }
+  }
+
+  // TODO
+  public LuceneQueryApi convertToLuceneQuery(ArticleSearchParameter param) {
+    LuceneQueryApi query = searchService.createQuery(param.getDatabase());
+    return query;
+  }
+  
+  private BlogClasses getBlogClasses() {
+    return (BlogClasses) blogClasses;
   }
 
 }

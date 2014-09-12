@@ -5,17 +5,11 @@ import java.util.List;
 
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.search.lucene.ILuceneSearchService;
-import com.celements.search.lucene.query.LuceneQueryApi;
-import com.xpn.xwiki.web.Utils;
-
 // TODO javadoc for fields (see BlogPlugin)
-public class ArticleSearchQuery {
-  
-  private ILuceneSearchService searchService;
+public class ArticleSearchParameter {
 
-  private final SpaceReference blogSpaceRef;
   private final String database;
+  private final SpaceReference blogSpaceRef;
 
   // TODO define default values
   private int offset = 0;
@@ -34,9 +28,17 @@ public class ArticleSearchQuery {
   private boolean withUnsubscribed;
   private boolean withUndecided;
   
-  public ArticleSearchQuery(String database, SpaceReference blogSpaceRef) {
+  public ArticleSearchParameter(String database, SpaceReference blogSpaceRef) {
     this.database = database;
     this.blogSpaceRef = blogSpaceRef;
+  }
+
+  public String getDatabase() {
+    return database;
+  }
+
+  public SpaceReference getBlogSpaceRef() {
+    return blogSpaceRef;
   }
 
   public int getOffset() {
@@ -166,31 +168,17 @@ public class ArticleSearchQuery {
     this.withUndecided = withUndecided;
   }
 
-  public SpaceReference getBlogSpaceRef() {
-    return blogSpaceRef;
-  }
-
-  public String getDatabase() {
-    return database;
-  }
-
-  public LuceneQueryApi getAsLuceneQuery() {
-    LuceneQueryApi query = getSearchService().createQuery(getDatabase());
-    // TODO
-    return query;
-  }
-  
   @Override
   public String toString() {
-    // TODO
-    return getAsLuceneQuery().getQueryString();
-  }
-  
-  private ILuceneSearchService getSearchService() {
-    if (searchService == null) {
-      searchService = Utils.getComponent(ILuceneSearchService.class);
-    }
-    return searchService;
+    return "ArticleSearchParamter [blogSpaceRef=" + blogSpaceRef + ", database="
+        + database + ", offset=" + offset + ", limit=" + limit + ", sortFields="
+        + sortFields + ", skipChecks=" + skipChecks + ", subscribedBlogs="
+        + subscribedBlogs + ", language=" + language + ", archiveOnly=" + archiveOnly
+        + ", futurOnly=" + futurOnly + ", subscribableOnly=" + subscribableOnly
+        + ", withArchive=" + withArchive + ", withFutur=" + withFutur
+        + ", withSubscribable=" + withSubscribable + ", withSubscribed=" + withSubscribed
+        + ", withUnsubscribed=" + withUnsubscribed + ", withUndecided=" + withUndecided
+        + "]";
   }
 
 }

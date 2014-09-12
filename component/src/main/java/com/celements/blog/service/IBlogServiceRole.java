@@ -7,7 +7,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadException;
-import com.celements.blog.article.ArticleSearchQuery;
+import com.celements.blog.article.ArticleSearchParameter;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @ComponentRole
@@ -18,12 +18,13 @@ public interface IBlogServiceRole {
   public XWikiDocument getBlogPageByBlogSpace(String blogSpaceName);
   
   /**
-   * gets articles as list for given {@link ArticleSearchQuery}
+   * gets articles as list for given {@link ArticleSearchParameter}
    * 
-   * @param query may not be null
+   * @param param may not be null
    * @return
    * @throws ArticleLoadException if there was an error loading articles
    */
-  public List<Article> getArticles(ArticleSearchQuery query) throws ArticleLoadException;
+  public List<Article> getArticles(ArticleSearchParameter param
+      ) throws ArticleLoadException;
 
 }
