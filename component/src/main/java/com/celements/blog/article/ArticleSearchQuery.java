@@ -5,14 +5,14 @@ import java.util.List;
 
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.search.lucene.IQueryService;
+import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.query.LuceneQueryApi;
 import com.xpn.xwiki.web.Utils;
 
 // TODO javadoc for fields (see BlogPlugin)
 public class ArticleSearchQuery {
   
-  private IQueryService queryService;
+  private ILuceneSearchService searchService;
 
   private final SpaceReference blogSpaceRef;
   private final String database;
@@ -21,7 +21,7 @@ public class ArticleSearchQuery {
   private int offset = 0;
   private int limit = 0;
   private List<String> sortFields = Collections.emptyList();
-  private boolean skipChecks = false;  
+  private boolean skipChecks = false;
   private List<SpaceReference> subscribedBlogs = Collections.emptyList();
   private String language = null;
   private boolean archiveOnly;
@@ -61,9 +61,10 @@ public class ArticleSearchQuery {
 
   public void setSortFields(List<String> sortFields) {
     if (sortFields == null) {
-      sortFields = Collections.emptyList();
+      this.sortFields = Collections.emptyList();
+    } else {
+      this.sortFields = Collections.unmodifiableList(sortFields);
     }
-    this.sortFields = Collections.unmodifiableList(sortFields);
   }
 
   public boolean isSkipChecks() {
@@ -174,7 +175,7 @@ public class ArticleSearchQuery {
   }
 
   public LuceneQueryApi getAsLuceneQuery() {
-    LuceneQueryApi query = getQueryService().createQuery(getDatabase());
+    LuceneQueryApi query = getSearchService().createQuery(getDatabase());
     // TODO
     return query;
   }
@@ -185,11 +186,11 @@ public class ArticleSearchQuery {
     return getAsLuceneQuery().getQueryString();
   }
   
-  private IQueryService getQueryService() {
-    if (queryService == null) {
-      queryService = Utils.getComponent(IQueryService.class);
+  private ILuceneSearchService getSearchService() {
+    if (searchService == null) {
+      searchService = Utils.getComponent(ILuceneSearchService.class);
     }
-    return queryService;
+    return searchService;
   }
 
 }
