@@ -5,3 +5,5 @@ com.celements.blog.service.NewsletterAttachmentService
 com.celements.migrator.NewsletterReceiversToLowerCaseMigrator
 com.celements.migrator.NewsletterReceiversRemoveDoublesMigrator
 com.celements.migrator.AddBlogDateValidationMigrator
+com.celements.blog.article.ArticleEngineLucene
+com.celements.blog.article.ArticleEngineHQL
