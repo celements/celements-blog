@@ -182,8 +182,9 @@ public class Article extends Api{
       BaseObject blogConfigObj = blogDoc.getXObject(getBlogClasses(
           ).getBlogConfigClassRef(getContext().getDatabase()));
       if ((blogConfigObj != null) && (blogConfigObj.getIntValue(
-          BlogClasses.MAX_NUM_CHARS_FIELD, -1) > 0)) {
-        maxNumChars = blogConfigObj.getIntValue(BlogClasses.MAX_NUM_CHARS_FIELD);
+          BlogClasses.PROPERTY_BLOG_CONFIG_MAX_NUM_CHARS_FIELD, -1) > 0)) {
+        maxNumChars = blogConfigObj.getIntValue(
+            BlogClasses.PROPERTY_BLOG_CONFIG_MAX_NUM_CHARS_FIELD);
       }
     } else {
       LOGGER.info("BlogConfig document not found for space name [" + blogSpaceName
