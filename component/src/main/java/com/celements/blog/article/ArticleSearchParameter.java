@@ -1,184 +1,159 @@
 package com.celements.blog.article;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.xwiki.model.reference.SpaceReference;
 
 // TODO javadoc for fields (see BlogPlugin)
 public class ArticleSearchParameter {
-
-  private final String database;
-  private final SpaceReference blogSpaceRef;
-
-  // TODO define default values
-  private int offset = 0;
-  private int limit = 0;
-  private List<String> sortFields = Collections.emptyList();
-  private boolean skipChecks = false;
-  private List<SpaceReference> subscribedBlogs = Collections.emptyList();
-  private String language = null;
-  private boolean archiveOnly;
-  private boolean futurOnly;
-  private boolean subscribableOnly;
-  private boolean withArchive;
-  private boolean withFutur;
-  private boolean withSubscribable;
-  private boolean withSubscribed;
-  private boolean withUnsubscribed;
-  private boolean withUndecided;
   
-  public ArticleSearchParameter(String database, SpaceReference blogSpaceRef) {
-    this.database = database;
-    this.blogSpaceRef = blogSpaceRef;
+  public enum SubscriptionMode {
+    BLOG, SUBSCRIBED, UNSUBSCRIBED, UNDECIDED;
+  }
+  
+  public enum DateMode {
+    PUBLISHED, ARCHIVED, FUTURE;
   }
 
-  public String getDatabase() {
-    return database;
+  private static final int DEFAULT_OFFSET = 0;
+  private static final int DEFAULT_LIMIT = 0;
+  private static final boolean DEFAULT_SKIP_CHECKS = false;
+  private static final Set<SubscriptionMode> DEFAULT_SUBSCRIPTION_MODES = 
+      Collections.unmodifiableSet(new HashSet<SubscriptionMode>(Arrays.asList(
+      SubscriptionMode.BLOG, SubscriptionMode.SUBSCRIBED)));
+  private static final Set<DateMode> DEFAULT_DATE_MODES = Collections.unmodifiableSet(
+      new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED)));
+
+  private SpaceReference blogSpaceRef;
+  private List<SpaceReference> subscribedToSpaceRefs = Collections.emptyList();
+
+  private int offset = DEFAULT_OFFSET;
+  private int limit = DEFAULT_LIMIT;
+  private List<String> sortFields = Collections.emptyList();
+  private boolean skipChecks = DEFAULT_SKIP_CHECKS;
+  private String language = null;
+  private Set<SubscriptionMode> subsModes = DEFAULT_SUBSCRIPTION_MODES;
+  private Set<DateMode> dateModes = DEFAULT_DATE_MODES;
+  
+  public ArticleSearchParameter() {
   }
 
   public SpaceReference getBlogSpaceRef() {
     return blogSpaceRef;
+  }
+  
+  public ArticleSearchParameter setBlogSpaceRef(SpaceReference blogSpaceRef) {
+    this.blogSpaceRef = blogSpaceRef;
+    return this;
+  }
+
+  public List<SpaceReference> getSubscribedToSpaceRefs() {
+    return subscribedToSpaceRefs;
+  }
+
+  public ArticleSearchParameter setSubscribedToSpaceRefs(List<SpaceReference> spaceRefs) {
+    if (spaceRefs != null) {
+      this.subscribedToSpaceRefs = Collections.unmodifiableList(spaceRefs);
+    } else {
+      this.subscribedToSpaceRefs = Collections.emptyList();
+    }
+    return this;
   }
 
   public int getOffset() {
     return offset;
   }
 
-  public void setOffset(int offset) {
-    this.offset = offset;
+  public ArticleSearchParameter setOffset(int offset) {
+    if (offset > 0) {
+      this.offset = offset;
+    } else {
+      this.offset = DEFAULT_OFFSET;
+    }
+    return this;
   }
 
   public int getLimit() {
     return limit;
   }
 
-  public void setLimit(int limit) {
-    this.limit = limit;
+  public ArticleSearchParameter setLimit(int limit) {
+    if (limit > 0) {
+      this.limit = limit;
+    } else {
+      this.limit = DEFAULT_LIMIT;
+    }
+    return this;
   }
 
   public List<String> getSortFields() {
     return sortFields;
   }
 
-  public void setSortFields(List<String> sortFields) {
-    if (sortFields == null) {
-      this.sortFields = Collections.emptyList();
-    } else {
+  public ArticleSearchParameter setSortFields(List<String> sortFields) {
+    if (sortFields != null) {
       this.sortFields = Collections.unmodifiableList(sortFields);
+    } else {
+      this.sortFields = Collections.emptyList();
     }
+    return this;
   }
 
   public boolean isSkipChecks() {
     return skipChecks;
   }
 
-  public void setSkipChecks(boolean skipChecks) {
+  public ArticleSearchParameter setSkipChecks(boolean skipChecks) {
     this.skipChecks = skipChecks;
-  }
-
-  public List<SpaceReference> getSubscribedBlogs() {
-    return subscribedBlogs;
-  }
-
-  public void setSubscribedBlogs(List<SpaceReference> subscribedBlogs) {
-    if (subscribedBlogs == null) {
-      subscribedBlogs = Collections.emptyList();
-    }
-    this.subscribedBlogs = Collections.unmodifiableList(subscribedBlogs);
+    return this;
   }
 
   public String getLanguage() {
     return language;
   }
 
-  public void setLanguage(String language) {
+  public ArticleSearchParameter setLanguage(String language) {
     this.language = language;
+    return this;
   }
 
-  public boolean isArchiveOnly() {
-    return archiveOnly;
+  public Set<SubscriptionMode> getSubscriptionModes() {
+    return subsModes;
   }
 
-  public void setArchiveOnly(boolean archiveOnly) {
-    this.archiveOnly = archiveOnly;
+  public ArticleSearchParameter setSubscriptionModes(Set<SubscriptionMode> subsModes) {
+    if ((subsModes != null) && subsModes.size() > 0) {
+      this.subsModes = Collections.unmodifiableSet(subsModes);
+    } else {
+      this.subsModes = DEFAULT_SUBSCRIPTION_MODES;
+    }
+    return this;
   }
 
-  public boolean isFuturOnly() {
-    return futurOnly;
+  public Set<DateMode> getDateModes() {
+    return dateModes;
   }
 
-  public void setFuturOnly(boolean futurOnly) {
-    this.futurOnly = futurOnly;
-  }
-
-  public boolean isSubscribableOnly() {
-    return subscribableOnly;
-  }
-
-  public void setSubscribableOnly(boolean subscribableOnly) {
-    this.subscribableOnly = subscribableOnly;
-  }
-
-  public boolean isWithArchive() {
-    return withArchive;
-  }
-
-  public void setWithArchive(boolean withArchive) {
-    this.withArchive = withArchive;
-  }
-
-  public boolean isWithFutur() {
-    return withFutur;
-  }
-
-  public void setWithFutur(boolean withFutur) {
-    this.withFutur = withFutur;
-  }
-
-  public boolean isWithSubscribable() {
-    return withSubscribable;
-  }
-
-  public void setWithSubscribable(boolean withSubscribable) {
-    this.withSubscribable = withSubscribable;
-  }
-
-  public boolean isWithSubscribed() {
-    return withSubscribed;
-  }
-
-  public void setWithSubscribed(boolean withSubscribed) {
-    this.withSubscribed = withSubscribed;
-  }
-
-  public boolean isWithUnsubscribed() {
-    return withUnsubscribed;
-  }
-
-  public void setWithUnsubscribed(boolean withUnsubscribed) {
-    this.withUnsubscribed = withUnsubscribed;
-  }
-
-  public boolean isWithUndecided() {
-    return withUndecided;
-  }
-
-  public void setWithUndecided(boolean withUndecided) {
-    this.withUndecided = withUndecided;
+  public ArticleSearchParameter setDateModes(Set<DateMode> dateModes) {
+    if ((dateModes != null) && dateModes.size() > 0) {
+      this.dateModes = Collections.unmodifiableSet(dateModes);
+    } else {
+      this.dateModes = DEFAULT_DATE_MODES;
+    }
+    return this;
   }
 
   @Override
   public String toString() {
-    return "ArticleSearchParamter [blogSpaceRef=" + blogSpaceRef + ", database="
-        + database + ", offset=" + offset + ", limit=" + limit + ", sortFields="
-        + sortFields + ", skipChecks=" + skipChecks + ", subscribedBlogs="
-        + subscribedBlogs + ", language=" + language + ", archiveOnly=" + archiveOnly
-        + ", futurOnly=" + futurOnly + ", subscribableOnly=" + subscribableOnly
-        + ", withArchive=" + withArchive + ", withFutur=" + withFutur
-        + ", withSubscribable=" + withSubscribable + ", withSubscribed=" + withSubscribed
-        + ", withUnsubscribed=" + withUnsubscribed + ", withUndecided=" + withUndecided
-        + "]";
+    return "ArticleSearchParameter [blogSpaceRef=" + blogSpaceRef
+        + ", subscribedToSpaceRefs=" + subscribedToSpaceRefs + ", offset=" + offset
+        + ", limit=" + limit + ", sortFields=" + sortFields + ", skipChecks="
+        + skipChecks + ", language=" + language + ", subsModes=" + subsModes
+        + ", dateModes=" + dateModes + "]";
   }
 
 }
