@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 // TODO javadoc for fields (see BlogPlugin)
@@ -29,7 +30,7 @@ public class ArticleSearchParameter {
       new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED)));
 
   private SpaceReference blogSpaceRef;
-  private List<SpaceReference> subscribedToSpaceRefs = Collections.emptyList();
+  private List<DocumentReference> subscribedToBlogs = Collections.emptyList();
 
   private int offset = DEFAULT_OFFSET;
   private int limit = DEFAULT_LIMIT;
@@ -51,15 +52,15 @@ public class ArticleSearchParameter {
     return this;
   }
 
-  public List<SpaceReference> getSubscribedToSpaceRefs() {
-    return subscribedToSpaceRefs;
+  public List<DocumentReference> getSubscribedToBlogs() {
+    return subscribedToBlogs;
   }
 
-  public ArticleSearchParameter setSubscribedToSpaceRefs(List<SpaceReference> spaceRefs) {
-    if (spaceRefs != null) {
-      this.subscribedToSpaceRefs = Collections.unmodifiableList(spaceRefs);
+  public ArticleSearchParameter setSubscribedToBlogs(List<DocumentReference> docRefs) {
+    if (docRefs != null) {
+      this.subscribedToBlogs = Collections.unmodifiableList(docRefs);
     } else {
-      this.subscribedToSpaceRefs = Collections.emptyList();
+      this.subscribedToBlogs = Collections.emptyList();
     }
     return this;
   }
@@ -150,10 +151,10 @@ public class ArticleSearchParameter {
   @Override
   public String toString() {
     return "ArticleSearchParameter [blogSpaceRef=" + blogSpaceRef
-        + ", subscribedToSpaceRefs=" + subscribedToSpaceRefs + ", offset=" + offset
-        + ", limit=" + limit + ", sortFields=" + sortFields + ", skipChecks="
-        + skipChecks + ", language=" + language + ", subsModes=" + subsModes
-        + ", dateModes=" + dateModes + "]";
+        + ", subscribedToBlogs=" + subscribedToBlogs + ", offset=" + offset + ", limit=" 
+        + limit + ", sortFields=" + sortFields + ", skipChecks=" + skipChecks 
+        + ", language=" + language + ", subsModes=" + subsModes + ", dateModes=" 
+        + dateModes + "]";
   }
 
 }
