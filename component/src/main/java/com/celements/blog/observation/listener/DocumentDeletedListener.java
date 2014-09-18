@@ -18,14 +18,17 @@ public class DocumentDeletedListener extends AbstractDocumentListener {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       DocumentDeletedListener.class);
 
+  @Override
   public List<Event> getEvents() {
     return Arrays.<Event> asList(new DocumentDeletedEvent());
   }
 
+  @Override
   public String getName() {
     return "celements.blog.deleted";
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
     XWikiDocument doc = getOrginialDocument(source);
     if ((doc != null) && !remoteObservationManagerContext.isRemoteState()) {

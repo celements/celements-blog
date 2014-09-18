@@ -18,14 +18,17 @@ public class DocumentUpdatedListener extends AbstractDocumentListener {
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       DocumentUpdatedListener.class);
 
+  @Override
   public List<Event> getEvents() {
     return Arrays.<Event> asList(new DocumentUpdatedEvent());
   }
 
+  @Override
   public String getName() {
     return "celements.blog.updated";
   }
 
+  @Override
   public void onEvent(Event event, Object source, Object data) {
     XWikiDocument doc = (XWikiDocument) source;
     if ((doc != null) && !remoteObservationManagerContext.isRemoteState()) {
