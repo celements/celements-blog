@@ -128,11 +128,8 @@ public class BlogService implements IBlogServiceRole {
     return blogCache;
   }
 
-  // TODO add listener to clear blog
   public synchronized void clearBlogCache() {
-    if (blogCache != null) {
-      blogCache = null;
-    }
+    blogCache = null;
   }
 
   @Override
@@ -184,7 +181,7 @@ public class BlogService implements IBlogServiceRole {
   @Override
   public List<Article> getArticles(DocumentReference blogConfDocRef, 
       ArticleSearchParameter param) throws ArticleLoadException {
-    param = setParamtersForBlog(param, blogConfDocRef);
+    param = setParamtersForBlog(blogConfDocRef, param);
     List<Article> articles = getArticleEngine().getArticles(param);
     LOGGER.info("getArticles: for " + param + " got " + articles.size() + " articles");
     if (LOGGER.isTraceEnabled()) {
@@ -193,9 +190,24 @@ public class BlogService implements IBlogServiceRole {
     return Collections.unmodifiableList(articles);
   }
 
-  private ArticleSearchParameter setParamtersForBlog(ArticleSearchParameter param,
-      DocumentReference blogConfDocRef) throws ArticleLoadException {
-    // TODO
+  private ArticleSearchParameter setParamtersForBlog(DocumentReference blogConfDocRef,
+      ArticleSearchParameter param) throws ArticleLoadException {
+    try {
+      if (param == null) {
+        param = new ArticleSearchParameter();
+      }
+      SpaceReference spaceRef = getBlogSpaceRef(blogConfDocRef);
+      if (spaceRef != null) {
+        param.setBlogSpaceRef(spaceRef);
+      } else {
+        throw new ArticleLoadException("No space found for blog '" + blogConfDocRef + "'");
+      }
+      param.setSubscribedToBlogs(getSubribedToBlogs(blogConfDocRef));
+    } catch (XWikiException xwe) {
+      throw new ArticleLoadException("Error for '" + blogConfDocRef + "'", xwe);
+    } catch (QueryException qexc) {
+      throw new ArticleLoadException("Error for '" + blogConfDocRef + "'", qexc);
+    }
     return param;
   }
 
