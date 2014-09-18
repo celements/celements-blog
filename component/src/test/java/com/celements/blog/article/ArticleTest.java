@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.blog.article.Article;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.service.BlogService;
@@ -456,7 +455,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     DocumentReference blogConfigClassRef = new DocumentReference("xwikidb",
         BlogClasses.BLOG_CONFIG_CLASS_SPACE, BlogClasses.BLOG_CONFIG_CLASS_DOC);
     blogConfigObj.setXClassReference(blogConfigClassRef);
-    blogConfigObj.setIntValue(BlogClasses.MAX_NUM_CHARS_FIELD, 1000);
+    blogConfigObj.setIntValue(BlogClasses.PROPERTY_BLOG_CONFIG_MAX_NUM_CHARS_FIELD, 1000);
     blogDoc.addXObject(blogConfigObj);
     expect(blogServiceMock.getBlogPageByBlogSpace(eq("News"))).andReturn(blogDoc
         ).anyTimes();
