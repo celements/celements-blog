@@ -1,4 +1,4 @@
-package com.celements.migrator;
+package com.celements.blog.migrator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,6 +10,7 @@ import org.xwiki.query.QueryManager;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.migrations.SubSystemHibernateMigrationManager;
+import com.celements.migrator.AbstractCelementsHibernateMigrator;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

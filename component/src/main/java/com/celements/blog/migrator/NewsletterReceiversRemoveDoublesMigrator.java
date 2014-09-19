@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.migrator;
+package com.celements.blog.migrator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +33,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 
 import com.celements.migrations.SubSystemHibernateMigrationManager;
+import com.celements.migrator.AbstractCelementsHibernateMigrator;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
