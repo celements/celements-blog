@@ -1,11 +1,10 @@
 package com.celements.blog.observation.listener;
 
-import org.apache.commons.logging.Log;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -22,7 +21,7 @@ public abstract class AbstractDocumentListener implements EventListener {
   private IClassCollectionRole blogClasses;
   
   @Requirement
-  RemoteObservationManagerContext remoteObservationManagerContext;
+  protected RemoteObservationManagerContext remoteObservationManagerContext;
 
   @Requirement
   private ComponentManager componentManager;
@@ -35,29 +34,8 @@ public abstract class AbstractDocumentListener implements EventListener {
    * initialized event listeners)
    */
   private ObservationManager observationManager;
-  
-  protected void notifyIfBlog(XWikiDocument doc, Class<? extends Event> eventClass) {
-    DocumentReference classRef = getBlogClasses().getBlogConfigClassRef(
-        doc.getDocumentReference().getWikiReference().getName());
-    if (doc.getXObject(classRef) != null) {
-      notifyEvent(eventClass, doc, null);
-    } else {
-      getLogger().trace("onEvent: no blog config class object found on doc '" + doc 
-          + "', not notifiying event '" + eventClass);
-    }
-  }
-  
-  private void notifyEvent(Class<? extends Event> eventClass, Object source, Object data) {
-    try {
-      getObservationManager().notify(eventClass.newInstance(), source, data);
-    } catch (IllegalAccessException exc) {
-      getLogger().error("Error getting new instance", exc);
-    } catch (InstantiationException exc) {
-      getLogger().error("Error getting new instance", exc);
-    }
-  }
 
-  private ObservationManager getObservationManager() {
+  protected ObservationManager getObservationManager() {
     if (this.observationManager == null) {
       try {
         this.observationManager = componentManager.lookup(ObservationManager.class);  
@@ -68,11 +46,20 @@ public abstract class AbstractDocumentListener implements EventListener {
     }
     return this.observationManager;
   }
-  
-  private BlogClasses getBlogClasses() {
-    return (BlogClasses) blogClasses;
+
+  protected XWikiDocument getDocument(Object source, Event event) {
+    XWikiDocument doc = null;
+    if (source != null) {
+      doc = (XWikiDocument) source;
+      if (event instanceof DocumentDeletedEvent) {
+        doc = doc.getOriginalDocument();
+      }
+    }
+    return doc;
   }
   
-  abstract protected Log getLogger();
+  protected BlogClasses getBlogClasses() {
+    return (BlogClasses) blogClasses;
+  }
 
 }
