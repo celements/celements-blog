@@ -5,9 +5,9 @@ com.celements.blog.service.NewsletterAttachmentService
 com.celements.migrator.NewsletterReceiversToLowerCaseMigrator
 com.celements.migrator.NewsletterReceiversRemoveDoublesMigrator
 com.celements.migrator.AddBlogDateValidationMigrator
-com.celements.blog.observation.listener.DocumentCreatedListener
-com.celements.blog.observation.listener.DocumentUpdatedListener
-com.celements.blog.observation.listener.DocumentDeletedListener
+com.celements.blog.observation.listener.BlogDocumentListener
+com.celements.blog.observation.listener.ArticleDocumentListener
 com.celements.blog.observation.listener.ClearBlogCacheListener
+com.celements.blog.observation.listener.ArticleDatesListener
 com.celements.blog.article.ArticleEngineLucene
 com.celements.blog.article.ArticleEngineHQL
