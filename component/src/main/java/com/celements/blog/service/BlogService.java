@@ -3,6 +3,7 @@ package com.celements.blog.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -196,6 +197,7 @@ public class BlogService implements IBlogServiceRole {
       if (param == null) {
         param = new ArticleSearchParameter();
       }
+      param.setExecutionDate(new Date());
       SpaceReference spaceRef = getBlogSpaceRef(blogConfDocRef);
       if (spaceRef != null) {
         param.setBlogSpaceRef(spaceRef);

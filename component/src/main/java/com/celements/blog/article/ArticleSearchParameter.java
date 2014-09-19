@@ -2,6 +2,7 @@ package com.celements.blog.article;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +30,7 @@ public class ArticleSearchParameter {
   private static final Set<DateMode> DEFAULT_DATE_MODES = Collections.unmodifiableSet(
       new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED)));
 
+  private Date executionDate = new Date();
   private SpaceReference blogSpaceRef;
   private List<DocumentReference> subscribedToBlogs = Collections.emptyList();
 
@@ -41,6 +43,14 @@ public class ArticleSearchParameter {
   private Set<DateMode> dateModes = DEFAULT_DATE_MODES;
   
   public ArticleSearchParameter() {
+  }
+
+  public Date getExecutionDate() {
+    return executionDate;
+  }
+
+  public void setExecutionDate(Date executionDate) {
+    this.executionDate = executionDate;
   }
 
   public SpaceReference getBlogSpaceRef() {
