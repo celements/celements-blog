@@ -131,9 +131,6 @@ public class ArticleEngineLucene implements IArticleEngineRole {
     return query;
   }
 
-  // TODO null values now allowed... -> migration
-  // publish is null = always published = lowdate
-  // archive is null = never archived = highdate
   QueryRestrictionGroup getDateRestrictions(Set<DateMode> modes, Date date) {
     QueryRestrictionGroup dateRestrGrp = searchService.createRestrictionGroup(Type.OR);
     if (modes.size() < 3) {

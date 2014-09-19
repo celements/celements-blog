@@ -11,3 +11,4 @@ com.celements.blog.observation.listener.ClearBlogCacheListener
 com.celements.blog.observation.listener.ArticleDatesListener
 com.celements.blog.article.ArticleEngineLucene
 com.celements.blog.article.ArticleEngineHQL
+com.celements.blog.migrator.ArticleNullDatesMigrator

@@ -17,8 +17,6 @@ import com.celements.search.lucene.ILuceneSearchService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-// TODO tests
-
 @Component("celements.blog.articleDatesListener")
 public class ArticleDatesListener extends AbstractDocumentListener {
 
