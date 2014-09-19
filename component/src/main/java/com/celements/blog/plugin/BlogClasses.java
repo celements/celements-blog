@@ -54,6 +54,9 @@ public class BlogClasses extends AbstractClassCollection {
   public static final String ARTICLE_CLASS_SPACE = "XWiki";
   public static final String ARTICLE_CLASS = ARTICLE_CLASS_SPACE + "."
         + ARTICLE_CLASS_DOC;
+  public static final String PROPERTY_ARTICLE_LANG = "lang";
+  public static final String PROPERTY_ARTICLE_PUBLISH_DATE = "publishdate";
+  public static final String PROPERTY_ARTICLE_ARCHIVE_DATE = "archivedate";
   public static final String PROPERTY_ARTICLE_IS_SUBSCRIBABLE = "isSubscribable";
 
   public static final String RECEIVER_E_MAIL_CLASS_DOC = "ReceiverEMail";
@@ -220,14 +223,14 @@ public class BlogClasses extends AbstractClassCollection {
     //category
     needsUpdate |= bclass.addTextAreaField("content", "content", 80, 15);
     needsUpdate |= bclass.addNumberField("id", "id", 30, "integer");
-    needsUpdate |= bclass.addTextField("lang", "lang", 30);
+    needsUpdate |= bclass.addTextField(PROPERTY_ARTICLE_LANG, PROPERTY_ARTICLE_LANG, 30);
     needsUpdate |= bclass.addTextField("blogeditor", "blogeditor", 30);
-    needsUpdate |= addDateField(bclass, "publishdate", "publishdate", 
-        "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(false, true), 
+    needsUpdate |= addDateField(bclass, PROPERTY_ARTICLE_PUBLISH_DATE, 
+        PROPERTY_ARTICLE_PUBLISH_DATE, "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(false, true), 
         "cel_blog_validation_publishdate");    
     needsUpdate |= bclass.addBooleanField("hasComments", "hasComments", "yesno");
-    needsUpdate |= addDateField(bclass, "archivedate", "archivedate", 
-        "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(true, true), 
+    needsUpdate |= addDateField(bclass, PROPERTY_ARTICLE_ARCHIVE_DATE, 
+        PROPERTY_ARTICLE_ARCHIVE_DATE, "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(true, true), 
         "cel_blog_validation_archivedate");
     needsUpdate |= bclass.addBooleanField(PROPERTY_ARTICLE_IS_SUBSCRIBABLE, 
         PROPERTY_ARTICLE_IS_SUBSCRIBABLE, "yesno");
