@@ -1,5 +1,6 @@
 package com.celements.blog.article;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -156,6 +157,23 @@ public class ArticleSearchParameter {
       this.dateModes = DEFAULT_DATE_MODES;
     }
     return this;
+  }
+  
+  // TODO test
+  public ArticleSearchParameter copy() {
+    ArticleSearchParameter copy = new ArticleSearchParameter();
+    copy.executionDate = new Date(executionDate.getTime());
+    copy.blogSpaceRef = new SpaceReference(blogSpaceRef);
+    copy.subscribedToBlogs =  Collections.unmodifiableList(
+        new ArrayList<DocumentReference>(subscribedToBlogs));
+    copy.offset = offset;
+    copy.limit = limit;
+    copy.sortFields = Collections.unmodifiableList(new ArrayList<String>(sortFields));
+    copy.skipChecks = skipChecks;
+    copy.language = language;
+    copy.subsModes = Collections.unmodifiableSet(new HashSet<SubscriptionMode>(subsModes));
+    copy.dateModes = Collections.unmodifiableSet(new HashSet<DateMode>(dateModes));
+    return copy;
   }
 
   @Override

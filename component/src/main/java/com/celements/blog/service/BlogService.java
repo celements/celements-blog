@@ -196,6 +196,9 @@ public class BlogService implements IBlogServiceRole {
     try {
       if (param == null) {
         param = new ArticleSearchParameter();
+      } else {
+        // param might be changed during rights check
+        param = param.copy();
       }
       param.setExecutionDate(new Date());
       SpaceReference spaceRef = getBlogSpaceRef(blogConfDocRef);
