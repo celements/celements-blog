@@ -1,5 +1,6 @@
 package com.celements.blog.article;
 
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -10,12 +11,19 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.blog.article.ArticleSearchParameter.DateMode;
 import com.celements.blog.article.ArticleSearchParameter.SubscriptionMode;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.query.QueryRestrictionGroup;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
 public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
@@ -33,9 +41,173 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
   
   private ArticleEngineLucene engine;
 
+  private XWiki xwiki;
+  private XWikiContext context;
+  private XWikiRightService rightsServiceMock;
+  private INextFreeDocRole nextFreeDocServiceMock;
+
   @Before
   public void setUp_ArticleEngineLuceneTest() {
+    xwiki = getWikiMock();
+    context = getContext();
     engine = (ArticleEngineLucene) Utils.getComponent(IArticleEngineRole.class, "lucene");
+    rightsServiceMock = createMockAndAddToDefault(XWikiRightService.class);
+    expect(xwiki.getRightService()).andReturn(rightsServiceMock).anyTimes();
+    nextFreeDocServiceMock = createMockAndAddToDefault(INextFreeDocRole.class);
+    engine.injectNextFreeDocService(nextFreeDocServiceMock);
+  }
+  
+  @Test
+  public void testCheckRights() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
+    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.values())); 
+    param.setSubscriptionModes(subsModes);
+    Set<DateMode> dateModes = new HashSet<DateMode>(Arrays.asList(DateMode.values()));
+    param.setDateModes(dateModes);
+    
+    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
+        ).andReturn(blogConfDocRef).once();
+    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
+        eq("wiki:space.blog"), same(context))).andReturn(true).once();
+    expect(rightsServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"), 
+        eq("wiki:space.blog"), same(context))).andReturn(true).once();
+    
+    replayDefault();
+    boolean ret = engine.checkRights(param);
+    verifyDefault();
+    
+    assertTrue(ret);
+    assertEquals(subsModes, param.getSubscriptionModes());
+    assertEquals(dateModes, param.getDateModes());
+  }
+  
+  @Test
+  public void testCheckRights_noView() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
+    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.values())); 
+    param.setSubscriptionModes(subsModes);
+    Set<DateMode> dateModes = new HashSet<DateMode>(Arrays.asList(DateMode.values()));
+    param.setDateModes(dateModes);
+    
+    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
+        ).andReturn(blogConfDocRef).once();
+    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
+        eq("wiki:space.blog"), same(context))).andReturn(false).once();
+    
+    replayDefault();
+    boolean ret = engine.checkRights(param);
+    verifyDefault();
+    
+    assertFalse(ret);
+    assertEquals(subsModes, param.getSubscriptionModes());
+    assertEquals(dateModes, param.getDateModes());
+  }
+  
+  @Test
+  public void testCheckRights_noEdit() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
+    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.values())); 
+    param.setSubscriptionModes(subsModes);
+    Set<DateMode> dateModes = new HashSet<DateMode>(Arrays.asList(DateMode.values()));
+    param.setDateModes(dateModes);
+    
+    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
+        ).andReturn(blogConfDocRef).once();
+    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
+        eq("wiki:space.blog"), same(context))).andReturn(true).once();
+    expect(rightsServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"), 
+        eq("wiki:space.blog"), same(context))).andReturn(false).once();
+    
+    replayDefault();
+    boolean ret = engine.checkRights(param);
+    verifyDefault();
+    
+    assertTrue(ret);
+    assertEquals(new HashSet<SubscriptionMode>(Arrays.asList(SubscriptionMode.BLOG, 
+        SubscriptionMode.SUBSCRIBED)), param.getSubscriptionModes());
+    assertEquals(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
+        DateMode.ARCHIVED)), param.getDateModes());
+  }
+  
+  @Test
+  public void testCheckRights_noSubsModes() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
+    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.UNSUBSCRIBED)); 
+    param.setSubscriptionModes(subsModes);
+    Set<DateMode> dateModes = new HashSet<DateMode>(Arrays.asList(DateMode.values()));
+    param.setDateModes(dateModes);
+    
+    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
+        ).andReturn(blogConfDocRef).once();
+    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
+        eq("wiki:space.blog"), same(context))).andReturn(true).once();
+    expect(rightsServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"), 
+        eq("wiki:space.blog"), same(context))).andReturn(false).once();
+    
+    replayDefault();
+    boolean ret = engine.checkRights(param);
+    verifyDefault();
+    
+    assertFalse(ret);
+    assertEquals(param.getSubscriptionModes(), param.getSubscriptionModes());
+    assertEquals(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
+        DateMode.ARCHIVED)), param.getDateModes());
+  }
+  
+  @Test
+  public void testCheckRights_XWE() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
+    XWikiException cause = new XWikiException();
+    
+    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
+        ).andReturn(blogConfDocRef).once();
+    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
+        eq("wiki:space.blog"), same(context))).andThrow(cause).once();
+    
+    replayDefault();
+    try {
+      engine.checkRights(param);
+      fail("Expecting ALE");
+    } catch (ArticleLoadException ale) {
+      assertSame(cause, ale.getCause());
+    }
+    verifyDefault();
+  }
+  
+  @Test
+  public void testCheckRights_noDateModes() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
+    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.values())); 
+    param.setSubscriptionModes(subsModes);
+    Set<DateMode> dateModes = new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE));
+    param.setDateModes(dateModes);
+    
+    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
+        ).andReturn(blogConfDocRef).once();
+    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
+        eq("wiki:space.blog"), same(context))).andReturn(true).once();
+    expect(rightsServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"), 
+        eq("wiki:space.blog"), same(context))).andReturn(false).once();
+    
+    replayDefault();
+    boolean ret = engine.checkRights(param);
+    verifyDefault();
+    
+    assertFalse(ret);
+    assertEquals(new HashSet<SubscriptionMode>(Arrays.asList(SubscriptionMode.BLOG, 
+        SubscriptionMode.SUBSCRIBED)), param.getSubscriptionModes());
+    assertEquals(param.getDateModes(), param.getDateModes());
   }
   
   @Test

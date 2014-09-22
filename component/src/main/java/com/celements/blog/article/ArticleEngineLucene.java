@@ -22,6 +22,7 @@ import com.celements.blog.plugin.BlogClasses;
 import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.LuceneSearchException;
 import com.celements.search.lucene.LuceneSearchResult;
@@ -47,6 +48,9 @@ public class ArticleEngineLucene implements IArticleEngineRole {
   private IBlogServiceRole blogService;
   
   @Requirement
+  private INextFreeDocRole nextFreeDocService;
+  
+  @Requirement
   private IWebUtilsService webUtilsService;
   
   @Requirement("celements.celBlogClasses")
@@ -65,22 +69,23 @@ public class ArticleEngineLucene implements IArticleEngineRole {
       ) throws ArticleLoadException {
     try {
       List<Article> articles = new ArrayList<Article>();
-      LuceneSearchResult result;
-      // TODO rights check
-      if (param.isSkipChecks()) {
-        result = searchService.searchWithoutChecks(convertToLuceneQuery(param), 
-            param.getSortFields(), Arrays.asList(param.getLanguage()));
-      } else {
-        result = searchService.search(convertToLuceneQuery(param), param.getSortFields(), 
-            Arrays.asList(param.getLanguage()));
-      }
-      result.setOffset(param.getOffset()).setLimit(param.getLimit());
-      for (DocumentReference docRef : result.getResults()) {
-        XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
-        try {
-          articles.add(new Article(doc, getContext()));
-        } catch (EmptyArticleException exc) {
-          LOGGER.warn("empty article: " + doc, exc);
+      if (checkRights(param)) {
+        LuceneSearchResult result;
+        if (param.isSkipChecks()) {
+          result = searchService.searchWithoutChecks(convertToLuceneQuery(param), 
+              param.getSortFields(), Arrays.asList(param.getLanguage()));
+        } else {
+          result = searchService.search(convertToLuceneQuery(param), param.getSortFields(), 
+              Arrays.asList(param.getLanguage()));
+        }
+        result.setOffset(param.getOffset()).setLimit(param.getLimit());
+        for (DocumentReference docRef : result.getResults()) {
+          XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
+          try {
+            articles.add(new Article(doc, getContext()));
+          } catch (EmptyArticleException exc) {
+            LOGGER.warn("empty article: " + doc, exc);
+          }
         }
       }
       return articles;
@@ -89,6 +94,54 @@ public class ArticleEngineLucene implements IArticleEngineRole {
     } catch (XWikiException xwe) {
       throw new ArticleLoadException(xwe);
     }
+  }
+
+  boolean checkRights(ArticleSearchParameter param) throws ArticleLoadException {
+    DocumentReference docRef = nextFreeDocService.getNextUntitledPageDocRef(
+        param.getBlogSpaceRef());
+    boolean sufficientRights = hasRights(docRef, "view");
+    if (sufficientRights && !hasRights(docRef, "edit")) {
+      Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(
+          param.getSubscriptionModes());
+      subsModes.remove(SubscriptionMode.UNSUBSCRIBED);
+      subsModes.remove(SubscriptionMode.UNDECIDED);
+      if (subsModes.isEmpty()) {
+        sufficientRights = false;
+      } else if (subsModes.size() != param.getSubscriptionModes().size()) {
+        LOGGER.debug("checkRights: subs modes changed from '" 
+            + param.getSubscriptionModes() + "' to '" + subsModes + "'");
+        param.setSubscriptionModes(subsModes);
+      }
+      Set<DateMode> dateModes = new HashSet<DateMode>(param.getDateModes());
+      dateModes.remove(DateMode.FUTURE);
+      if (dateModes.isEmpty()) {
+        sufficientRights = false;
+      } else if (dateModes.size() != param.getDateModes().size()) {
+        LOGGER.debug("checkRights: date modes changed from '" + param.getDateModes() 
+            + "' to '" + dateModes + "'");
+        param.setDateModes(dateModes);
+      }
+    }
+    LOGGER.info("checkRights: sufficientRights '" + sufficientRights + "' for param: " 
+        + param);
+    return sufficientRights;
+  }
+  
+  private boolean hasRights(DocumentReference docRef, String rights
+      ) throws ArticleLoadException {
+    boolean ret = false;
+    if (docRef != null) {
+      try {
+        String fullName = webUtilsService.getRefDefaultSerializer().serialize(docRef);
+        ret = getContext().getWiki().getRightService().hasAccessLevel(rights, getContext(
+            ).getUser(), fullName, getContext());
+      } catch (XWikiException xwe) {
+        throw new ArticleLoadException("Failed to check rights '" + rights + "'", xwe);
+      }
+    }
+    LOGGER.debug("hasRights for docRef [" + docRef + "] and rights [" + rights 
+        + "] returned [" + ret + "]");
+    return ret;
   }
 
   LuceneQuery convertToLuceneQuery(ArticleSearchParameter param) throws XWikiException {
@@ -187,6 +240,10 @@ public class ArticleEngineLucene implements IArticleEngineRole {
 
   private BlogClasses getBlogClasses() {
     return (BlogClasses) blogClasses;
+  }
+
+  void injectNextFreeDocService(INextFreeDocRole nextFreeDocService) {
+    this.nextFreeDocService = nextFreeDocService;
   }
 
 }
