@@ -119,6 +119,9 @@ $adminMsg.get('cel_tm_article_edit')
       #set($publishdateEditStr = $publishdateEditStr.replaceAll("(.*value=['${q}])(['${q}].*)", "${d}1${datetool.get('dd.MM.yyyy HH:mm')}${d}2"))
     #end
     <div class="editblock">$adminMsg.get('cel_tm_publish_date') (dd.MM.yyyy HH:mm): ${publishdateEditStr.replaceAll('\{/?pre\}','')}</div><!-- IE6 -->
+    #if($services.celementsweb.isHighDate($!obj.getProperty('archivedate').getValue()))
+        $!obj.set('archivedate', '')
+    #end
     #set($archivedateEditStr = '')
     #set($archivedateEditStr = $doc.display('archivedate', 'edit', $deflang_obj))
     #set($archivedateEditStr = $archivedateEditStr.replaceAll("<input", "<input class='archivedate_hidden_deflang'"))
