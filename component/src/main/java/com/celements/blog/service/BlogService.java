@@ -196,18 +196,15 @@ public class BlogService implements IBlogServiceRole {
     try {
       if (param == null) {
         param = new ArticleSearchParameter();
-      } else {
-        // param might be changed during rights check
-        param = param.copy();
       }
       param.setExecutionDate(new Date());
       SpaceReference spaceRef = getBlogSpaceRef(blogConfDocRef);
       if (spaceRef != null) {
         param.setBlogSpaceRef(spaceRef);
+        param.setSubscribedToBlogs(getSubribedToBlogs(blogConfDocRef));
       } else {
         throw new ArticleLoadException("No space found for blog '" + blogConfDocRef + "'");
       }
-      param.setSubscribedToBlogs(getSubribedToBlogs(blogConfDocRef));
     } catch (XWikiException xwe) {
       throw new ArticleLoadException("Error for '" + blogConfDocRef + "'", xwe);
     } catch (QueryException qexc) {
