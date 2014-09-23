@@ -187,7 +187,7 @@ public class BlogService implements IBlogServiceRole {
         param = new ArticleSearchParameter();
       }
       param.setExecutionDate(new Date());
-      param.setBlogSpaceRef(blogConfDocRef);
+      param.setBlogDocRef(blogConfDocRef);
       param.setSubscribedToBlogs(getSubribedToBlogs(blogConfDocRef));
       List<Article> articles = getArticleEngine().getArticles(param);
       LOGGER.info("getArticles: for " + param + " got " + articles.size() + " articles");

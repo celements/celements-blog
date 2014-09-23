@@ -54,7 +54,7 @@ public class ArticleSearchParameter {
     return blogDocRef;
   }
   
-  public ArticleSearchParameter setBlogSpaceRef(DocumentReference blogDocRef) {
+  public ArticleSearchParameter setBlogDocRef(DocumentReference blogDocRef) {
     this.blogDocRef = blogDocRef;
     return this;
   }

@@ -67,4 +67,12 @@ public class ArticleEngineLucene implements IArticleEngineRole {
     }
   }
 
+  void injectSearchService(ILuceneSearchService searchService) {
+    this.searchService = searchService;
+  }
+
+  void injectQueryBuilder(IArticleLuceneQueryBuilderRole queryBuilder) {
+    this.queryBuilder = queryBuilder;
+  }
+
 }
