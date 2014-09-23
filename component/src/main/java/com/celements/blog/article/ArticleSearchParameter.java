@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
 
 // TODO javadoc for fields (see BlogPlugin)
 public class ArticleSearchParameter {
@@ -30,7 +29,7 @@ public class ArticleSearchParameter {
   private static final int DEFAULT_LIMIT = 0;
 
   private Date executionDate = new Date();
-  private SpaceReference blogSpaceRef;
+  private DocumentReference blogDocRef;
   private boolean withBlogArticles = true;
   private List<DocumentReference> subscribedToBlogs = Collections.emptyList();
   private Set<DateMode> dateModes = DEFAULT_DATE_MODES;
@@ -51,12 +50,12 @@ public class ArticleSearchParameter {
     this.executionDate = executionDate;
   }
 
-  public SpaceReference getBlogSpaceRef() {
-    return blogSpaceRef;
+  public DocumentReference getBlogDocRef() {
+    return blogDocRef;
   }
   
-  public ArticleSearchParameter setBlogSpaceRef(SpaceReference blogSpaceRef) {
-    this.blogSpaceRef = blogSpaceRef;
+  public ArticleSearchParameter setBlogSpaceRef(DocumentReference blogDocRef) {
+    this.blogDocRef = blogDocRef;
     return this;
   }
 
@@ -157,8 +156,8 @@ public class ArticleSearchParameter {
 
   @Override
   public String toString() {
-    return "ArticleSearchParameter [executionDate=" + executionDate + ", blogSpaceRef="
-        + blogSpaceRef + ", withBlogArticles=" + withBlogArticles
+    return "ArticleSearchParameter [executionDate=" + executionDate + ", blogDocRef="
+        + blogDocRef + ", withBlogArticles=" + withBlogArticles
         + ", subscribedToBlogs=" + subscribedToBlogs + ", dateModes=" + dateModes
         + ", subsModes=" + subsModes + ", language=" + language + ", offset=" + offset
         + ", limit=" + limit + ", sortFields=" + sortFields + "]";

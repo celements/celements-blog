@@ -182,35 +182,24 @@ public class BlogService implements IBlogServiceRole {
   @Override
   public List<Article> getArticles(DocumentReference blogConfDocRef, 
       ArticleSearchParameter param) throws ArticleLoadException {
-    param = setParamtersForBlog(blogConfDocRef, param);
-    List<Article> articles = getArticleEngine().getArticles(param);
-    LOGGER.info("getArticles: for " + param + " got " + articles.size() + " articles");
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("getArticles: for " + param + " got: " + articles);
-    }
-    return Collections.unmodifiableList(articles);
-  }
-
-  private ArticleSearchParameter setParamtersForBlog(DocumentReference blogConfDocRef,
-      ArticleSearchParameter param) throws ArticleLoadException {
     try {
       if (param == null) {
         param = new ArticleSearchParameter();
       }
       param.setExecutionDate(new Date());
-      SpaceReference spaceRef = getBlogSpaceRef(blogConfDocRef);
-      if (spaceRef != null) {
-        param.setBlogSpaceRef(spaceRef);
-        param.setSubscribedToBlogs(getSubribedToBlogs(blogConfDocRef));
-      } else {
-        throw new ArticleLoadException("No space found for blog '" + blogConfDocRef + "'");
+      param.setBlogSpaceRef(blogConfDocRef);
+      param.setSubscribedToBlogs(getSubribedToBlogs(blogConfDocRef));
+      List<Article> articles = getArticleEngine().getArticles(param);
+      LOGGER.info("getArticles: for " + param + " got " + articles.size() + " articles");
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("getArticles: for " + param + " got: " + articles);
       }
+      return Collections.unmodifiableList(articles);
     } catch (XWikiException xwe) {
       throw new ArticleLoadException("Error for '" + blogConfDocRef + "'", xwe);
     } catch (QueryException qexc) {
       throw new ArticleLoadException("Error for '" + blogConfDocRef + "'", qexc);
     }
-    return param;
   }
 
   private IArticleEngineRole getArticleEngine() throws ArticleLoadException {
