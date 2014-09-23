@@ -3,7 +3,6 @@ package com.celements.blog.article;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -69,15 +68,10 @@ public class ArticleEngineLucene implements IArticleEngineRole {
       ) throws ArticleLoadException {
     try {
       List<Article> articles = new ArrayList<Article>();
-      if (checkRights(param)) {
-        LuceneSearchResult result;
-        if (param.isSkipChecks()) {
-          result = searchService.searchWithoutChecks(convertToLuceneQuery(param), 
-              param.getSortFields(), Arrays.asList(param.getLanguage()));
-        } else {
-          result = searchService.search(convertToLuceneQuery(param), param.getSortFields(), 
-              Arrays.asList(param.getLanguage()));
-        }
+      LuceneQuery query = convertToLuceneQuery(param);
+      if (query != null) {
+        LuceneSearchResult result = searchService.searchWithoutChecks(query, 
+            param.getSortFields(), Arrays.asList(param.getLanguage()));
         result.setOffset(param.getOffset()).setLimit(param.getLimit());
         for (DocumentReference docRef : result.getResults()) {
           XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
@@ -96,97 +90,78 @@ public class ArticleEngineLucene implements IArticleEngineRole {
     }
   }
 
-  boolean checkRights(ArticleSearchParameter param) throws ArticleLoadException {
-    DocumentReference docRef = nextFreeDocService.getNextUntitledPageDocRef(
-        param.getBlogSpaceRef());
-    boolean sufficientRights = hasRights(docRef, "view");
-    if (sufficientRights && !hasRights(docRef, "edit")) {
-      Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(
-          param.getSubscriptionModes());
-      subsModes.remove(SubscriptionMode.UNSUBSCRIBED);
-      subsModes.remove(SubscriptionMode.UNDECIDED);
-      if (subsModes.isEmpty()) {
-        sufficientRights = false;
-      } else if (subsModes.size() != param.getSubscriptionModes().size()) {
-        LOGGER.debug("checkRights: subs modes changed from '" 
-            + param.getSubscriptionModes() + "' to '" + subsModes + "'");
-        param.setSubscriptionModes(subsModes);
-      }
-      Set<DateMode> dateModes = new HashSet<DateMode>(param.getDateModes());
-      dateModes.remove(DateMode.FUTURE);
-      if (dateModes.isEmpty()) {
-        sufficientRights = false;
-      } else if (dateModes.size() != param.getDateModes().size()) {
-        LOGGER.debug("checkRights: date modes changed from '" + param.getDateModes() 
-            + "' to '" + dateModes + "'");
-        param.setDateModes(dateModes);
-      }
-    }
-    LOGGER.info("checkRights: sufficientRights '" + sufficientRights + "' for param: " 
-        + param);
-    return sufficientRights;
-  }
-  
-  private boolean hasRights(DocumentReference docRef, String rights
-      ) throws ArticleLoadException {
-    boolean ret = false;
-    if (docRef != null) {
-      try {
-        String fullName = webUtilsService.getRefDefaultSerializer().serialize(docRef);
-        ret = getContext().getWiki().getRightService().hasAccessLevel(rights, getContext(
-            ).getUser(), fullName, getContext());
-      } catch (XWikiException xwe) {
-        throw new ArticleLoadException("Failed to check rights '" + rights + "'", xwe);
-      }
-    }
-    LOGGER.debug("hasRights for docRef [" + docRef + "] and rights [" + rights 
-        + "] returned [" + ret + "]");
-    return ret;
-  }
-
   LuceneQuery convertToLuceneQuery(ArticleSearchParameter param) throws XWikiException {
-    String database = param.getBlogSpaceRef().getParent().getName();
-    LuceneQuery query = searchService.createQuery(database);
-
-    DocumentReference articleClassRef = getBlogClasses().getArticleClassRef(database);
-    query.add(searchService.createObjectRestriction(articleClassRef));
-    if (StringUtils.isNotBlank(param.getLanguage())) {
-      query.add(searchService.createFieldRestriction(articleClassRef, 
-          BlogClasses.PROPERTY_ARTICLE_LANG, "\"" + param.getLanguage() + "\""));
+    LuceneQuery query = null;
+    QueryRestrictionGroup blogOrSubsGrp = searchService.createRestrictionGroup(Type.OR);    
+    blogOrSubsGrp.add(getBlogRestriction(param));
+    blogOrSubsGrp.add(getSubsRestrictions(param));    
+    if (!blogOrSubsGrp.isEmpty()) {
+      String database = param.getBlogSpaceRef().getParent().getName();
+      query = searchService.createQuery(database);
+      DocumentReference articleClassRef = getBlogClasses().getArticleClassRef(database);
+      query.add(searchService.createObjectRestriction(articleClassRef));
+      if (StringUtils.isNotBlank(param.getLanguage())) {
+        query.add(searchService.createFieldRestriction(articleClassRef, 
+            BlogClasses.PROPERTY_ARTICLE_LANG, "\"" + param.getLanguage() + "\""));
+      }    
+      query.add(blogOrSubsGrp);
     }
-    
-    query.add(getDateRestrictions(param.getDateModes(), param.getExecutionDate()));
-    
-    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(
-        param.getSubscriptionModes());
-    QueryRestrictionGroup blogOrSubsGrp = searchService.createRestrictionGroup(Type.OR);
-    if (modes.remove(SubscriptionMode.BLOG)) {
-      blogOrSubsGrp.add(searchService.createSpaceRestriction(param.getBlogSpaceRef()));
-    }
-    if (!modes.isEmpty()) {
-      QueryRestrictionGroup subsGrp = searchService.createRestrictionGroup(Type.AND);
-      subsGrp.add(searchService.createFieldRestriction(articleClassRef, 
-          BlogClasses.PROPERTY_ARTICLE_IS_SUBSCRIBABLE, "\"1\""));
-      QueryRestrictionGroup spacesOrGrp = searchService.createRestrictionGroup(Type.OR);
-      for (DocumentReference docRef : param.getSubscribedToBlogs()) {
-        SpaceReference spaceRef = blogService.getBlogSpaceRef(docRef);
-        if (spaceRef != null) {
-          QueryRestrictionGroup spaceGrp = searchService.createRestrictionGroup(Type.AND);
-          spaceGrp.add(searchService.createSpaceRestriction(spaceRef));
-          spaceGrp.add(getArticleSubsRestrictions(modes, docRef));
-          spacesOrGrp.add(spaceGrp);
-        }
-      }
-      subsGrp.add(spacesOrGrp);
-      blogOrSubsGrp.add(subsGrp);
-    }
-    query.add(blogOrSubsGrp);
     return query;
   }
 
-  QueryRestrictionGroup getDateRestrictions(Set<DateMode> modes, Date date) {
-    QueryRestrictionGroup dateRestrGrp = searchService.createRestrictionGroup(Type.OR);
-    if (modes.size() < 3) {
+  // TODO test
+  private IQueryRestriction getBlogRestriction(ArticleSearchParameter param
+      ) throws XWikiException {
+    QueryRestrictionGroup restr = null;
+    if (param.isWithBlogArticles() && hasRights(param.getBlogSpaceRef(), "view")) {
+      IQueryRestriction dateRestr = getDateRestrictions(param.getDateModes(), 
+          param.getExecutionDate(), hasRights(param.getBlogSpaceRef(), "edit"));
+      if (dateRestr != null) {
+        restr = searchService.createRestrictionGroup(Type.AND);
+        restr.add(searchService.createSpaceRestriction(param.getBlogSpaceRef()));
+        restr.add(dateRestr);
+      }
+    }
+    return restr;
+  }
+
+  // TODO test
+  private QueryRestrictionGroup getSubsRestrictions(ArticleSearchParameter param
+      ) throws XWikiException {
+    QueryRestrictionGroup ret = null;
+    QueryRestrictionGroup subsOrGrp = searchService.createRestrictionGroup(Type.OR);
+    for (DocumentReference docRef : param.getSubscribedToBlogs()) {
+      SpaceReference spaceRef = blogService.getBlogSpaceRef(docRef);
+      if (hasRights(spaceRef, "view")) {
+        boolean hasEditRights = hasRights(spaceRef, "edit");
+        IQueryRestriction artSubsRestr = getArticleSubsRestrictions(
+            param.getSubscriptionModes(), docRef, hasEditRights);
+        IQueryRestriction dateRestr = getDateRestrictions(param.getDateModes(), 
+            param.getExecutionDate(), hasEditRights);
+        if ((artSubsRestr != null) && (dateRestr != null)) {
+          QueryRestrictionGroup spaceGrp = searchService.createRestrictionGroup(Type.AND);
+          spaceGrp.add(searchService.createSpaceRestriction(spaceRef));
+          spaceGrp.add(artSubsRestr);
+          spaceGrp.add(dateRestr);
+          subsOrGrp.add(spaceGrp);
+        }
+      }
+    }
+    if (!subsOrGrp.isEmpty()) {
+      ret = searchService.createRestrictionGroup(Type.AND);
+      DocumentReference articleClassRef = getBlogClasses().getArticleClassRef(
+          param.getBlogSpaceRef().getParent().getName());
+      ret.add(searchService.createFieldRestriction(articleClassRef, 
+          BlogClasses.PROPERTY_ARTICLE_IS_SUBSCRIBABLE, "\"1\""));
+      ret.add(subsOrGrp);
+    }
+    return ret;
+  }
+
+  QueryRestrictionGroup getDateRestrictions(Set<DateMode> modes, Date date, 
+      boolean hasEditRights) {
+    QueryRestrictionGroup ret = null;
+    if ((modes.size() < DateMode.values().length) || !hasEditRights) {
       // TODO not-restrictions shouldn't be inclusive of date but rather 
       //      {date TO highdate]). this doesn't work for now, see Ticket #7245
       IQueryRestriction publishRestr = searchService.createFromToDateRestriction(
@@ -198,43 +173,72 @@ public class ArticleEngineLucene implements IArticleEngineRole {
       IQueryRestriction notArchiveRestr = searchService.createFromToDateRestriction(
           ARTICLE_FIELD_ARCHIVE, date,  null, true);      
       if (modes.contains(DateMode.PUBLISHED)) {
-        QueryRestrictionGroup restrGrp = searchService.createRestrictionGroup(Type.AND);
-        restrGrp.add(publishRestr);
-        restrGrp.add(notArchiveRestr);
-        dateRestrGrp.add(restrGrp);
+        QueryRestrictionGroup restrs = searchService.createRestrictionGroup(Type.AND);
+        restrs.add(publishRestr);
+        restrs.add(notArchiveRestr);
+        ret = addRestrToGrp(ret, restrs);
       }
-      if (modes.contains(DateMode.FUTURE)) {
-        dateRestrGrp.add(notPublishRestr);
+      if (modes.contains(DateMode.FUTURE) && hasEditRights) {
+        ret = addRestrToGrp(ret, notPublishRestr);
       }
       if (modes.contains(DateMode.ARCHIVED)) {
-        dateRestrGrp.add(archiveRestr);
+        ret = addRestrToGrp(ret, archiveRestr);
       }    
+    } else {
+      ret = searchService.createRestrictionGroup(Type.OR);
     }
-    return dateRestrGrp;
+    return ret;
+  }
+  
+  private QueryRestrictionGroup addRestrToGrp(QueryRestrictionGroup grp, 
+      IQueryRestriction restr) {
+    if (grp == null) {
+      grp = searchService.createRestrictionGroup(Type.OR);
+    }
+    grp.add(restr);
+    return grp;
   }
 
   QueryRestrictionGroup getArticleSubsRestrictions(Set<SubscriptionMode> modes, 
-      DocumentReference blogConfDocRef) {
-    QueryRestrictionGroup ret = searchService.createRestrictionGroup(Type.AND);
+      DocumentReference blogConfDocRef, boolean hasEditRights) {
+    QueryRestrictionGroup ret = null;
     DocumentReference classRef = getBlogClasses().getBlogArticleSubscriptionClassRef(
         blogConfDocRef.getWikiReference().getName());
-    if (modes.size() < 3) {
-      ret.add(searchService.createObjectRestriction(classRef));
-      ret.add(searchService.createFieldRefRestriction(classRef, 
-          BlogClasses.PROPERTY_ARTICLE_SUBSCRIPTION_SUBSCRIBER, blogConfDocRef));
-      QueryRestrictionGroup doSubsRestrs = searchService.createRestrictionGroup(Type.OR);
-      boolean modeUndecided = modes.contains(SubscriptionMode.UNDECIDED);
-      if (modes.contains(SubscriptionMode.SUBSCRIBED) != modeUndecided) {
-        doSubsRestrs.add(searchService.createFieldRestriction(classRef, 
+    if ((modes.size() < SubscriptionMode.values().length) || !hasEditRights) {
+      QueryRestrictionGroup artSubsRestrs = searchService.createRestrictionGroup(Type.OR);
+      boolean undecided = modes.contains(SubscriptionMode.UNDECIDED) && hasEditRights;
+      if (modes.contains(SubscriptionMode.SUBSCRIBED) != undecided) {
+        artSubsRestrs.add(searchService.createFieldRestriction(classRef, 
             BlogClasses.PROPERTY_ARTICLE_SUBSCRIPTION_DO_SUBSCRIBE, "\"1\""));
       }
-      if (modes.contains(SubscriptionMode.UNSUBSCRIBED) != modeUndecided) {
-        doSubsRestrs.add(searchService.createFieldRestriction(classRef, 
+      if ((modes.contains(SubscriptionMode.UNSUBSCRIBED) != undecided) && hasEditRights) {
+        artSubsRestrs.add(searchService.createFieldRestriction(classRef, 
             BlogClasses.PROPERTY_ARTICLE_SUBSCRIPTION_DO_SUBSCRIBE, "\"0\""));
       }
-      ret.add(doSubsRestrs);
-      ret.setNegate(modeUndecided); // TODO test this if working as intended...
-    }    
+      if (!artSubsRestrs.isEmpty()) {
+        ret = searchService.createRestrictionGroup(Type.AND);
+        ret.add(searchService.createObjectRestriction(classRef));
+        ret.add(searchService.createFieldRefRestriction(classRef, 
+            BlogClasses.PROPERTY_ARTICLE_SUBSCRIPTION_SUBSCRIBER, blogConfDocRef));
+        ret.add(artSubsRestrs);
+        ret.setNegate(undecided); // TODO test this if working as intended...
+      }
+    } else {
+      ret = searchService.createRestrictionGroup(Type.AND);
+    }
+    return ret;
+  }
+  
+  private boolean hasRights(SpaceReference spaceRef, String rights) throws XWikiException {
+    boolean ret = false;
+    if (spaceRef != null) {
+      DocumentReference docRef = nextFreeDocService.getNextUntitledPageDocRef(spaceRef);
+      String fullName = webUtilsService.getRefDefaultSerializer().serialize(docRef);
+      ret = getContext().getWiki().getRightService().hasAccessLevel(rights, getContext(
+          ).getUser(), fullName, getContext());
+    }
+    LOGGER.debug("hasRights for spaceRef [" + spaceRef + "] and rights [" + rights 
+        + "] returned [" + ret + "]");
     return ret;
   }
 

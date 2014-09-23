@@ -11,8 +11,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 import com.celements.blog.article.ArticleSearchParameter.DateMode;
 import com.celements.blog.article.ArticleSearchParameter.SubscriptionMode;
@@ -22,7 +20,6 @@ import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.query.QueryRestrictionGroup;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
@@ -58,191 +55,57 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
   }
   
   @Test
-  public void testCheckRights() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
-    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
-    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(Arrays.asList(
-        SubscriptionMode.values())); 
-    param.setSubscriptionModes(subsModes);
-    Set<DateMode> dateModes = new HashSet<DateMode>(Arrays.asList(DateMode.values()));
-    param.setDateModes(dateModes);
-    
-    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
-        ).andReturn(blogConfDocRef).once();
-    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
-        eq("wiki:space.blog"), same(context))).andReturn(true).once();
-    expect(rightsServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"), 
-        eq("wiki:space.blog"), same(context))).andReturn(true).once();
-    
-    replayDefault();
-    boolean ret = engine.checkRights(param);
-    verifyDefault();
-    
-    assertTrue(ret);
-    assertEquals(subsModes, param.getSubscriptionModes());
-    assertEquals(dateModes, param.getDateModes());
-  }
-  
-  @Test
-  public void testCheckRights_noView() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
-    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
-    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(Arrays.asList(
-        SubscriptionMode.values())); 
-    param.setSubscriptionModes(subsModes);
-    Set<DateMode> dateModes = new HashSet<DateMode>(Arrays.asList(DateMode.values()));
-    param.setDateModes(dateModes);
-    
-    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
-        ).andReturn(blogConfDocRef).once();
-    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
-        eq("wiki:space.blog"), same(context))).andReturn(false).once();
-    
-    replayDefault();
-    boolean ret = engine.checkRights(param);
-    verifyDefault();
-    
-    assertFalse(ret);
-    assertEquals(subsModes, param.getSubscriptionModes());
-    assertEquals(dateModes, param.getDateModes());
-  }
-  
-  @Test
-  public void testCheckRights_noEdit() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
-    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
-    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(Arrays.asList(
-        SubscriptionMode.values())); 
-    param.setSubscriptionModes(subsModes);
-    Set<DateMode> dateModes = new HashSet<DateMode>(Arrays.asList(DateMode.values()));
-    param.setDateModes(dateModes);
-    
-    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
-        ).andReturn(blogConfDocRef).once();
-    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
-        eq("wiki:space.blog"), same(context))).andReturn(true).once();
-    expect(rightsServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"), 
-        eq("wiki:space.blog"), same(context))).andReturn(false).once();
-    
-    replayDefault();
-    boolean ret = engine.checkRights(param);
-    verifyDefault();
-    
-    assertTrue(ret);
-    assertEquals(new HashSet<SubscriptionMode>(Arrays.asList(SubscriptionMode.BLOG, 
-        SubscriptionMode.SUBSCRIBED)), param.getSubscriptionModes());
-    assertEquals(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
-        DateMode.ARCHIVED)), param.getDateModes());
-  }
-  
-  @Test
-  public void testCheckRights_noSubsModes() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
-    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
-    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(Arrays.asList(
-        SubscriptionMode.UNSUBSCRIBED)); 
-    param.setSubscriptionModes(subsModes);
-    Set<DateMode> dateModes = new HashSet<DateMode>(Arrays.asList(DateMode.values()));
-    param.setDateModes(dateModes);
-    
-    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
-        ).andReturn(blogConfDocRef).once();
-    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
-        eq("wiki:space.blog"), same(context))).andReturn(true).once();
-    expect(rightsServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"), 
-        eq("wiki:space.blog"), same(context))).andReturn(false).once();
-    
-    replayDefault();
-    boolean ret = engine.checkRights(param);
-    verifyDefault();
-    
-    assertFalse(ret);
-    assertEquals(param.getSubscriptionModes(), param.getSubscriptionModes());
-    assertEquals(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
-        DateMode.ARCHIVED)), param.getDateModes());
-  }
-  
-  @Test
-  public void testCheckRights_XWE() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
-    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
-    XWikiException cause = new XWikiException();
-    
-    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
-        ).andReturn(blogConfDocRef).once();
-    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
-        eq("wiki:space.blog"), same(context))).andThrow(cause).once();
-    
-    replayDefault();
-    try {
-      engine.checkRights(param);
-      fail("Expecting ALE");
-    } catch (ArticleLoadException ale) {
-      assertSame(cause, ale.getCause());
-    }
-    verifyDefault();
-  }
-  
-  @Test
-  public void testCheckRights_noDateModes() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
-    param.setBlogSpaceRef(new SpaceReference("blogSpace", new WikiReference("wiki")));
-    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>(Arrays.asList(
-        SubscriptionMode.values())); 
-    param.setSubscriptionModes(subsModes);
-    Set<DateMode> dateModes = new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE));
-    param.setDateModes(dateModes);
-    
-    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(param.getBlogSpaceRef()))
-        ).andReturn(blogConfDocRef).once();
-    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq("XWiki.XWikiGuest"), 
-        eq("wiki:space.blog"), same(context))).andReturn(true).once();
-    expect(rightsServiceMock.hasAccessLevel(eq("edit"), eq("XWiki.XWikiGuest"), 
-        eq("wiki:space.blog"), same(context))).andReturn(false).once();
-    
-    replayDefault();
-    boolean ret = engine.checkRights(param);
-    verifyDefault();
-    
-    assertFalse(ret);
-    assertEquals(new HashSet<SubscriptionMode>(Arrays.asList(SubscriptionMode.BLOG, 
-        SubscriptionMode.SUBSCRIBED)), param.getSubscriptionModes());
-    assertEquals(param.getDateModes(), param.getDateModes());
-  }
-  
-  @Test
   public void testGetDateRestrictions_published() {
     Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED));
     Date date = new Date();
-    String dateString = ILuceneSearchService.SDF.format(date);
-    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date);
-    String expectedQuery = "(" + IArticleEngineRole.ARTICLE_FIELD_PUBLISH + ":([" 
-        + ILuceneSearchService.DATE_LOW + " TO " + dateString + "]) AND " 
-        + IArticleEngineRole.ARTICLE_FIELD_ARCHIVE + ":([" + dateString + " TO " 
-        + ILuceneSearchService.DATE_HIGH + "]))";
-    assertEquals(expectedQuery, ret.getQueryString());
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    assertEquals(getPublishedQuery(date), ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetDateRestrictions_published_noEditRights() {
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED));
+    Date date = new Date();
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    assertEquals(getPublishedQuery(date), ret.getQueryString());
   }
   
   @Test
   public void testGetDateRestrictions_archived() {
     Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.ARCHIVED));
     Date date = new Date();
-    String dateString = ILuceneSearchService.SDF.format(date);
-    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date);
-    String expectedQuery = IArticleEngineRole.ARTICLE_FIELD_ARCHIVE + ":([" 
-        + ILuceneSearchService.DATE_LOW + " TO " + dateString + "])";
-    assertEquals(expectedQuery, ret.getQueryString());
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    assertEquals(getArchivedQuery(date), ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetDateRestrictions_archived_noEditRights() {
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.ARCHIVED));
+    Date date = new Date();
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    assertEquals(getArchivedQuery(date), ret.getQueryString());
   }
   
   @Test
   public void testGetDateRestrictions_future() {
     Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE));
     Date date = new Date();
-    String dateString = ILuceneSearchService.SDF.format(date);
-    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date);
-    String expectedQuery = IArticleEngineRole.ARTICLE_FIELD_PUBLISH + ":([" + dateString 
-        + " TO " + ILuceneSearchService.DATE_HIGH + "])";
-    assertEquals(expectedQuery, ret.getQueryString());
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    assertEquals(getFutureQuery(date), ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetDateRestrictions_future_noEditRights() {
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE));
+    Date date = new Date();
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    assertNull(ret);
   }
   
   @Test
@@ -250,14 +113,22 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
         DateMode.ARCHIVED));
     Date date = new Date();
-    String dateString = ILuceneSearchService.SDF.format(date);
-    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date);
-    String expectedQuery = "((" + IArticleEngineRole.ARTICLE_FIELD_PUBLISH + ":([" 
-        + ILuceneSearchService.DATE_LOW + " TO " + dateString + "]) AND " 
-        + IArticleEngineRole.ARTICLE_FIELD_ARCHIVE + ":([" + dateString + " TO " 
-        + ILuceneSearchService.DATE_HIGH + "])) OR " 
-        + IArticleEngineRole.ARTICLE_FIELD_ARCHIVE + ":([" + ILuceneSearchService.DATE_LOW 
-        + " TO " + dateString + "]))";
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getArchivedQuery(date) 
+        + ")";
+    assertEquals(expectedQuery, ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetDateRestrictions_published_archived_noEditRights() {
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
+        DateMode.ARCHIVED));
+    Date date = new Date();
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getArchivedQuery(date) 
+        + ")";
     assertEquals(expectedQuery, ret.getQueryString());
   }
   
@@ -266,15 +137,21 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
         DateMode.FUTURE));
     Date date = new Date();
-    String dateString = ILuceneSearchService.SDF.format(date);
-    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date);
-    String expectedQuery = "((" + IArticleEngineRole.ARTICLE_FIELD_PUBLISH + ":([" 
-        + ILuceneSearchService.DATE_LOW + " TO " + dateString + "]) AND " 
-        + IArticleEngineRole.ARTICLE_FIELD_ARCHIVE + ":([" + dateString + " TO " 
-        + ILuceneSearchService.DATE_HIGH + "])) OR " 
-        + IArticleEngineRole.ARTICLE_FIELD_PUBLISH + ":([" + dateString + " TO " 
-        + ILuceneSearchService.DATE_HIGH + "]))";
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getFutureQuery(date) 
+        + ")";
     assertEquals(expectedQuery, ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetDateRestrictions_published_future_noEditRights() {
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
+        DateMode.FUTURE));
+    Date date = new Date();
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    assertEquals(getPublishedQuery(date), ret.getQueryString());
   }
   
   @Test
@@ -282,13 +159,21 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.ARCHIVED, 
         DateMode.FUTURE));
     Date date = new Date();
-    String dateString = ILuceneSearchService.SDF.format(date);
-    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date);
-    String expectedQuery = "(" + IArticleEngineRole.ARTICLE_FIELD_PUBLISH + ":([" 
-        + dateString + " TO " + ILuceneSearchService.DATE_HIGH + "]) OR " 
-        + IArticleEngineRole.ARTICLE_FIELD_ARCHIVE + ":([" + ILuceneSearchService.DATE_LOW 
-        + " TO " + dateString + "]))";
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    String expectedQuery = "(" + getFutureQuery(date) + " OR " + getArchivedQuery(date) 
+        + ")";
     assertEquals(expectedQuery, ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetDateRestrictions_archived_future_noEditRights() {
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.ARCHIVED, 
+        DateMode.FUTURE));
+    Date date = new Date();
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    assertEquals(getArchivedQuery(date), ret.getQueryString());
   }
   
   @Test
@@ -296,15 +181,60 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
         DateMode.ARCHIVED, DateMode.FUTURE));
     Date date = new Date();
-    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date);
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
     assertEquals("", ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetDateRestrictions_all_noEditRights() {
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
+        DateMode.ARCHIVED, DateMode.FUTURE));
+    Date date = new Date();
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getDateRestrictions(modes, date, hasEditRights);
+    String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getArchivedQuery(date) 
+        + ")";
+    assertEquals(expectedQuery, ret.getQueryString());
+  }
+  
+  private String getArchivedQuery(Date date) {
+    String dateString = ILuceneSearchService.SDF.format(date);
+    return IArticleEngineRole.ARTICLE_FIELD_ARCHIVE + ":([" 
+        + ILuceneSearchService.DATE_LOW + " TO " + dateString + "])";
+  }
+  
+  private String getPublishedQuery(Date date) {
+    String dateString = ILuceneSearchService.SDF.format(date);
+    return "(" + IArticleEngineRole.ARTICLE_FIELD_PUBLISH + ":([" 
+        + ILuceneSearchService.DATE_LOW + " TO " + dateString + "]) AND " 
+        + IArticleEngineRole.ARTICLE_FIELD_ARCHIVE + ":([" + dateString + " TO " 
+        + ILuceneSearchService.DATE_HIGH + "]))";
+  }
+  
+  private String getFutureQuery(Date date) {
+    String dateString = ILuceneSearchService.SDF.format(date);
+    return IArticleEngineRole.ARTICLE_FIELD_PUBLISH + ":([" + dateString 
+        + " TO " + ILuceneSearchService.DATE_HIGH + "])";
   }
 
   @Test
   public void testGetArticleSubsRestrictions_subscribed() {
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED));
-    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef);
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
+    assertEquals("(" + BASE + " AND " + SUBS + ")", ret.getQueryString());
+  }
+
+  @Test
+  public void testGetArticleSubsRestrictions_subscribed_noEditRights() {
+    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.SUBSCRIBED));
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
     assertEquals("(" + BASE + " AND " + SUBS + ")", ret.getQueryString());
   }
 
@@ -312,40 +242,100 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
   public void testGetArticleSubsRestrictions_unsubscribed() {
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNSUBSCRIBED));
-    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef);
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
     assertEquals("(" + BASE + " AND " + UNSUBS + ")", ret.getQueryString());
+  }
+
+  @Test
+  public void testGetArticleSubsRestrictions_unsubscribed_noEditRights() {
+    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.UNSUBSCRIBED));
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
+    assertNull(ret);
   }
 
   @Test
   public void testGetArticleSubsRestrictions_subscribed_unsubscribed() {
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED));
-    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef);
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
     assertEquals("(" + BASE + " AND " + SUBS_UNSUBS + ")", ret.getQueryString());
+  }
+
+  @Test
+  public void testGetArticleSubsRestrictions_subscribed_unsubscribed_noEditRights() {
+    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED));
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
+    assertEquals("(" + BASE + " AND " + SUBS + ")", ret.getQueryString());
   }
 
   @Test
   public void testGetArticleSubsRestrictions_undecided() {
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNDECIDED));
-    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef);
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
     assertEquals("NOT (" + BASE + " AND " + SUBS_UNSUBS + ")", ret.getQueryString());
+  }
+
+  @Test
+  public void testGetArticleSubsRestrictions_undecided_noEditRights() {
+    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.UNDECIDED));
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
+    assertNull(ret);
   }
 
   @Test
   public void testGetArticleSubsRestrictions_undecided_unsubscribed() {
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNDECIDED, SubscriptionMode.UNSUBSCRIBED));
-    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef);
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
     assertEquals("NOT (" + BASE + " AND " + SUBS + ")", ret.getQueryString());
+  }
+
+  @Test
+  public void testGetArticleSubsRestrictions_undecided_unsubscribed_noEditRights() {
+    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.UNDECIDED, SubscriptionMode.UNSUBSCRIBED));
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
+    assertNull(ret);
   }
 
   @Test
   public void testGetArticleSubsRestrictions_undecided_subscribed() {
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNDECIDED, SubscriptionMode.SUBSCRIBED));
-    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef);
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
     assertEquals("NOT (" + BASE + " AND " + UNSUBS + ")", ret.getQueryString());
+  }
+
+  @Test
+  public void testGetArticleSubsRestrictions_undecided_subscribed_noEditRights() {
+    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.UNDECIDED, SubscriptionMode.SUBSCRIBED));
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
+    assertEquals("(" + BASE + " AND " + SUBS + ")", ret.getQueryString());
   }
 
   @Test
@@ -354,8 +344,22 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED, 
         SubscriptionMode.UNDECIDED));
-    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef);
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
     assertEquals("", ret.getQueryString());
+  }
+
+  @Test
+  public void testGetArticleSubsRestrictions_all_noEditRights() {
+    DocumentReference blogConfDocRef = new DocumentReference("wiki", "space", "blog");
+    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED, 
+        SubscriptionMode.UNDECIDED));
+    boolean hasEditRights = false;
+    QueryRestrictionGroup ret = engine.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
+    assertEquals("(" + BASE + " AND " + SUBS + ")", ret.getQueryString());
   }
 
 }
