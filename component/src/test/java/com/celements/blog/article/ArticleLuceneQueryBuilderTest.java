@@ -11,15 +11,21 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.blog.article.ArticleSearchParameter.DateMode;
 import com.celements.blog.article.ArticleSearchParameter.SubscriptionMode;
+import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.nextfreedoc.INextFreeDocRole;
 import com.celements.search.lucene.ILuceneSearchService;
+import com.celements.search.lucene.query.IQueryRestriction;
 import com.celements.search.lucene.query.QueryRestrictionGroup;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
@@ -41,6 +47,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   private XWiki xwiki;
   private XWikiContext context;
   private XWikiRightService rightsServiceMock;
+  private IBlogServiceRole blogServiceMock;
   private INextFreeDocRole nextFreeDocServiceMock;
 
   @Before
@@ -51,8 +58,132 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
         IArticleLuceneQueryBuilderRole.class);
     rightsServiceMock = createMockAndAddToDefault(XWikiRightService.class);
     expect(xwiki.getRightService()).andReturn(rightsServiceMock).anyTimes();
+    blogServiceMock = createMockAndAddToDefault(IBlogServiceRole.class);
+    builder.injectBlogService(blogServiceMock);
     nextFreeDocServiceMock = createMockAndAddToDefault(INextFreeDocRole.class);
     builder.injectNextFreeDocService(nextFreeDocServiceMock);
+  }
+  
+  @Test
+  public void testGetBlogRestriction() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogDocRef(blogConfDocRef);
+    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE)));
+    SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
+    
+    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andReturn(spaceRef).once();
+    expectSpaceRightsCheck(spaceRef, true, true);
+    
+    replayDefault();
+    IQueryRestriction ret = builder.getBlogRestriction(param);
+    verifyDefault();
+    
+    assertEquals("(space:(+\"artSpace\") AND " + getFutureQuery(param.getExecutionDate()) 
+        + ")", ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetBlogRestriction_noEdit() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogDocRef(blogConfDocRef);
+    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.ARCHIVED)));
+    SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
+    
+    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andReturn(spaceRef).once();
+    expectSpaceRightsCheck(spaceRef, true, false);
+    
+    replayDefault();
+    IQueryRestriction ret = builder.getBlogRestriction(param);
+    verifyDefault();
+    
+    assertEquals("(space:(+\"artSpace\") AND " + getArchivedQuery(param.getExecutionDate()) 
+        + ")", ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetBlogRestriction_noEdit_future() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogDocRef(blogConfDocRef);
+    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE)));
+    SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
+    
+    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andReturn(spaceRef).once();
+    expectSpaceRightsCheck(spaceRef, true, false);
+    
+    replayDefault();
+    IQueryRestriction ret = builder.getBlogRestriction(param);
+    verifyDefault();
+    
+    assertNull(ret);
+  }
+  
+  @Test
+  public void testGetBlogRestriction_noView() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogDocRef(blogConfDocRef);
+    SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
+    
+    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andReturn(spaceRef).once();
+    expectSpaceRightsCheck(spaceRef, false, false);
+    
+    replayDefault();
+    IQueryRestriction ret = builder.getBlogRestriction(param);
+    verifyDefault();
+    
+    assertNull(ret);
+  }
+  
+  @Test
+  public void testGetBlogRestriction_withoutBlogArticles() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogDocRef(blogConfDocRef);
+    param.setWithBlogArticles(false);
+    SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
+    
+    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andReturn(spaceRef).once();
+    
+    replayDefault();
+    IQueryRestriction ret = builder.getBlogRestriction(param);
+    verifyDefault();
+    
+    assertNull(ret);
+  }
+  
+  @Test
+  public void testGetBlogRestriction_XWE() throws Exception {
+    ArticleSearchParameter param = new ArticleSearchParameter();
+    param.setBlogDocRef(blogConfDocRef);
+    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE)));
+    
+    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andThrow(
+        new XWikiException()).once();
+    
+    replayDefault();
+    try {
+      builder.getBlogRestriction(param);
+      fail("expecting XWE");
+    } catch (XWikiException exc) {
+      //expected
+    }
+    verifyDefault();
+  }
+  
+  @Test
+  public void testGetSubsRestrictions() {
+    fail("TODO"); // TODO
+  }
+  
+  private void expectSpaceRightsCheck(SpaceReference spaceRef, boolean viewRights, 
+      boolean editRights) throws Exception {;
+      DocumentReference untitledDocRef = new DocumentReference("untitled1", spaceRef);
+      expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(spaceRef))).andReturn(
+          untitledDocRef).atLeastOnce();
+    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq(context.getUser()), 
+        eq(serialize(untitledDocRef)), same(context))).andReturn(viewRights).once();
+    if (viewRights) {
+      expect(rightsServiceMock.hasAccessLevel(eq("edit"), eq(context.getUser()), 
+          eq(serialize(untitledDocRef)), same(context))).andReturn(editRights).once();
+    }
   }
   
   @Test
@@ -361,6 +492,11 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
         hasEditRights);
     assertEquals("(" + BASE + " AND " + SUBS + ")", ret.getQueryString());
+  }
+  
+  private String serialize(DocumentReference docRef) {
+    return Utils.getComponent(IWebUtilsService.class).getRefDefaultSerializer().serialize(
+        docRef);
   }
 
 }

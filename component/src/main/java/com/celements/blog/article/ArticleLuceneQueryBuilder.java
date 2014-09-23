@@ -76,8 +76,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     return query;
   }
 
-  // TODO test
-  private IQueryRestriction getBlogRestriction(ArticleSearchParameter param
+  IQueryRestriction getBlogRestriction(ArticleSearchParameter param
       ) throws XWikiException {
     QueryRestrictionGroup restr = null;
     SpaceReference blogSpaceRef = blogService.getBlogSpaceRef(param.getBlogDocRef());
@@ -93,8 +92,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     return restr;
   }
 
-  // TODO test
-  private QueryRestrictionGroup getSubsRestrictions(ArticleSearchParameter param
+  QueryRestrictionGroup getSubsRestrictions(ArticleSearchParameter param
       ) throws XWikiException {
     QueryRestrictionGroup ret = null;
     QueryRestrictionGroup subsOrGrp = searchService.createRestrictionGroup(Type.OR);
@@ -212,6 +210,10 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
 
   private BlogClasses getBlogClasses() {
     return (BlogClasses) blogClasses;
+  }
+
+  void injectBlogService(IBlogServiceRole blogService) {
+    this.blogService = blogService;
   }
 
   void injectNextFreeDocService(INextFreeDocRole nextFreeDocService) {
