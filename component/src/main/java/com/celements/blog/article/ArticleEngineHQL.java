@@ -68,6 +68,14 @@ public class ArticleEngineHQL implements IArticleEngineRole {
       boolean withUnsubscribed = subsModes.contains(SubscriptionMode.UNSUBSCRIBED);
       boolean withUndecided = subsModes.contains(SubscriptionMode.UNDECIDED);
       boolean checkAccessRights = true;
+      LOGGER.debug(param + "' translated to: blogArticleSpace=" + blogArticleSpace 
+          + ", subscribedBlogs=" + subscribedBlogs + ", language=" + language 
+          + ", archiveOnly=" + archiveOnly + ", futurOnly=" + futurOnly + ", withArchive=" 
+          + withArchive + ", withFutur=" + withFutur + ", subscribableOnly=" 
+          + subscribableOnly + ", withSubscribable=" + withSubscribable 
+          + ", withSubscribed=" + withSubscribed + ", withUnsubscribed=" 
+          + withUnsubscribed + ", withUndecided=" + withUndecided + ", checkAccessRights=" 
+          + checkAccessRights);
       return getBlogArticles(blogArticleSpace, subscribedBlogs, language, archiveOnly, 
           futurOnly, subscribableOnly, withArchive, withFutur, withSubscribable, 
           withSubscribed, withUnsubscribed, withUndecided, checkAccessRights);

@@ -129,6 +129,7 @@ public class BlogPlugin extends XWikiDefaultPlugin{
           context.getDatabase()));
       DocumentReference blogConfDocRef = getBlogService().getBlogConfigDocRef(spaceRef);
       ArticleLoadParameter param = new ArticleLoadParameter();
+      param.setBlogDocRef(blogConfDocRef);
       param.setWithBlogArticles(!subscribableOnly);
       param.setLanguage(language);
       if (withSubscribable) {
@@ -136,6 +137,14 @@ public class BlogPlugin extends XWikiDefaultPlugin{
             withUndecided));
       }
       param.setDateModes(getDateModes(archiveOnly, futurOnly, withArchive, withFutur));
+      LOGGER.debug("Got " + param + "' for: blogArticleSpace=" + blogArticleSpace 
+          + ", subscribedBlogs=" + subscribedBlogsStr + ", language=" + language 
+          + ", archiveOnly=" + archiveOnly + ", futurOnly=" + futurOnly + ", withArchive=" 
+          + withArchive + ", withFutur=" + withFutur + ", subscribableOnly=" 
+          + subscribableOnly + ", withSubscribable=" + withSubscribable 
+          + ", withSubscribed=" + withSubscribed + ", withUnsubscribed=" 
+          + withUnsubscribed + ", withUndecided=" + withUndecided + ", checkAccessRights=" 
+          + checkAccessRights);
       return getBlogService().getArticles(blogConfDocRef, param);
     } catch (XWikiException xwe) {
       throw new ArticleLoadException(xwe);
