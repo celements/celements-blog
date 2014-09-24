@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.blog.article.Article;
+import com.celements.blog.article.ArticleLoadException;
 import com.celements.blog.service.INewsletterAttachmentServiceRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -91,7 +92,7 @@ public class BlogPluginApi extends Api {
    * @throws XWikiException
    */
   public List<Article> getAllArticles(String blogArticleSpace, String subscribedBlogs, 
-      String language) throws XWikiException{
+      String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllArticles");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, false, false, false, true, true, true, true, true, true, false, 
@@ -101,7 +102,7 @@ public class BlogPluginApi extends Api {
   }
   
   public List<Article> getAllWithRightsArticles(String blogArticleSpace, 
-      String subscribedBlogs, String language) throws XWikiException{
+      String subscribedBlogs, String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllWithRightsArticles");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, false, false, false, true, true, true, true, true, true, true, context);
@@ -110,7 +111,7 @@ public class BlogPluginApi extends Api {
   }
   
   public List<Article> getArticles(String blogArticleSpace, String subscribedBlogs, 
-      String language) throws XWikiException{
+      String language) throws ArticleLoadException {
     LOGGER.info("ENTER getArticles");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, false, false, false, false, true, true, true, false, true, true, 
@@ -120,7 +121,7 @@ public class BlogPluginApi extends Api {
   }
   
   public List<Article> getArchivedArticles(String blogArticleSpace, 
-      String subscribedBlogs, String language) throws XWikiException{
+      String subscribedBlogs, String language) throws ArticleLoadException {
     LOGGER.info("ENTER getArchivedArticles");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, true, false, false, true, true, true, true, false, true, true, 
@@ -130,7 +131,7 @@ public class BlogPluginApi extends Api {
   }
   
   public List<Article> getAllFromSubscribedBlogs(String blogArticleSpace, 
-      String subscribedBlogs, String language) throws XWikiException{
+      String subscribedBlogs, String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllFromSubscribedBlogs");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, false, false, true, true, true, true, true, true, true, true, context);
@@ -139,7 +140,7 @@ public class BlogPluginApi extends Api {
   }
   
   public List<Article> getAllNewSubscribable(String blogArticleSpace, String 
-      subscribedBlogs, String language) throws XWikiException{
+      subscribedBlogs, String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllNewSubscribable");
     List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
         language, false, false, true, true, true, true, false, false, true, true, 

@@ -4,13 +4,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
+import com.celements.blog.article.ArticleSearchParameter.DateMode;
+import com.celements.blog.article.ArticleSearchParameter.SubscriptionMode;
 import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.service.IBlogServiceRole;
 import com.xpn.xwiki.XWikiContext;
@@ -28,38 +33,63 @@ public class ArticleEngineHQL implements IArticleEngineRole {
   @Requirement
   private IBlogServiceRole blogService;
 
+  @Requirement
+  private Execution execution;
+  
+  private XWikiContext getContext() {
+    return (XWikiContext) execution.getContext().getProperty(
+        XWikiContext.EXECUTIONCONTEXT_KEY);
+  }
+
   @Override
   public List<Article> getArticles(ArticleSearchParameter param
       ) throws ArticleLoadException {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("TODO");
+    try {
+      String blogArticleSpace = blogService.getBlogSpaceRef(param.getBlogDocRef()).getName();
+      List<String> subscribedBlogs = new ArrayList<String>();
+      for (DocumentReference docRef : param.getSubscribedToBlogs()) {
+        SpaceReference spaceRef = blogService.getBlogSpaceRef(docRef);
+        if (spaceRef != null) {
+          subscribedBlogs.add(spaceRef.getName());
+        }
+      }
+      String language = param.getLanguage();
+      Set<DateMode> dateModes = param.getDateModes();
+      boolean archiveOnly = (dateModes.size() == 1 && dateModes.contains(DateMode.ARCHIVED)) 
+          || (dateModes.size() == 0);
+      boolean futurOnly = (dateModes.size() == 1 && dateModes.contains(DateMode.FUTURE)) 
+          || (dateModes.size() == 0);
+      boolean subscribableOnly = !param.isWithBlogArticles();
+      boolean withArchive = dateModes.contains(DateMode.ARCHIVED);
+      boolean withFutur = dateModes.contains(DateMode.FUTURE);
+      Set<SubscriptionMode> subsModes = param.getSubscriptionModes();
+      boolean withSubscribable = subsModes.size() > 0;
+      boolean withSubscribed = subsModes.contains(SubscriptionMode.SUBSCRIBED);
+      boolean withUnsubscribed = subsModes.contains(SubscriptionMode.UNSUBSCRIBED);
+      boolean withUndecided = subsModes.contains(SubscriptionMode.UNDECIDED);
+      boolean checkAccessRights = true;
+      return getBlogArticles(blogArticleSpace, subscribedBlogs, language, archiveOnly, 
+          futurOnly, subscribableOnly, withArchive, withFutur, withSubscribable, 
+          withSubscribed, withUnsubscribed, withUndecided, checkAccessRights);
+    } catch (XWikiException xwe) {
+      throw new ArticleLoadException(xwe);
+    }
   }
   
-  public List<Article> getBlogArticles(String blogArticleSpace, String subscribedBlogsStr,
+  List<Article> getBlogArticles(String blogArticleSpace, List<String> subscribedBlogs,
       String language, boolean archiveOnly, boolean futurOnly, boolean subscribableOnly,
       boolean withArchive, boolean withFutur, boolean withSubscribable,
       boolean withSubscribed, boolean withUnsubscribed, boolean withUndecided, 
-      boolean checkAccessRights, XWikiContext context) throws XWikiException{
+      boolean checkAccessRights) throws XWikiException {
     List<Article> articles = new ArrayList<Article>();
-    List<String> subscribedBlogs = new ArrayList<String>();
-    String[] subscribedBlogArray = subscribedBlogsStr.split(",");
-    for (int i = 0; i < subscribedBlogArray.length; i++) {
-      if((subscribedBlogArray[i] != null) 
-          && (subscribedBlogArray[i].trim().length() > 0)){
-        LOGGER.info("Subscribed to Blog: '" + subscribedBlogArray[i] + "'");
-        subscribedBlogs.add(subscribedBlogArray[i]);
-      }
-    }
-    String hql = getHQL(blogArticleSpace, language, subscribedBlogs, withSubscribable, 
-        context);
-    getArticlesFromDocs(articles, context.getWiki().search(hql, context), 
-        blogArticleSpace, context);
+    String hql = getHQL(blogArticleSpace, language, subscribedBlogs, withSubscribable);
+    getArticlesFromDocs(articles, getContext().getWiki().search(hql, getContext()), 
+        blogArticleSpace);
     LOGGER.info("Total articles found: '" + articles.size() + "'");
-    filterTimespan(articles, language, withArchive, archiveOnly, withFutur, futurOnly, 
-        context);
+    filterTimespan(articles, language, withArchive, archiveOnly, withFutur, futurOnly);
     LOGGER.info("Total articles after Timespanfilter: '" + articles.size() + "'");
     filterRightsAndSubscription(articles, blogArticleSpace, language, withUnsubscribed, 
-        withUndecided, withSubscribed, subscribableOnly, checkAccessRights, context);
+        withUndecided, withSubscribed, subscribableOnly, checkAccessRights);
     LOGGER.info("Total articles returned: " + articles.size());
     return articles;
   }
@@ -68,7 +98,7 @@ public class ArticleEngineHQL implements IArticleEngineRole {
   private void filterRightsAndSubscription(List<Article> articles, 
       String blogArticleSpace, String language, boolean withUnsubscribed, 
       boolean withUndecided, boolean withSubscribed, boolean subscribableOnly, 
-      boolean checkRights, XWikiContext context) throws XWikiException {
+      boolean checkRights) throws XWikiException {
     List<Article> deleteArticles = new ArrayList<Article>();
     XWikiDocument spaceBlogDoc = blogService.getBlogPageByBlogSpace(blogArticleSpace);
     if(spaceBlogDoc == null){
@@ -76,17 +106,17 @@ public class ArticleEngineHQL implements IArticleEngineRole {
           + "')");
       deleteArticles.addAll(articles);
     } else{
-      Document origBlogDoc = spaceBlogDoc.newDocument(context);
+      Document origBlogDoc = spaceBlogDoc.newDocument(getContext());
       for (Iterator<Article> artIter = articles.iterator(); artIter.hasNext();) {
         Article article = (Article) artIter.next();
         try {
-          XWikiDocument articleDoc = context.getWiki().getDocument(
-              article.getDocumentReference(), context);
+          XWikiDocument articleDoc = getContext().getWiki().getDocument(
+              article.getDocumentReference(), getContext());
           DocumentReference blogDocRef = blogService.getBlogDocRefByBlogSpace(
               articleDoc.getDocumentReference().getLastSpaceReference().getName());
           LOGGER.debug("articleDoc='" + articleDoc + "', " + blogDocRef);
-          Document blogDoc = context.getWiki().getDocument(blogDocRef, context
-              ).newDocument(context);
+          Document blogDoc = getContext().getWiki().getDocument(blogDocRef, getContext()
+              ).newDocument(getContext());
           boolean hasRight = false;
           boolean hasEditOnBlog = false;
           if(checkRights || !blogDoc.hasProgrammingRights()){
@@ -162,9 +192,8 @@ public class ArticleEngineHQL implements IArticleEngineRole {
     }
   }
 
-  private void filterTimespan(List<Article> articles, String language, 
-      boolean withArchive, boolean archiveOnly, boolean withFutur, boolean futurOnly, 
-      XWikiContext context){
+  void filterTimespan(List<Article> articles, String language, 
+      boolean withArchive, boolean archiveOnly, boolean withFutur, boolean futurOnly){
     Date now = new Date();
     List<Article> deleteArticles = new ArrayList<Article>();
     for (Iterator<Article> artIter = articles.iterator(); artIter.hasNext();) {
@@ -192,14 +221,15 @@ public class ArticleEngineHQL implements IArticleEngineRole {
   }
   
   private void getArticlesFromDocs(List<Article> articles, List<Object> articleDocNames, 
-      String blogArticleSpace, XWikiContext context) throws XWikiException{
+      String blogArticleSpace) throws XWikiException{
     LOGGER.debug("Matching articles found: " + articleDocNames.size());
     for (Object articleFullNameObj : articleDocNames) {
       String articleFullName = (String) articleFullNameObj.toString();
-      XWikiDocument articleDoc = context.getWiki().getDocument(articleFullName, context);
+      XWikiDocument articleDoc = getContext().getWiki().getDocument(articleFullName, 
+          getContext());
       Article article = null;
       try{
-        article = new Article(articleDoc.newDocument(context), context);
+        article = new Article(articleDoc.newDocument(getContext()), getContext());
       } catch (EmptyArticleException e) {
         LOGGER.info(e);
       }
@@ -211,8 +241,7 @@ public class ArticleEngineHQL implements IArticleEngineRole {
   }
   
   private String getHQL(String blogArticleSpace, String language, 
-      List<String> subscribedBlogs, boolean withSubscribable, XWikiContext context) 
-      throws XWikiException{
+      List<String> subscribedBlogs, boolean withSubscribable) throws XWikiException {
     String useInt = " ";
     String subscribableHQL = "";
     String subscribedBlogsStr = "";
@@ -228,7 +257,7 @@ public class ArticleEngineHQL implements IArticleEngineRole {
       for (Iterator<String> blogIter = subscribedBlogs.iterator(); blogIter.hasNext();) {
         String blogSpace = (String) blogIter.next();
         Document blogDoc = blogService.getBlogPageByBlogSpace(blogSpace).newDocument(
-            context);
+            getContext());
         com.xpn.xwiki.api.Object obj = blogDoc.getObject("Celements2.BlogConfigClass");
         Property prop = obj.getProperty("is_subscribable");
         LOGGER.debug("blogDoc is '" + blogDoc.getFullName() + "' and obj is '" + obj + 
@@ -268,6 +297,10 @@ public class ArticleEngineHQL implements IArticleEngineRole {
     
     LOGGER.debug("hql built: " + hql);
     return hql;
+  }
+
+  void injectBlogService(IBlogServiceRole blogService) {
+    this.blogService = blogService;
   }
 
 }

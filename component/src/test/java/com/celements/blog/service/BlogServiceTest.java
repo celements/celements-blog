@@ -289,6 +289,11 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
     assertEquals(Arrays.asList(docRef1, docRef3), ret);
   }
   
+  @Test
+  public void testGetArticles() {
+    fail("TODO"); // TODO
+  }
+  
   private XWikiDocument getBlogDoc(DocumentReference docRef, String field, String val) {
     XWikiDocument doc = new XWikiDocument(docRef);
     BaseObject blogObj = new BaseObject();
