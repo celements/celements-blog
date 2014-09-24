@@ -9,13 +9,16 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 
+import com.celements.blog.article.Article;
+import com.celements.blog.article.ArticleLoadParameter;
 import com.celements.blog.plugin.EmailAddressDate;
 import com.celements.blog.plugin.NewsletterReceivers;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component("celblog")
 public class BlogScriptService implements ScriptService {
@@ -70,11 +73,42 @@ public class BlogScriptService implements ScriptService {
   }
 
   public DocumentReference getBlogDocRefByBlogSpace(String blogSpaceName) {
-    XWikiDocument blogPageByBlogSpace = blogService.getBlogPageByBlogSpace(blogSpaceName); 
-    if (blogPageByBlogSpace != null) {
-      return blogPageByBlogSpace.getDocumentReference();
+    return getBlogDocRefForSpaceRef(new SpaceReference(blogSpaceName, new WikiReference(
+        getContext().getDatabase())));
+  }
+
+  public DocumentReference getBlogDocRefForSpaceRef(SpaceReference spaceRef) {
+    DocumentReference ret = null;
+    try {
+      if (spaceRef != null) {
+        ret = blogService.getBlogConfigDocRef(spaceRef);
+      }
+    } catch (Exception exc) {
+      LOGGER.error("Error getting blog config for '" + spaceRef + "'", exc);
     }
-    return null;
+    return ret;
+  }
+  
+  public ArticleLoadParameter getNewArticleLoadParameter() {
+    return new ArticleLoadParameter();
+  }
+  
+  public List<Article> getArticles(DocumentReference blogConfDocRef) {
+    return getArticles(blogConfDocRef, null);
+  }
+  
+  public List<Article> getArticles(DocumentReference blogConfDocRef, 
+      ArticleLoadParameter param) {
+    List<Article> ret = Collections.emptyList();
+    try {
+      if (blogConfDocRef != null) {
+        ret = blogService.getArticles(blogConfDocRef, param);
+      }
+    } catch (Exception exc) {
+      LOGGER.error("Error getting articles for '" + blogConfDocRef + "' and param '" 
+          + param + "'", exc);
+    }
+    return ret;
   }
 
 }
