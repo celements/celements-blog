@@ -91,7 +91,7 @@ public class BlogPlugin extends XWikiDefaultPlugin{
   }
   
   /**
-   * @deprecated since 1.31 instead use {@link BlogService#getArticles(DocumentReference, 
+   * @deprecated since 1.32 instead use {@link BlogService#getArticles(DocumentReference, 
    *        ArticleSearchParameter)}
    * 
    * @param blogArticleSpace Space where the blog's articles are saved.
@@ -118,7 +118,6 @@ public class BlogPlugin extends XWikiDefaultPlugin{
    * @return
    * @throws XWikiException
    */
-  // TODO mark deprecated
   @Deprecated
   public List<Article> getBlogArticles(String blogArticleSpace, String subscribedBlogsStr,
       String language, boolean archiveOnly, boolean futurOnly, boolean subscribableOnly,

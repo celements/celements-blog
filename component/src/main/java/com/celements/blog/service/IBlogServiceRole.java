@@ -17,7 +17,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public interface IBlogServiceRole {
 
   /**
-   * @deprecated instead use {@link #getBlogConfigDocRef(SpaceReference)}
+   * @deprecated since 1.32 instead use {@link #getBlogConfigDocRef(SpaceReference)}
    * 
    * @param blogSpaceName
    * @return
@@ -26,7 +26,7 @@ public interface IBlogServiceRole {
   public DocumentReference getBlogDocRefByBlogSpace(String blogSpaceName);
 
   /**
-   * @deprecated instead use {@link #getBlogConfigDocRef(SpaceReference)}
+   * @deprecated since 1.32 instead use {@link #getBlogConfigDocRef(SpaceReference)}
    * 
    * @param blogSpaceName
    * @return
