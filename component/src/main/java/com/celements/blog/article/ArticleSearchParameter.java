@@ -20,23 +20,16 @@ public class ArticleSearchParameter {
     PUBLISHED, ARCHIVED, FUTURE;
   }
 
-  private static final Set<DateMode> DEFAULT_DATE_MODES = Collections.unmodifiableSet(
-      new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED)));
-  private static final Set<SubscriptionMode> DEFAULT_SUBSCRIPTION_MODES = 
-      Collections.unmodifiableSet(new HashSet<SubscriptionMode>(Arrays.asList(
-      SubscriptionMode.SUBSCRIBED)));
-  private static final int DEFAULT_OFFSET = 0;
-  private static final int DEFAULT_LIMIT = 0;
-
   private Date executionDate = new Date();
   private DocumentReference blogDocRef;
   private boolean withBlogArticles = true;
   private List<DocumentReference> subscribedToBlogs = Collections.emptyList();
-  private Set<DateMode> dateModes = DEFAULT_DATE_MODES;
-  private Set<SubscriptionMode> subsModes = DEFAULT_SUBSCRIPTION_MODES;
+  private Set<DateMode> dateModes = Collections.unmodifiableSet(
+      new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED)));
+  private Set<SubscriptionMode> subsModes = Collections.emptySet();
   private String language = null;
-  private int offset = DEFAULT_OFFSET;
-  private int limit = DEFAULT_LIMIT;
+  private int offset = 0;
+  private int limit = 0;
   private List<String> sortFields = Collections.emptyList();
   
   public ArticleSearchParameter() {
@@ -85,11 +78,7 @@ public class ArticleSearchParameter {
   }
 
   public ArticleSearchParameter setDateModes(Set<DateMode> dateModes) {
-    if ((dateModes != null) && dateModes.size() > 0) {
-      this.dateModes = Collections.unmodifiableSet(dateModes);
-    } else {
-      this.dateModes = DEFAULT_DATE_MODES;
-    }
+    this.dateModes = Collections.unmodifiableSet(dateModes);
     return this;
   }
 
@@ -98,11 +87,7 @@ public class ArticleSearchParameter {
   }
 
   public ArticleSearchParameter setSubscriptionModes(Set<SubscriptionMode> subsModes) {
-    if ((subsModes != null) && subsModes.size() > 0) {
-      this.subsModes = Collections.unmodifiableSet(subsModes);
-    } else {
-      this.subsModes = DEFAULT_SUBSCRIPTION_MODES;
-    }
+    this.subsModes = Collections.unmodifiableSet(subsModes);
     return this;
   }
 
@@ -123,7 +108,7 @@ public class ArticleSearchParameter {
     if (offset > 0) {
       this.offset = offset;
     } else {
-      this.offset = DEFAULT_OFFSET;
+      this.offset = 0;
     }
     return this;
   }
@@ -136,7 +121,7 @@ public class ArticleSearchParameter {
     if (limit > 0) {
       this.limit = limit;
     } else {
-      this.limit = DEFAULT_LIMIT;
+      this.limit = 0;
     }
     return this;
   }
