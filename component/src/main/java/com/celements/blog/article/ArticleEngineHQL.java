@@ -45,12 +45,13 @@ public class ArticleEngineHQL implements IArticleEngineRole {
   public List<Article> getArticles(ArticleLoadParameter param
       ) throws ArticleLoadException {
     try {
-      String blogArticleSpace = blogService.getBlogSpaceRef(param.getBlogDocRef()).getName();
+      SpaceReference spaceRef = blogService.getBlogSpaceRef(param.getBlogDocRef());
+      String blogArticleSpace = spaceRef != null ? spaceRef.getName() : "";
       List<String> subscribedBlogs = new ArrayList<String>();
-      for (DocumentReference docRef : param.getSubscribedToBlogs()) {
-        SpaceReference spaceRef = blogService.getBlogSpaceRef(docRef);
-        if (spaceRef != null) {
-          subscribedBlogs.add(spaceRef.getName());
+      for (DocumentReference subsDocRef : param.getSubscribedToBlogs()) {
+        SpaceReference subsSpaceRef = blogService.getBlogSpaceRef(subsDocRef);
+        if (subsSpaceRef != null) {
+          subscribedBlogs.add(subsSpaceRef.getName());
         }
       }
       String language = param.getLanguage();
