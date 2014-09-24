@@ -37,7 +37,7 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetArticles() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
+    ArticleLoadParameter param = new ArticleLoadParameter();
     List<String> sortFields = Arrays.asList("field1", "field2");
     param.setSortFields(sortFields);
     String language = "de";
@@ -67,7 +67,7 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetArticles_XWE() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
+    ArticleLoadParameter param = new ArticleLoadParameter();
     XWikiException cause = new XWikiException();
     
     expect(queryBuilderMock.build(same(param))).andThrow(cause).once();
@@ -84,7 +84,7 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetArticles_LSE() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
+    ArticleLoadParameter param = new ArticleLoadParameter();
     List<String> sortFields = Arrays.asList("field1", "field2");
     param.setSortFields(sortFields);
     String language = "de";

@@ -41,7 +41,7 @@ public class ArticleEngineLucene implements IArticleEngineRole {
   }
 
   @Override
-  public List<Article> getArticles(ArticleSearchParameter param
+  public List<Article> getArticles(ArticleLoadParameter param
       ) throws ArticleLoadException {
     try {
       List<Article> articles = new ArrayList<Article>();

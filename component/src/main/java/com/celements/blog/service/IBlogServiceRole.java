@@ -9,7 +9,7 @@ import org.xwiki.query.QueryException;
 
 import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadException;
-import com.celements.blog.article.ArticleSearchParameter;
+import com.celements.blog.article.ArticleLoadParameter;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -76,7 +76,7 @@ public interface IBlogServiceRole {
       ) throws QueryException, XWikiException;
   
   /**
-   * gets articles as list for given {@link ArticleSearchParameter}
+   * gets articles as list for given {@link ArticleLoadParameter}
    * 
    * @param blogConfDocRef may not be null
    * @param param may not be null
@@ -84,6 +84,6 @@ public interface IBlogServiceRole {
    * @throws ArticleLoadException if there was an error loading articles
    */
   public List<Article> getArticles(DocumentReference blogConfDocRef, 
-      ArticleSearchParameter param) throws ArticleLoadException;
+      ArticleLoadParameter param) throws ArticleLoadException;
 
 }

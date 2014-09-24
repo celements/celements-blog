@@ -15,8 +15,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
-import com.celements.blog.article.ArticleSearchParameter.DateMode;
-import com.celements.blog.article.ArticleSearchParameter.SubscriptionMode;
+import com.celements.blog.article.ArticleLoadParameter.DateMode;
+import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.nextfreedoc.INextFreeDocRole;
@@ -67,7 +67,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   
   @Test
   public void testGetBlogRestriction() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
+    ArticleLoadParameter param = new ArticleLoadParameter();
     param.setBlogDocRef(blogConfDocRef);
     param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE)));
     SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
@@ -85,7 +85,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   
   @Test
   public void testGetBlogRestriction_noEdit() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
+    ArticleLoadParameter param = new ArticleLoadParameter();
     param.setBlogDocRef(blogConfDocRef);
     param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.ARCHIVED)));
     SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
@@ -103,7 +103,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   
   @Test
   public void testGetBlogRestriction_noEdit_future() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
+    ArticleLoadParameter param = new ArticleLoadParameter();
     param.setBlogDocRef(blogConfDocRef);
     param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE)));
     SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
@@ -120,7 +120,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   
   @Test
   public void testGetBlogRestriction_noView() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
+    ArticleLoadParameter param = new ArticleLoadParameter();
     param.setBlogDocRef(blogConfDocRef);
     SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
     
@@ -136,7 +136,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   
   @Test
   public void testGetBlogRestriction_withoutBlogArticles() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
+    ArticleLoadParameter param = new ArticleLoadParameter();
     param.setBlogDocRef(blogConfDocRef);
     param.setWithBlogArticles(false);
     SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
@@ -152,7 +152,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   
   @Test
   public void testGetBlogRestriction_XWE() throws Exception {
-    ArticleSearchParameter param = new ArticleSearchParameter();
+    ArticleLoadParameter param = new ArticleLoadParameter();
     param.setBlogDocRef(blogConfDocRef);
     param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE)));
     

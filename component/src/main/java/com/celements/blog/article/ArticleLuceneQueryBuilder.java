@@ -12,8 +12,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.blog.article.ArticleSearchParameter.DateMode;
-import com.celements.blog.article.ArticleSearchParameter.SubscriptionMode;
+import com.celements.blog.article.ArticleLoadParameter.DateMode;
+import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.classes.IClassCollectionRole;
@@ -57,7 +57,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
   }
 
   @Override
-  public LuceneQuery build(ArticleSearchParameter param) throws XWikiException {
+  public LuceneQuery build(ArticleLoadParameter param) throws XWikiException {
     LuceneQuery query = null;
     QueryRestrictionGroup blogOrSubsGrp = searchService.createRestrictionGroup(Type.OR);    
     blogOrSubsGrp.add(getBlogRestriction(param));
@@ -76,7 +76,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     return query;
   }
 
-  IQueryRestriction getBlogRestriction(ArticleSearchParameter param
+  IQueryRestriction getBlogRestriction(ArticleLoadParameter param
       ) throws XWikiException {
     QueryRestrictionGroup restr = null;
     SpaceReference blogSpaceRef = blogService.getBlogSpaceRef(param.getBlogDocRef());
@@ -92,7 +92,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     return restr;
   }
 
-  QueryRestrictionGroup getSubsRestrictions(ArticleSearchParameter param
+  QueryRestrictionGroup getSubsRestrictions(ArticleLoadParameter param
       ) throws XWikiException {
     QueryRestrictionGroup ret = null;
     QueryRestrictionGroup subsOrGrp = searchService.createRestrictionGroup(Type.OR);
@@ -187,7 +187,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
         ret.add(searchService.createFieldRefRestriction(classRef, 
             BlogClasses.PROPERTY_ARTICLE_SUBSCRIPTION_SUBSCRIBER, blogConfDocRef));
         ret.add(artSubsRestrs);
-        ret.setNegate(undecided); // TODO test this if working as intended...
+        ret.setNegate(undecided);
       }
     } else {
       ret = searchService.createRestrictionGroup(Type.AND);

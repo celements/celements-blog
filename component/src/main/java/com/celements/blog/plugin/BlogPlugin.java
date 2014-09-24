@@ -40,9 +40,9 @@ import org.xwiki.query.QueryException;
 
 import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadException;
-import com.celements.blog.article.ArticleSearchParameter;
-import com.celements.blog.article.ArticleSearchParameter.DateMode;
-import com.celements.blog.article.ArticleSearchParameter.SubscriptionMode;
+import com.celements.blog.article.ArticleLoadParameter;
+import com.celements.blog.article.ArticleLoadParameter.DateMode;
+import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
 import com.celements.blog.service.BlogService;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.blog.service.INewsletterAttachmentServiceRole;
@@ -92,7 +92,7 @@ public class BlogPlugin extends XWikiDefaultPlugin{
   
   /**
    * @deprecated since 1.32 instead use {@link BlogService#getArticles(DocumentReference, 
-   *        ArticleSearchParameter)}
+   *        ArticleLoadParameter)}
    * 
    * @param blogArticleSpace Space where the blog's articles are saved.
    * @param subscribedBlogsStr Comma separated String with all the blog article spaces 
@@ -128,7 +128,7 @@ public class BlogPlugin extends XWikiDefaultPlugin{
       SpaceReference spaceRef = new SpaceReference(blogArticleSpace, new WikiReference(
           context.getDatabase()));
       DocumentReference blogConfDocRef = getBlogService().getBlogConfigDocRef(spaceRef);
-      ArticleSearchParameter param = new ArticleSearchParameter();
+      ArticleLoadParameter param = new ArticleLoadParameter();
       param.setWithBlogArticles(!subscribableOnly);
       param.setLanguage(language);
       if (withSubscribable) {

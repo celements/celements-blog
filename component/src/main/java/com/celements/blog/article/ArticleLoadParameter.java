@@ -10,7 +10,7 @@ import java.util.Set;
 import org.xwiki.model.reference.DocumentReference;
 
 // TODO javadoc for fields (see BlogPlugin)
-public class ArticleSearchParameter {
+public class ArticleLoadParameter {
   
   public enum SubscriptionMode {
     SUBSCRIBED, UNSUBSCRIBED, UNDECIDED;
@@ -32,7 +32,7 @@ public class ArticleSearchParameter {
   private int limit = 0;
   private List<String> sortFields = Collections.emptyList();
   
-  public ArticleSearchParameter() {
+  public ArticleLoadParameter() {
   }
 
   public Date getExecutionDate() {
@@ -47,7 +47,7 @@ public class ArticleSearchParameter {
     return blogDocRef;
   }
   
-  public ArticleSearchParameter setBlogDocRef(DocumentReference blogDocRef) {
+  public ArticleLoadParameter setBlogDocRef(DocumentReference blogDocRef) {
     this.blogDocRef = blogDocRef;
     return this;
   }
@@ -64,7 +64,7 @@ public class ArticleSearchParameter {
     return subscribedToBlogs;
   }
 
-  public ArticleSearchParameter setSubscribedToBlogs(List<DocumentReference> docRefs) {
+  public ArticleLoadParameter setSubscribedToBlogs(List<DocumentReference> docRefs) {
     if (docRefs != null) {
       this.subscribedToBlogs = Collections.unmodifiableList(docRefs);
     } else {
@@ -77,7 +77,7 @@ public class ArticleSearchParameter {
     return dateModes;
   }
 
-  public ArticleSearchParameter setDateModes(Set<DateMode> dateModes) {
+  public ArticleLoadParameter setDateModes(Set<DateMode> dateModes) {
     this.dateModes = Collections.unmodifiableSet(dateModes);
     return this;
   }
@@ -86,7 +86,7 @@ public class ArticleSearchParameter {
     return subsModes;
   }
 
-  public ArticleSearchParameter setSubscriptionModes(Set<SubscriptionMode> subsModes) {
+  public ArticleLoadParameter setSubscriptionModes(Set<SubscriptionMode> subsModes) {
     this.subsModes = Collections.unmodifiableSet(subsModes);
     return this;
   }
@@ -95,7 +95,7 @@ public class ArticleSearchParameter {
     return language;
   }
 
-  public ArticleSearchParameter setLanguage(String language) {
+  public ArticleLoadParameter setLanguage(String language) {
     this.language = language;
     return this;
   }
@@ -104,7 +104,7 @@ public class ArticleSearchParameter {
     return offset;
   }
 
-  public ArticleSearchParameter setOffset(int offset) {
+  public ArticleLoadParameter setOffset(int offset) {
     if (offset > 0) {
       this.offset = offset;
     } else {
@@ -117,7 +117,7 @@ public class ArticleSearchParameter {
     return limit;
   }
 
-  public ArticleSearchParameter setLimit(int limit) {
+  public ArticleLoadParameter setLimit(int limit) {
     if (limit > 0) {
       this.limit = limit;
     } else {
@@ -130,7 +130,7 @@ public class ArticleSearchParameter {
     return sortFields;
   }
 
-  public ArticleSearchParameter setSortFields(List<String> sortFields) {
+  public ArticleLoadParameter setSortFields(List<String> sortFields) {
     if (sortFields != null) {
       this.sortFields = Collections.unmodifiableList(sortFields);
     } else {

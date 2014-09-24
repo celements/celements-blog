@@ -25,7 +25,7 @@ import org.xwiki.query.QueryManager;
 
 import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadException;
-import com.celements.blog.article.ArticleSearchParameter;
+import com.celements.blog.article.ArticleLoadParameter;
 import com.celements.blog.article.IArticleEngineRole;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.common.classes.IClassCollectionRole;
@@ -181,10 +181,10 @@ public class BlogService implements IBlogServiceRole {
 
   @Override
   public List<Article> getArticles(DocumentReference blogConfDocRef, 
-      ArticleSearchParameter param) throws ArticleLoadException {
+      ArticleLoadParameter param) throws ArticleLoadException {
     try {
       if (param == null) {
-        param = new ArticleSearchParameter();
+        param = new ArticleLoadParameter();
       }
       param.setExecutionDate(new Date());
       param.setBlogDocRef(blogConfDocRef);

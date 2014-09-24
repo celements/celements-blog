@@ -14,8 +14,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
-import com.celements.blog.article.ArticleSearchParameter.DateMode;
-import com.celements.blog.article.ArticleSearchParameter.SubscriptionMode;
+import com.celements.blog.article.ArticleLoadParameter.DateMode;
+import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
 import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.service.IBlogServiceRole;
 import com.xpn.xwiki.XWikiContext;
@@ -42,7 +42,7 @@ public class ArticleEngineHQL implements IArticleEngineRole {
   }
 
   @Override
-  public List<Article> getArticles(ArticleSearchParameter param
+  public List<Article> getArticles(ArticleLoadParameter param
       ) throws ArticleLoadException {
     try {
       String blogArticleSpace = blogService.getBlogSpaceRef(param.getBlogDocRef()).getName();

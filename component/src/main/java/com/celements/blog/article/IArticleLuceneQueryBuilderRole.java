@@ -14,6 +14,6 @@ public interface IArticleLuceneQueryBuilderRole {
   static final String ARTICLE_FIELD_ARCHIVE = BlogClasses.ARTICLE_CLASS + "." 
       + BlogClasses.PROPERTY_ARTICLE_ARCHIVE_DATE;
   
-  public LuceneQuery build(ArticleSearchParameter param) throws XWikiException;
+  public LuceneQuery build(ArticleLoadParameter param) throws XWikiException;
 
 }
