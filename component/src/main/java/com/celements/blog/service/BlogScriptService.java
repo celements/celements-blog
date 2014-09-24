@@ -89,7 +89,7 @@ public class BlogScriptService implements ScriptService {
     return ret;
   }
   
-  public ArticleLoadParameter getNewArticleLoadParameter() {
+  public ArticleLoadParameter newArticleLoadParameter() {
     return new ArticleLoadParameter();
   }
   

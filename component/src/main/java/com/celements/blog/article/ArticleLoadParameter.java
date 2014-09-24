@@ -82,6 +82,14 @@ public class ArticleLoadParameter {
     return this;
   }
 
+  public ArticleLoadParameter setDateModes(List<String> modeStrs) {
+    Set<DateMode> modes = new HashSet<DateMode>();
+    for (String modeStr : modeStrs) {
+      modes.add(DateMode.valueOf(modeStr.toUpperCase()));
+    }
+    return setDateModes(modes);
+  }
+
   public Set<SubscriptionMode> getSubscriptionModes() {
     return subsModes;
   }
@@ -89,6 +97,14 @@ public class ArticleLoadParameter {
   public ArticleLoadParameter setSubscriptionModes(Set<SubscriptionMode> subsModes) {
     this.subsModes = Collections.unmodifiableSet(subsModes);
     return this;
+  }
+
+  public ArticleLoadParameter setSubscriptionModes(List<String> modeStrs) {
+    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>();
+    for (String modeStr : modeStrs) {
+      modes.add(SubscriptionMode.valueOf(modeStr.toUpperCase()));
+    }
+    return setSubscriptionModes(modes);
   }
 
   public String getLanguage() {
