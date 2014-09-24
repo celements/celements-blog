@@ -66,8 +66,10 @@ public class BlogService implements IBlogServiceRole {
   @Override
   public DocumentReference getBlogDocRefByBlogSpace(String blogSpaceName) {
     try {
-      return getBlogConfigDocRef(webUtils.resolveSpaceReference(blogSpaceName, 
-          new WikiReference(getContext().getDatabase())));
+      if (StringUtils.isNotBlank(blogSpaceName)) {
+        return getBlogConfigDocRef(webUtils.resolveSpaceReference(blogSpaceName, 
+            new WikiReference(getContext().getDatabase())));
+      }
     } catch (QueryException qex) {
       LOGGER.error("Failed to parse xwql query to get BlogDocRef for blog space ["
           + blogSpaceName + "].", qex);
@@ -110,7 +112,7 @@ public class BlogService implements IBlogServiceRole {
     if (blogCache == null) {
       Map<SpaceReference, List<DocumentReference>> map = 
           new HashMap<SpaceReference, List<DocumentReference>>();
-      String xqwl = "from doc.object(" + BlogClasses.BLOG_CONFIG_CLASS + ")";
+      String xqwl = "from doc.object(" + BlogClasses.BLOG_CONFIG_CLASS + ") as obj";
       Query query = queryManager.createQuery(xqwl, Query.XWQL).setWiki(wikiRef.getName());
       for (String result : query.<String>execute()) {
         DocumentReference docRef = webUtils.resolveDocumentReference(result, wikiRef);

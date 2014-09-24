@@ -54,10 +54,10 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
     SpaceReference spaceRef = new SpaceReference("blogSpace", wikiRef);
     XWikiDocument doc = getBlogDoc(docRef, BlogClasses.PROPERTY_BLOG_CONFIG_BLOGSPACE, 
         spaceRef.getName());
+    String xwql = "from doc.object(" + BlogClasses.BLOG_CONFIG_CLASS + ") as obj";
     Query query = new DefaultQuery("theStatement", Query.XWQL, queryExecutorMock);
     
-    expect(queryManagerMock.createQuery(eq("from doc.object(" 
-        + BlogClasses.BLOG_CONFIG_CLASS + ")"), eq(Query.XWQL))).andReturn(query).once();
+    expect(queryManagerMock.createQuery(eq(xwql), eq(Query.XWQL))).andReturn(query).once();
     expect(queryExecutorMock.execute(eq(query))).andReturn(Arrays.<Object>asList(
         "space.blog")).once();    
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
