@@ -73,6 +73,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
       }    
       query.add(blogOrSubsGrp);
     }
+    LOGGER.info("Built '" + query + "' for '" + param + "'");
     return query;
   }
 
@@ -89,6 +90,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
         restr.add(dateRestr);
       }
     }
+    LOGGER.trace("got blog restriction " + restr + "' for '" + param + "'");
     return restr;
   }
 
@@ -99,18 +101,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     for (DocumentReference docRef : param.getSubscribedToBlogs()) {
       SpaceReference spaceRef = blogService.getBlogSpaceRef(docRef);
       if (hasRights(spaceRef, "view")) {
-        boolean hasEditRights = hasRights(spaceRef, "edit");
-        IQueryRestriction artSubsRestr = getArticleSubsRestrictions(
-            param.getSubscriptionModes(), param.getBlogDocRef(), hasEditRights);
-        IQueryRestriction dateRestr = getDateRestrictions(param.getDateModes(), 
-            param.getExecutionDate(), hasEditRights);
-        if ((artSubsRestr != null) && (dateRestr != null)) {
-          QueryRestrictionGroup spaceGrp = searchService.createRestrictionGroup(Type.AND);
-          spaceGrp.add(searchService.createSpaceRestriction(spaceRef));
-          spaceGrp.add(artSubsRestr);
-          spaceGrp.add(dateRestr);
-          subsOrGrp.add(spaceGrp);
-        }
+        subsOrGrp.add(getSubsSpaceRestriction(param, spaceRef));
       }
     }
     if (!subsOrGrp.isEmpty()) {
@@ -121,7 +112,30 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
           BlogClasses.PROPERTY_ARTICLE_IS_SUBSCRIBABLE, "\"1\""));
       ret.add(subsOrGrp);
     }
+    LOGGER.trace("got subs restriction " + ret + "' for '" + param + "'");
     return ret;
+  }
+
+  private QueryRestrictionGroup getSubsSpaceRestriction(ArticleLoadParameter param, 
+      SpaceReference spaceRef) throws XWikiException {
+    QueryRestrictionGroup subsSpaceGrp = null;
+    boolean hasEditRights = hasRights(spaceRef, "edit");
+    IQueryRestriction dateRestr = getDateRestrictions(param.getDateModes(), 
+        param.getExecutionDate(), hasEditRights);
+    IQueryRestriction artSubsRestr = getArticleSubsRestrictions(
+        param.getSubscriptionModes(), param.getBlogDocRef(), hasEditRights);
+    if ((artSubsRestr != null) && (dateRestr != null)) {
+      subsSpaceGrp = searchService.createRestrictionGroup(Type.AND);
+      subsSpaceGrp.add(searchService.createSpaceRestriction(spaceRef));
+      subsSpaceGrp.add(artSubsRestr);
+      subsSpaceGrp.add(dateRestr);
+    } else {
+      LOGGER.debug("no date restriction '" + dateRestr + "' or article subs "
+          + "restriction '" + artSubsRestr + "' for space '" + spaceRef 
+          + "' with edit righs '" + hasEditRights + "'");
+    }
+    LOGGER.trace("got space restriction '" + subsSpaceGrp + "' for space: " + spaceRef);
+    return subsSpaceGrp;
   }
 
   QueryRestrictionGroup getDateRestrictions(Set<DateMode> modes, Date date, 
