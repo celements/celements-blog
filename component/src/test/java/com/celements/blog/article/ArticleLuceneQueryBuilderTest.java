@@ -4,6 +4,7 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -187,6 +188,15 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   }
   
   @Test
+  public void testGetDateRestrictions_none() {
+    Set<DateMode> modes = Collections.emptySet();
+    Date date = new Date();
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    assertNull(ret);
+  }
+  
+  @Test
   public void testGetDateRestrictions_published() {
     Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED));
     Date date = new Date();
@@ -348,6 +358,15 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     String dateString = ILuceneSearchService.SDF.format(date);
     return IArticleLuceneQueryBuilderRole.ARTICLE_FIELD_PUBLISH + ":([" + dateString 
         + " TO " + ILuceneSearchService.DATE_HIGH + "])";
+  }
+
+  @Test
+  public void testGetArticleSubsRestrictions_none() {
+    Set<SubscriptionMode> modes = Collections.emptySet();
+    boolean hasEditRights = true;
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+        hasEditRights);
+    assertNull(ret);
   }
 
   @Test
