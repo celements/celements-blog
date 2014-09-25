@@ -4,12 +4,17 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.easymock.Capture;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -18,6 +23,10 @@ import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 
+import com.celements.blog.article.Article;
+import com.celements.blog.article.ArticleLoadException;
+import com.celements.blog.article.ArticleLoadParameter;
+import com.celements.blog.article.IArticleEngineRole;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
@@ -33,10 +42,12 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
   private XWikiContext context;
   private QueryManager queryManagerMock;
   private QueryExecutor queryExecutorMock;
+  private IArticleEngineRole articleEngineMock;
   
   private BlogService blogService;
   
   private final WikiReference wikiRef = new WikiReference("wiki");
+  private final String testEngineHint = "test";
   
   @Before
   public void setUp_BlogServiceTest() throws Exception {
@@ -46,6 +57,22 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
     queryManagerMock = createMockAndAddToDefault(QueryManager.class);
     queryExecutorMock = createMockAndAddToDefault(QueryExecutor.class);
     blogService.injectQueryManager(queryManagerMock);
+    articleEngineMock = createMockAndAddToDefault(IArticleEngineRole.class);
+    
+    DefaultComponentDescriptor<IArticleEngineRole> descriptor = 
+        new DefaultComponentDescriptor<IArticleEngineRole>();
+    descriptor.setRole(IArticleEngineRole.class);
+    descriptor.setRoleHint(testEngineHint);
+    Utils.getComponentManager().registerComponent(descriptor, articleEngineMock);
+  }
+  
+  @After
+  public void breakDown_BlogServiceTest() {    
+    DefaultComponentDescriptor<IArticleEngineRole> descriptor = 
+        new DefaultComponentDescriptor<IArticleEngineRole>();
+    descriptor.setRole(IArticleEngineRole.class);
+    Utils.getComponentManager().unregisterComponent(IArticleEngineRole.class, 
+        testEngineHint);
   }
 
   @Test
@@ -290,8 +317,86 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
   }
   
   @Test
-  public void testGetArticles() {
-    fail("TODO"); // TODO
+  public void testGetArticles() throws Exception {
+    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setExecutionDate(new Date(0));
+    param.setSubscribedToBlogs(Arrays.asList(docRef));
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(new XWikiDocument(
+        docRef)).once();    
+    expect(xwiki.getXWikiPreference(eq("blog_article_engine"), eq("blog.article.engine"), 
+        isNull(String.class), same(getContext()))).andReturn(testEngineHint).once();
+    expect(articleEngineMock.getArticles(same(param))).andReturn(
+        Collections.<Article>emptyList()).once();
+    
+    replayDefault();
+    List<Article> ret = blogService.getArticles(docRef, param);
+    verifyDefault();
+    
+    assertEquals(0, ret.size());
+    assertTrue(new Date(0).before(param.getExecutionDate()));
+    assertTrue(param.getExecutionDate().before(new Date()));
+    assertEquals(docRef, param.getBlogDocRef());
+    assertEquals(0, param.getSubscribedToBlogs().size());
+  }
+  
+  @Test
+  public void testGetArticles_nullparam() throws Exception {
+    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
+    Capture<ArticleLoadParameter> paramCapture = new Capture<ArticleLoadParameter>();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(new XWikiDocument(
+        docRef)).once();    
+    expect(xwiki.getXWikiPreference(eq("blog_article_engine"), eq("blog.article.engine"), 
+        isNull(String.class), same(getContext()))).andReturn(testEngineHint).once();
+    expect(articleEngineMock.getArticles(capture(paramCapture))).andReturn(
+        Collections.<Article>emptyList()).once();
+    
+    replayDefault();
+    List<Article> ret = blogService.getArticles(docRef, null);
+    verifyDefault();
+    
+    assertEquals(0, ret.size());
+    ArticleLoadParameter param = paramCapture.getValue();
+    assertEquals(docRef, param.getBlogDocRef());
+  }
+  
+  @Test
+  public void testGetArticles_ALE() throws Exception {
+    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(new XWikiDocument(
+        docRef)).once();    
+    expect(xwiki.getXWikiPreference(eq("blog_article_engine"), eq("blog.article.engine"), 
+        isNull(String.class), same(getContext()))).andReturn(testEngineHint).once();
+    ArticleLoadException cause = new ArticleLoadException("");
+    expect(articleEngineMock.getArticles(same(param))).andThrow(cause).once();
+    
+    replayDefault();
+    try {
+      blogService.getArticles(docRef, param);
+      fail("expecting ALE");
+    } catch (ArticleLoadException ale) {
+      assertSame(cause, ale);
+    }
+    verifyDefault();
+    
+    assertEquals(docRef, param.getBlogDocRef());
+  }
+  
+  @Test
+  public void testGetArticles_ALEfromXWE() throws Exception {
+    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
+    XWikiException cause = new XWikiException();
+    expect(xwiki.getDocument(eq(docRef), same(context))).andThrow(cause).once();
+    
+    replayDefault();
+    try {
+      blogService.getArticles(docRef, null);
+      fail("expecting ALE");
+    } catch (ArticleLoadException ale) {
+      assertSame(cause, ale.getCause());
+    }
+    verifyDefault();
   }
   
   private XWikiDocument getBlogDoc(DocumentReference docRef, String field, String val) {
