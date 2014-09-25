@@ -2,6 +2,14 @@ com.celements.blog.plugin.BlogClasses
 com.celements.blog.service.BlogScriptService
 com.celements.blog.service.BlogService
 com.celements.blog.service.NewsletterAttachmentService
-com.celements.migrator.NewsletterReceiversToLowerCaseMigrator
-com.celements.migrator.NewsletterReceiversRemoveDoublesMigrator
-com.celements.migrator.AddBlogDateValidationMigrator
+com.celements.blog.migrator.NewsletterReceiversToLowerCaseMigrator
+com.celements.blog.migrator.NewsletterReceiversRemoveDoublesMigrator
+com.celements.blog.migrator.AddBlogDateValidationMigrator
+com.celements.blog.observation.listener.BlogDocumentListener
+com.celements.blog.observation.listener.ArticleDocumentListener
+com.celements.blog.observation.listener.ClearBlogCacheListener
+com.celements.blog.observation.listener.ArticleDatesListener
+com.celements.blog.article.ArticleEngineLucene
+com.celements.blog.article.ArticleEngineHQL
+com.celements.blog.article.ArticleLuceneQueryBuilder
+com.celements.blog.migrator.ArticleNullDatesMigrator

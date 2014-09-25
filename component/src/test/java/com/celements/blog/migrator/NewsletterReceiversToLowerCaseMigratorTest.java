@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.migrator;
+package com.celements.blog.migrator;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.migrator.NewsletterReceiversToLowerCaseMigrator;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.celements.blog.plugin;
+package com.celements.blog.article;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +30,8 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.plugin.BlogClasses;
+import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.web.service.IWebUtilsService;
@@ -180,8 +182,9 @@ public class Article extends Api{
       BaseObject blogConfigObj = blogDoc.getXObject(getBlogClasses(
           ).getBlogConfigClassRef(getContext().getDatabase()));
       if ((blogConfigObj != null) && (blogConfigObj.getIntValue(
-          BlogClasses.MAX_NUM_CHARS_FIELD, -1) > 0)) {
-        maxNumChars = blogConfigObj.getIntValue(BlogClasses.MAX_NUM_CHARS_FIELD);
+          BlogClasses.PROPERTY_BLOG_CONFIG_MAX_NUM_CHARS_FIELD, -1) > 0)) {
+        maxNumChars = blogConfigObj.getIntValue(
+            BlogClasses.PROPERTY_BLOG_CONFIG_MAX_NUM_CHARS_FIELD);
       }
     } else {
       LOGGER.info("BlogConfig document not found for space name [" + blogSpaceName

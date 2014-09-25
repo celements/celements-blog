@@ -32,7 +32,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 @Component("celements.celBlogClasses")
 public class BlogClasses extends AbstractClassCollection {
-  
+
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       BlogClasses.class);
   
@@ -45,12 +45,19 @@ public class BlogClasses extends AbstractClassCollection {
   public static final String BLOG_CONFIG_CLASS_SPACE = "Celements2";
   public static final String BLOG_CONFIG_CLASS = BLOG_CONFIG_CLASS_SPACE + "."
         + BLOG_CONFIG_CLASS_DOC;
-  public static final String MAX_NUM_CHARS_FIELD = "max_num_chars";
+  public static final String PROPERTY_BLOG_CONFIG_BLOGSPACE = "blogspace";
+  public static final String PROPERTY_BLOG_CONFIG_SUBSCRIBE_TO = "subscribe_to";
+  public static final String PROPERTY_BLOG_CONFIG_IS_SUBSCRIBABLE = "is_subscribable";
+  public static final String PROPERTY_BLOG_CONFIG_MAX_NUM_CHARS_FIELD = "max_num_chars";
 
   public static final String ARTICLE_CLASS_DOC = "ArticleClass";
   public static final String ARTICLE_CLASS_SPACE = "XWiki";
   public static final String ARTICLE_CLASS = ARTICLE_CLASS_SPACE + "."
         + ARTICLE_CLASS_DOC;
+  public static final String PROPERTY_ARTICLE_LANG = "lang";
+  public static final String PROPERTY_ARTICLE_PUBLISH_DATE = "publishdate";
+  public static final String PROPERTY_ARTICLE_ARCHIVE_DATE = "archivedate";
+  public static final String PROPERTY_ARTICLE_IS_SUBSCRIBABLE = "isSubscribable";
 
   public static final String RECEIVER_E_MAIL_CLASS_DOC = "ReceiverEMail";
   public static final String RECEIVER_E_MAIL_CLASS_SPACE = "Celements2";
@@ -67,6 +74,8 @@ public class BlogClasses extends AbstractClassCollection {
   public static final String BLOG_ARTICLE_SUBSCRIPTION_CLASS_SPACE = "Celements2";
   public static final String BLOG_ARTICLE_SUBSCRIPTION_CLASS =
     BLOG_ARTICLE_SUBSCRIPTION_CLASS_SPACE + "." + BLOG_ARTICLE_SUBSCRIPTION_CLASS_DOC;
+  public static final String PROPERTY_ARTICLE_SUBSCRIPTION_SUBSCRIBER = "subscriber";
+  public static final String PROPERTY_ARTICLE_SUBSCRIPTION_DO_SUBSCRIBE = "doSubscribe";
 
   public BlogClasses() {}
   
@@ -161,9 +170,10 @@ public class BlogClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setXClassReference(blogConfigClassRef);
-    needsUpdate |= bclass.addBooleanField("is_subscribable", "is_subscribable",
-        "yesno");
-    needsUpdate |= bclass.addTextField("subscribe_to", "subscribe_to", 30);
+    needsUpdate |= bclass.addBooleanField(PROPERTY_BLOG_CONFIG_IS_SUBSCRIBABLE, 
+        PROPERTY_BLOG_CONFIG_IS_SUBSCRIBABLE, "yesno");
+    needsUpdate |= bclass.addTextField(PROPERTY_BLOG_CONFIG_SUBSCRIBE_TO, 
+        PROPERTY_BLOG_CONFIG_SUBSCRIBE_TO, 30);
     needsUpdate |= bclass.addNumberField("art_per_page", "art_per_page", 5,
         "integer");
     needsUpdate |= bclass.addBooleanField("is_newsletter", "is_newsletter",
@@ -176,13 +186,14 @@ public class BlogClasses extends AbstractClassCollection {
     needsUpdate |= bclass.addTextField("template", "template", 30);
     needsUpdate |= bclass.addStaticListField("blogeditor", "blogeditor", 1,
         false, "plain|wysiwyg", "select");
-    needsUpdate |= bclass.addTextField("blogspace", "blogspace", 30);
+    needsUpdate |= bclass.addTextField(PROPERTY_BLOG_CONFIG_BLOGSPACE, 
+        PROPERTY_BLOG_CONFIG_BLOGSPACE, 30);
     needsUpdate |= bclass.addStaticListField("viewtype", "viewtype", 1,
         false, "title|extract|full", "select");
     needsUpdate |= bclass.addBooleanField("has_comments", "has_comments",
         "yesno");
-    needsUpdate |= bclass.addNumberField(MAX_NUM_CHARS_FIELD, "max number of characters"
-        + " in extract", 5, "integer");
+    needsUpdate |= bclass.addNumberField(PROPERTY_BLOG_CONFIG_MAX_NUM_CHARS_FIELD, 
+        "max number of characters in extract", 5, "integer");
     
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
@@ -212,16 +223,17 @@ public class BlogClasses extends AbstractClassCollection {
     //category
     needsUpdate |= bclass.addTextAreaField("content", "content", 80, 15);
     needsUpdate |= bclass.addNumberField("id", "id", 30, "integer");
-    needsUpdate |= bclass.addTextField("lang", "lang", 30);
+    needsUpdate |= bclass.addTextField(PROPERTY_ARTICLE_LANG, PROPERTY_ARTICLE_LANG, 30);
     needsUpdate |= bclass.addTextField("blogeditor", "blogeditor", 30);
-    needsUpdate |= addDateField(bclass, "publishdate", "publishdate", 
-        "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(false, true), 
+    needsUpdate |= addDateField(bclass, PROPERTY_ARTICLE_PUBLISH_DATE, 
+        PROPERTY_ARTICLE_PUBLISH_DATE, "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(false, true), 
         "cel_blog_validation_publishdate");    
     needsUpdate |= bclass.addBooleanField("hasComments", "hasComments", "yesno");
-    needsUpdate |= addDateField(bclass, "archivedate", "archivedate", 
-        "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(true, true), 
+    needsUpdate |= addDateField(bclass, PROPERTY_ARTICLE_ARCHIVE_DATE, 
+        PROPERTY_ARTICLE_ARCHIVE_DATE, "dd.MM.yyyy HH:mm", 0, 0, getRegexDate(true, true), 
         "cel_blog_validation_archivedate");
-    needsUpdate |= bclass.addBooleanField("isSubscribable", "isSubscribable", "yesno");
+    needsUpdate |= bclass.addBooleanField(PROPERTY_ARTICLE_IS_SUBSCRIBABLE, 
+        PROPERTY_ARTICLE_IS_SUBSCRIBABLE, "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
@@ -312,8 +324,10 @@ public class BlogClasses extends AbstractClassCollection {
 
     BaseClass bclass = doc.getXClass();
     bclass.setXClassReference(getBlogArticleSubscriptionClassRef);
-    needsUpdate |= bclass.addTextField("subscriber", "subscriber", 30);
-    needsUpdate |= bclass.addBooleanField("doSubscribe", "doSubscribe", "yesno");
+    needsUpdate |= bclass.addTextField(PROPERTY_ARTICLE_SUBSCRIPTION_SUBSCRIBER, 
+        PROPERTY_ARTICLE_SUBSCRIPTION_SUBSCRIBER, 30);
+    needsUpdate |= bclass.addBooleanField(PROPERTY_ARTICLE_SUBSCRIPTION_DO_SUBSCRIBE, 
+        PROPERTY_ARTICLE_SUBSCRIPTION_DO_SUBSCRIBE, "yesno");
 
     setContentAndSaveClassDocument(doc, needsUpdate);
     return bclass;
