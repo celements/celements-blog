@@ -59,19 +59,21 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
   @Override
   public LuceneQuery build(ArticleLoadParameter param) throws XWikiException {
     LuceneQuery query = null;
-    QueryRestrictionGroup blogOrSubsGrp = searchService.createRestrictionGroup(Type.OR);    
-    blogOrSubsGrp.add(getBlogRestriction(param));
-    blogOrSubsGrp.add(getSubsRestrictions(param));    
-    if (!blogOrSubsGrp.isEmpty()) {
-      String database = param.getBlogDocRef().getWikiReference().getName();
-      query = searchService.createQuery(database);
-      DocumentReference articleClassRef = getBlogClasses().getArticleClassRef(database);
-      query.add(searchService.createObjectRestriction(articleClassRef));
-      if (StringUtils.isNotBlank(param.getLanguage())) {
-        query.add(searchService.createFieldRestriction(articleClassRef, 
-            BlogClasses.PROPERTY_ARTICLE_LANG, "\"" + param.getLanguage() + "\""));
-      }    
-      query.add(blogOrSubsGrp);
+    if (param.getBlogDocRef() != null) {
+      QueryRestrictionGroup blogOrSubsGrp = searchService.createRestrictionGroup(Type.OR);    
+      blogOrSubsGrp.add(getBlogRestriction(param));
+      blogOrSubsGrp.add(getSubsRestrictions(param));
+      if (!blogOrSubsGrp.isEmpty()) {
+        String database = param.getBlogDocRef().getWikiReference().getName();
+        query = searchService.createQuery(database);
+        DocumentReference articleClassRef = getBlogClasses().getArticleClassRef(database);
+        query.add(searchService.createObjectRestriction(articleClassRef));
+        if (StringUtils.isNotBlank(param.getLanguage())) {
+          query.add(searchService.createFieldRestriction(articleClassRef, 
+              BlogClasses.PROPERTY_ARTICLE_LANG, "\"" + param.getLanguage() + "\""));
+        }    
+        query.add(blogOrSubsGrp);
+      }
     }
     LOGGER.info("Built '" + query + "' for '" + param + "'");
     return query;
@@ -116,7 +118,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     return ret;
   }
 
-  private QueryRestrictionGroup getSubsSpaceRestriction(ArticleLoadParameter param, 
+  QueryRestrictionGroup getSubsSpaceRestriction(ArticleLoadParameter param, 
       SpaceReference spaceRef) throws XWikiException {
     QueryRestrictionGroup subsSpaceGrp = null;
     boolean hasEditRights = hasRights(spaceRef, "edit");
@@ -127,8 +129,8 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     if ((artSubsRestr != null) && (dateRestr != null)) {
       subsSpaceGrp = searchService.createRestrictionGroup(Type.AND);
       subsSpaceGrp.add(searchService.createSpaceRestriction(spaceRef));
-      subsSpaceGrp.add(artSubsRestr);
       subsSpaceGrp.add(dateRestr);
+      subsSpaceGrp.add(artSubsRestr);
     } else {
       LOGGER.debug("no date restriction '" + dateRestr + "' or article subs "
           + "restriction '" + artSubsRestr + "' for space '" + spaceRef 
@@ -182,10 +184,10 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
   QueryRestrictionGroup getArticleSubsRestrictions(Set<SubscriptionMode> modes, 
       DocumentReference blogConfDocRef, boolean hasEditRights) {
     QueryRestrictionGroup ret = null;
-    DocumentReference classRef = getBlogClasses().getBlogArticleSubscriptionClassRef(
-        blogConfDocRef.getWikiReference().getName());
     if ((modes.size() < SubscriptionMode.values().length) || !hasEditRights) {
       QueryRestrictionGroup artSubsRestrs = searchService.createRestrictionGroup(Type.OR);
+      DocumentReference classRef = getBlogClasses().getBlogArticleSubscriptionClassRef(
+          blogConfDocRef.getWikiReference().getName());
       boolean undecided = modes.contains(SubscriptionMode.UNDECIDED) && hasEditRights;
       if (modes.contains(SubscriptionMode.SUBSCRIBED) != undecided) {
         artSubsRestrs.add(searchService.createFieldRestriction(classRef, 
@@ -198,9 +200,9 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
       if (!artSubsRestrs.isEmpty()) {
         ret = searchService.createRestrictionGroup(Type.AND);
         ret.add(searchService.createObjectRestriction(classRef));
+        ret.add(artSubsRestrs);
         ret.add(searchService.createFieldRefRestriction(classRef, 
             BlogClasses.PROPERTY_ARTICLE_SUBSCRIPTION_SUBSCRIBER, blogConfDocRef));
-        ret.add(artSubsRestrs);
         ret.setNegate(undecided);
       }
     } else {

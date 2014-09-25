@@ -58,6 +58,8 @@ public class ArticleEngineLucene implements IArticleEngineRole {
             LOGGER.warn("empty article: " + doc, exc);
           }
         }
+      } else {
+        LOGGER.warn("got null from query builder for '" + param + "'");
       }
       return articles;
     } catch (LuceneSearchException lse) {
