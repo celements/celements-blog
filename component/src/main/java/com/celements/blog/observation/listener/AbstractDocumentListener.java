@@ -1,7 +1,6 @@
 package com.celements.blog.observation.listener;
 
 import org.xwiki.bridge.event.DocumentDeletedEvent;
-import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -14,7 +13,6 @@ import com.celements.blog.plugin.BlogClasses;
 import com.celements.common.classes.IClassCollectionRole;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-@Component
 public abstract class AbstractDocumentListener implements EventListener {
 
   @Requirement("celements.celBlogClasses")
