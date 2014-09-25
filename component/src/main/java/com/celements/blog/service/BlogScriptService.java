@@ -72,6 +72,13 @@ public class BlogScriptService implements ScriptService {
     return Collections.emptyList();
   }
 
+  /**
+   * @deprecated since 1.32 instead use {@link #getBlogDocRefForSpaceRef(SpaceReference)}
+   * 
+   * @param blogSpaceName
+   * @return
+   */
+  @Deprecated
   public DocumentReference getBlogDocRefByBlogSpace(String blogSpaceName) {
     return getBlogDocRefForSpaceRef(new SpaceReference(blogSpaceName, new WikiReference(
         getContext().getDatabase())));
