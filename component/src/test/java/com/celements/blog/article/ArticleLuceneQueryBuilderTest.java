@@ -32,16 +32,21 @@ import com.xpn.xwiki.web.Utils;
 
 public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestCase {
 
-  private static final String BASE = "object:(+Celements2.BlogArticleSubscriptionClass*) "
-      + "AND (Celements2.BlogArticleSubscriptionClass.subscriber:(+\"space.blog\") "
-      + "OR Celements2.BlogArticleSubscriptionClass.subscriber:(+\"wiki\\:space.blog\"))";
-  private static final String SUBS = 
+  private static final String RESTR_ARTICLE_ISSUBS = "XWiki.ArticleClass.isSubscribable:"
+      + "(+\"1\")";
+  private static final String RESTR_ARTSUBS_OBJ = 
+      "object:(+Celements2.BlogArticleSubscriptionClass*)";
+  private static final String RESTR_ARTSUBS_SPACE = 
+      "(Celements2.BlogArticleSubscriptionClass.subscriber:(+\"space.blog\") OR "
+      + "Celements2.BlogArticleSubscriptionClass.subscriber:(+\"wiki\\:space.blog\"))";
+  private static final String RESTR_ARTSUBS_SUBS = 
       "Celements2.BlogArticleSubscriptionClass.doSubscribe:(+\"1\")";
-  private static final String UNSUBS = 
+  private static final String RESTR_ARTSUBS_UNSUBS = 
       "Celements2.BlogArticleSubscriptionClass.doSubscribe:(+\"0\")";
-  private static final String SUBS_UNSUBS = "(" + SUBS + " OR " + UNSUBS + ")";
-  
-  private DocumentReference blogConfDocRef = new DocumentReference("wiki", "space", "blog");
+
+  private WikiReference wikiRef = new WikiReference("wiki");
+  private SpaceReference spaceRef = new SpaceReference("space", wikiRef);
+  private DocumentReference docRef = new DocumentReference("blog", spaceRef);
   
   private ArticleLuceneQueryBuilder builder;
 
@@ -66,49 +71,54 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   }
   
   @Test
+  public void testBuild() {
+    // TODO
+  }
+  
+  @Test
   public void testGetBlogRestriction() throws Exception {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setBlogDocRef(blogConfDocRef);
-    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE)));
-    SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
+    param.setBlogDocRef(docRef);
+    param.setDateModes(Arrays.asList(DateMode.FUTURE.name()));
+    SpaceReference spaceRef = new SpaceReference("artSpace", wikiRef);
     
-    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andReturn(spaceRef).once();
+    expect(blogServiceMock.getBlogSpaceRef(eq(docRef))).andReturn(spaceRef).once();
     expectSpaceRightsCheck(spaceRef, true, true);
     
     replayDefault();
     IQueryRestriction ret = builder.getBlogRestriction(param);
     verifyDefault();
     
-    assertEquals("(space:(+\"artSpace\") AND " + getFutureQuery(param.getExecutionDate()) 
-        + ")", ret.getQueryString());
+    assertEquals("(space:(+\"" + spaceRef.getName() + "\") AND " + getFutureQuery(
+        param.getExecutionDate()) + ")", ret.getQueryString());
   }
   
   @Test
   public void testGetBlogRestriction_noEdit() throws Exception {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setBlogDocRef(blogConfDocRef);
-    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.ARCHIVED)));
-    SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
+    param.setBlogDocRef(docRef);
+    param.setDateModes(Arrays.asList(DateMode.ARCHIVED.name()));
+    SpaceReference spaceRef = new SpaceReference("artSpace", wikiRef);
     
-    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andReturn(spaceRef).once();
+    expect(blogServiceMock.getBlogSpaceRef(eq(docRef))).andReturn(spaceRef).once();
     expectSpaceRightsCheck(spaceRef, true, false);
     
     replayDefault();
     IQueryRestriction ret = builder.getBlogRestriction(param);
     verifyDefault();
     
-    assertEquals("(space:(+\"artSpace\") AND " + getArchivedQuery(param.getExecutionDate()) 
-        + ")", ret.getQueryString());
+    assertEquals("(space:(+\"" + spaceRef.getName() + "\") AND " + getArchivedQuery(
+        param.getExecutionDate()) + ")", ret.getQueryString());
   }
   
   @Test
   public void testGetBlogRestriction_noEdit_future() throws Exception {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setBlogDocRef(blogConfDocRef);
-    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE)));
-    SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
+    param.setBlogDocRef(docRef);
+    param.setDateModes(Arrays.asList(DateMode.FUTURE.name()));
+    SpaceReference spaceRef = new SpaceReference("artSpace", wikiRef);
     
-    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andReturn(spaceRef).once();
+    expect(blogServiceMock.getBlogSpaceRef(eq(docRef))).andReturn(spaceRef).once();
     expectSpaceRightsCheck(spaceRef, true, false);
     
     replayDefault();
@@ -121,11 +131,11 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   @Test
   public void testGetBlogRestriction_noView() throws Exception {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setBlogDocRef(blogConfDocRef);
-    SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
+    param.setBlogDocRef(docRef);
+    SpaceReference spaceRef = new SpaceReference("artSpace", wikiRef);
     
-    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andReturn(spaceRef).once();
-    expectSpaceRightsCheck(spaceRef, false, false);
+    expect(blogServiceMock.getBlogSpaceRef(eq(docRef))).andReturn(spaceRef).once();
+    expectSpaceRightsCheck(spaceRef, false, null);
     
     replayDefault();
     IQueryRestriction ret = builder.getBlogRestriction(param);
@@ -137,11 +147,11 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   @Test
   public void testGetBlogRestriction_withoutBlogArticles() throws Exception {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setBlogDocRef(blogConfDocRef);
+    param.setBlogDocRef(docRef);
     param.setWithBlogArticles(false);
-    SpaceReference spaceRef = new SpaceReference("artSpace", new WikiReference("wiki"));
+    SpaceReference spaceRef = new SpaceReference("artSpace", wikiRef);
     
-    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andReturn(spaceRef).once();
+    expect(blogServiceMock.getBlogSpaceRef(eq(docRef))).andReturn(spaceRef).once();
     
     replayDefault();
     IQueryRestriction ret = builder.getBlogRestriction(param);
@@ -153,10 +163,10 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   @Test
   public void testGetBlogRestriction_XWE() throws Exception {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setBlogDocRef(blogConfDocRef);
-    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.FUTURE)));
+    param.setBlogDocRef(docRef);
+    param.setDateModes(Arrays.asList(DateMode.FUTURE.name()));
     
-    expect(blogServiceMock.getBlogSpaceRef(eq(blogConfDocRef))).andThrow(
+    expect(blogServiceMock.getBlogSpaceRef(eq(docRef))).andThrow(
         new XWikiException()).once();
     
     replayDefault();
@@ -170,21 +180,200 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   }
   
   @Test
-  public void testGetSubsRestrictions() {
-    fail("TODO"); // TODO
+  public void testGetSubsRestrictions_noSub() throws Exception {
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setBlogDocRef(docRef);
+    
+    replayDefault();
+    QueryRestrictionGroup ret = builder.getSubsRestrictions(param);
+    verifyDefault();
+    
+    assertNull(ret);
   }
   
-  private void expectSpaceRightsCheck(SpaceReference spaceRef, boolean viewRights, 
-      boolean editRights) throws Exception {;
-      DocumentReference untitledDocRef = new DocumentReference("untitled1", spaceRef);
-      expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(spaceRef))).andReturn(
-          untitledDocRef).atLeastOnce();
-    expect(rightsServiceMock.hasAccessLevel(eq("view"), eq(context.getUser()), 
-        eq(serialize(untitledDocRef)), same(context))).andReturn(viewRights).once();
-    if (viewRights) {
+  @Test
+  public void testGetSubsRestrictions_oneSub() throws Exception {
+    DocumentReference subsBlogDocRef = new DocumentReference("subsBlog", spaceRef);
+    SpaceReference subsSpaceRef = new SpaceReference("artSpace", wikiRef);
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setBlogDocRef(docRef);
+    param.setSubscribedToBlogs(Arrays.asList(subsBlogDocRef));
+    param.setDateModes(Arrays.asList(DateMode.PUBLISHED.name()));
+    param.setSubscriptionModes(Arrays.asList(SubscriptionMode.SUBSCRIBED.name()));
+    
+    expect(blogServiceMock.getBlogSpaceRef(eq(subsBlogDocRef))).andReturn(subsSpaceRef
+        ).once();
+    expectSpaceRightsCheck(subsSpaceRef, true, true);
+    
+    replayDefault();
+    QueryRestrictionGroup ret = builder.getSubsRestrictions(param);
+    verifyDefault();
+    
+    assertNotNull(ret);
+    String expected = "(" + RESTR_ARTICLE_ISSUBS + " AND " 
+        + getSubsPublishQuery(subsSpaceRef, param.getExecutionDate()) + ")";
+    assertEquals(expected, ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetSubsRestrictions_multipleSub() throws Exception {
+    DocumentReference subsBlogDocRef1 = new DocumentReference("subsBlog1", spaceRef);
+    DocumentReference subsBlogDocRef2 = new DocumentReference("subsBlog2", spaceRef);
+    DocumentReference subsBlogDocRef3 = new DocumentReference("subsBlog3", spaceRef);
+    DocumentReference subsBlogDocRef4 = new DocumentReference("subsBlog4", spaceRef);
+    SpaceReference subsSpaceRef1 = new SpaceReference("artSpace1", wikiRef);
+    SpaceReference subsSpaceRef2 = new SpaceReference("artSpace2", wikiRef);
+    SpaceReference subsSpaceRef3 = new SpaceReference("artSpace3", wikiRef);
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setBlogDocRef(docRef);
+    param.setSubscribedToBlogs(Arrays.asList(subsBlogDocRef1, subsBlogDocRef2, 
+        subsBlogDocRef3, subsBlogDocRef4));
+    param.setDateModes(Arrays.asList(DateMode.PUBLISHED.name()));
+    param.setSubscriptionModes(Arrays.asList(SubscriptionMode.SUBSCRIBED.name()));
+    
+    expect(blogServiceMock.getBlogSpaceRef(eq(subsBlogDocRef1))).andReturn(subsSpaceRef1
+        ).once();
+    expectSpaceRightsCheck(subsSpaceRef1, true, true);
+    expect(blogServiceMock.getBlogSpaceRef(eq(subsBlogDocRef2))).andReturn(subsSpaceRef2
+        ).once();
+    expectSpaceRightsCheck(subsSpaceRef2, false, null);
+    expect(blogServiceMock.getBlogSpaceRef(eq(subsBlogDocRef3))).andReturn(subsSpaceRef3
+        ).once();
+    expectSpaceRightsCheck(subsSpaceRef3, true, true);
+    expect(blogServiceMock.getBlogSpaceRef(eq(subsBlogDocRef4))).andReturn(null).once();
+    
+    replayDefault();
+    QueryRestrictionGroup ret = builder.getSubsRestrictions(param);
+    verifyDefault();
+    
+    assertNotNull(ret);
+    String expected = "(" + RESTR_ARTICLE_ISSUBS + " AND (" 
+        + getSubsPublishQuery(subsSpaceRef1, param.getExecutionDate()) + " OR " 
+        + getSubsPublishQuery(subsSpaceRef3, param.getExecutionDate()) + "))";
+    assertEquals(expected, ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetSubsSpaceRestriction() throws Exception {
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setBlogDocRef(docRef);
+    param.setDateModes(Arrays.asList(DateMode.PUBLISHED.name()));
+    param.setSubscriptionModes(Arrays.asList(SubscriptionMode.SUBSCRIBED.name()));
+    SpaceReference spaceRef = new SpaceReference("artSpace", wikiRef);
+    
+    expectSpaceRightsCheck(spaceRef, null, true);
+    
+    replayDefault();
+    QueryRestrictionGroup ret = builder.getSubsSpaceRestriction(param, spaceRef);
+    verifyDefault();
+    
+    assertEquals(getSubsPublishQuery(spaceRef, param.getExecutionDate()), 
+        ret.getQueryString());
+  }
+  
+  @Test
+  public void testGetSubsSpaceRestriction_noDateQuery() throws Exception {
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setBlogDocRef(docRef);
+    param.setDateModes(Collections.<String>emptyList());
+    param.setSubscriptionModes(Arrays.asList(SubscriptionMode.SUBSCRIBED.name()));
+    SpaceReference spaceRef = new SpaceReference("artSpace", wikiRef);
+    
+    expectSpaceRightsCheck(spaceRef, null, true);
+    
+    replayDefault();
+    QueryRestrictionGroup ret = builder.getSubsSpaceRestriction(param, spaceRef);
+    verifyDefault();
+
+    assertNull(ret);
+  }
+  
+  @Test
+  public void testGetSubsSpaceRestriction_noSubsQuery() throws Exception {
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setBlogDocRef(docRef);
+    param.setDateModes(Arrays.asList(DateMode.PUBLISHED.name()));
+    param.setSubscriptionModes(Collections.<String>emptyList());
+    SpaceReference spaceRef = new SpaceReference("artSpace", wikiRef);
+    
+    expectSpaceRightsCheck(spaceRef, null, true);
+    
+    replayDefault();
+    QueryRestrictionGroup ret = builder.getSubsSpaceRestriction(param, spaceRef);
+    verifyDefault();
+
+    assertNull(ret);
+  }
+  
+  @Test
+  public void testGetSubsSpaceRestriction_noEditRights() throws Exception {
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setBlogDocRef(docRef);
+    param.setDateModes(Arrays.asList(DateMode.PUBLISHED.name(), DateMode.FUTURE.name()));
+    param.setSubscriptionModes(Arrays.asList(SubscriptionMode.SUBSCRIBED.name(), 
+        SubscriptionMode.UNSUBSCRIBED.name()));
+    SpaceReference spaceRef = new SpaceReference("artSpace", wikiRef);
+    
+    expectSpaceRightsCheck(spaceRef, null, false);
+    
+    replayDefault();
+    QueryRestrictionGroup ret = builder.getSubsSpaceRestriction(param, spaceRef);
+    verifyDefault();
+    
+    assertEquals(getSubsPublishQuery(spaceRef, param.getExecutionDate()), 
+        ret.getQueryString());
+  }
+  
+  private String getSubsPublishQuery(SpaceReference spaceRef, Date date) {
+    return "(space:(+\"" + spaceRef.getName() + "\") AND " + getPublishedQuery(date) 
+        + " AND " + getSubsQuery(false) + ")";
+  }
+  
+  @Test
+  public void testGetSubsSpaceRestriction_XWE() throws Exception {
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setBlogDocRef(docRef);
+    param.setDateModes(Arrays.asList(DateMode.PUBLISHED.name(), DateMode.FUTURE.name()));
+    param.setSubscriptionModes(Arrays.asList(SubscriptionMode.SUBSCRIBED.name(), 
+        SubscriptionMode.UNSUBSCRIBED.name()));
+    SpaceReference spaceRef = new SpaceReference("artSpace", wikiRef);
+    
+    XWikiException cause = expectSpaceRightsCheckAndThrow(spaceRef, "edit");
+    
+    replayDefault();
+    try {
+      builder.getSubsSpaceRestriction(param, spaceRef);
+      fail("expecting XWE");
+    } catch (XWikiException xwe) {
+      assertSame(cause, xwe);
+    }
+    verifyDefault();
+  }
+  
+  private void expectSpaceRightsCheck(SpaceReference spaceRef, Boolean viewRights, 
+      Boolean editRights) throws Exception {
+    DocumentReference untitledDocRef = new DocumentReference("untitled1", spaceRef);
+    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(spaceRef))).andReturn(
+        untitledDocRef).atLeastOnce();
+    if (viewRights != null) {
+      expect(rightsServiceMock.hasAccessLevel(eq("view"), eq(context.getUser()), 
+          eq(serialize(untitledDocRef)), same(context))).andReturn(viewRights).once();
+    }
+    if (editRights != null) {
       expect(rightsServiceMock.hasAccessLevel(eq("edit"), eq(context.getUser()), 
           eq(serialize(untitledDocRef)), same(context))).andReturn(editRights).once();
     }
+  }
+  
+  private XWikiException expectSpaceRightsCheckAndThrow(SpaceReference spaceRef, 
+      String rights) throws Exception {
+    XWikiException cause = new XWikiException();
+    DocumentReference untitledDocRef = new DocumentReference("untitled1", spaceRef);
+    expect(nextFreeDocServiceMock.getNextUntitledPageDocRef(eq(spaceRef))).andReturn(
+        untitledDocRef).atLeastOnce();
+  expect(rightsServiceMock.hasAccessLevel(eq(rights), eq(context.getUser()), 
+      eq(serialize(untitledDocRef)), same(context))).andThrow(cause).once();
+    return cause;
   }
   
   @Test
@@ -364,7 +553,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   public void testGetArticleSubsRestrictions_none() {
     Set<SubscriptionMode> modes = Collections.emptySet();
     boolean hasEditRights = true;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
     assertNull(ret);
   }
@@ -374,9 +563,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = true;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
-    assertEquals("(" + BASE + " AND " + SUBS + ")", ret.getQueryString());
+    assertEquals(getSubsQuery(false), ret.getQueryString());
   }
 
   @Test
@@ -384,9 +573,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = false;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
-    assertEquals("(" + BASE + " AND " + SUBS + ")", ret.getQueryString());
+    assertEquals(getSubsQuery(false), ret.getQueryString());
   }
 
   @Test
@@ -394,9 +583,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = true;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
-    assertEquals("(" + BASE + " AND " + UNSUBS + ")", ret.getQueryString());
+    assertEquals(getUnsubsQuery(false), ret.getQueryString());
   }
 
   @Test
@@ -404,7 +593,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = false;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
     assertNull(ret);
   }
@@ -414,9 +603,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = true;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
-    assertEquals("(" + BASE + " AND " + SUBS_UNSUBS + ")", ret.getQueryString());
+    assertEquals(getSubsUnsubsQuery(false), ret.getQueryString());
   }
 
   @Test
@@ -424,9 +613,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = false;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
-    assertEquals("(" + BASE + " AND " + SUBS + ")", ret.getQueryString());
+    assertEquals(getSubsQuery(false), ret.getQueryString());
   }
 
   @Test
@@ -434,9 +623,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNDECIDED));
     boolean hasEditRights = true;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
-    assertEquals("NOT (" + BASE + " AND " + SUBS_UNSUBS + ")", ret.getQueryString());
+    assertEquals(getSubsUnsubsQuery(true), ret.getQueryString());
   }
 
   @Test
@@ -444,7 +633,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNDECIDED));
     boolean hasEditRights = false;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
     assertNull(ret);
   }
@@ -454,9 +643,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNDECIDED, SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = true;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
-    assertEquals("NOT (" + BASE + " AND " + SUBS + ")", ret.getQueryString());
+    assertEquals(getSubsQuery(true), ret.getQueryString());
   }
 
   @Test
@@ -464,7 +653,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNDECIDED, SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = false;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
     assertNull(ret);
   }
@@ -474,9 +663,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNDECIDED, SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = true;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
-    assertEquals("NOT (" + BASE + " AND " + UNSUBS + ")", ret.getQueryString());
+    assertEquals(getUnsubsQuery(true), ret.getQueryString());
   }
 
   @Test
@@ -484,9 +673,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNDECIDED, SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = false;
-    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
+    QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, 
         hasEditRights);
-    assertEquals("(" + BASE + " AND " + SUBS + ")", ret.getQueryString());
+    assertEquals(getSubsQuery(false), ret.getQueryString());
   }
 
   @Test
@@ -510,7 +699,34 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef, 
         hasEditRights);
-    assertEquals("(" + BASE + " AND " + SUBS + ")", ret.getQueryString());
+    assertEquals(getSubsQuery(false), ret.getQueryString());
+  }
+  
+  private String getSubsQuery(boolean not) {
+    String ret = "(" + RESTR_ARTSUBS_OBJ + " AND " + RESTR_ARTSUBS_SUBS + " AND " 
+        + RESTR_ARTSUBS_SPACE + ")";
+    if (not) {
+      ret = "NOT " + ret;
+    }
+    return ret;
+  }
+  
+  private String getUnsubsQuery(boolean not) {
+    String ret = "(" + RESTR_ARTSUBS_OBJ + " AND " + RESTR_ARTSUBS_UNSUBS + " AND " 
+        + RESTR_ARTSUBS_SPACE + ")";
+    if (not) {
+      ret = "NOT " + ret;
+    }
+    return ret;
+  }
+  
+  private String getSubsUnsubsQuery(boolean not) {
+    String ret = "(" + RESTR_ARTSUBS_OBJ + " AND " + "(" + RESTR_ARTSUBS_SUBS + " OR " 
+        + RESTR_ARTSUBS_UNSUBS + ")" + " AND " + RESTR_ARTSUBS_SPACE + ")";
+    if (not) {
+      ret = "NOT " + ret;
+    }
+    return ret;
   }
   
   private String serialize(DocumentReference docRef) {
