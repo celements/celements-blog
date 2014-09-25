@@ -40,7 +40,11 @@ public class ArticleLoadParameter {
   }
 
   public void setExecutionDate(Date executionDate) {
-    this.executionDate = executionDate;
+    if (executionDate != null) {
+      this.executionDate = executionDate;
+    } else {
+      this.executionDate = new Date();
+    }
   }
 
   public DocumentReference getBlogDocRef() {
