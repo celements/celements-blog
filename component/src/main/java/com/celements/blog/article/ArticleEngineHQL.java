@@ -24,6 +24,9 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Property;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * TODO needs refactoring
+ */
 @Component
 public class ArticleEngineHQL implements IArticleEngineRole {
 
