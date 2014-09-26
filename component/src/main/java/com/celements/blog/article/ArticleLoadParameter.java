@@ -161,7 +161,7 @@ public class ArticleLoadParameter {
 
   @Override
   public String toString() {
-    return "ArticleSearchParameter [executionDate=" + executionDate + ", blogDocRef="
+    return "ArticleLoadParameter [executionDate=" + executionDate + ", blogDocRef="
         + blogDocRef + ", withBlogArticles=" + withBlogArticles
         + ", subscribedToBlogs=" + subscribedToBlogs + ", dateModes=" + dateModes
         + ", subsModes=" + subsModes + ", language=" + language + ", offset=" + offset

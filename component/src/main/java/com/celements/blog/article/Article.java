@@ -426,4 +426,9 @@ public class Article extends Api{
         "xwikicontext");
   }
 
+  @Override
+  public String toString() {
+    return "Article [docRef=" + getDocumentReference() + "]";
+  }
+
 }
