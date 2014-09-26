@@ -126,6 +126,7 @@ public class BlogService implements IBlogServiceRole {
           list.add(docRef);
         }
       }
+      LOGGER.debug("Successfully loaded blog cache: " + map);
       blogCache = Collections.unmodifiableMap(map);
     }
     return blogCache;
