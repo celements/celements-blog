@@ -311,7 +311,7 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
         "obj.className='XWiki.ArticleClass' and (doc.space = '" + artSpace + "' ) and " +
         "lang.id.id=obj.id and lang.id.name='lang' and lang.value = 'de' and obj.id = " +
         "date.id.id and date.id.name='publishdate' order by date.value desc, " +
-        "doc.creationDate desc ";
+        "doc.name asc ";
   }
 
 }

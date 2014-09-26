@@ -305,7 +305,7 @@ public class ArticleEngineHQL implements IArticleEngineRole {
     hql += "and lang.value = '" + language + "' ";
     hql += "and obj.id = date.id.id ";
     hql += "and date.id.name='publishdate' ";
-    hql += "order by date.value desc, doc.creationDate desc ";
+    hql += "order by date.value desc, doc.name asc ";
     
     LOGGER.debug("hql built: " + hql);
     return hql;

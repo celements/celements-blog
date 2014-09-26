@@ -9,7 +9,10 @@ import java.util.Set;
 
 import org.xwiki.model.reference.DocumentReference;
 
-// TODO javadoc for fields (see BlogPlugin)
+import com.celements.blog.plugin.BlogClasses;
+
+// TODO javadoc for fields (also note if one isn't regarded by an engine, e.g. offset, 
+// limit, sortFields not regarded in ArticleEngineHQL)
 public class ArticleLoadParameter {
   
   public enum SubscriptionMode {
@@ -20,6 +23,7 @@ public class ArticleLoadParameter {
     PUBLISHED, ARCHIVED, FUTURE;
   }
 
+  // TODO test default
   private Date executionDate = new Date();
   private DocumentReference blogDocRef;
   private boolean withBlogArticles = true;
@@ -30,7 +34,8 @@ public class ArticleLoadParameter {
   private String language = null;
   private int offset = 0;
   private int limit = 0;
-  private List<String> sortFields = Collections.emptyList();
+  private List<String> sortFields = Arrays.asList("-" + BlogClasses.ARTICLE_CLASS + "." 
+      + BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE, "name");
   
   public ArticleLoadParameter() {
   }

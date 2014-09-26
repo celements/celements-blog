@@ -335,7 +335,9 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
     
     assertEquals(0, ret.size());
     assertTrue(new Date(0).before(param.getExecutionDate()));
-    assertTrue(param.getExecutionDate().before(new Date()));
+    Date dateNow = new Date();
+    assertTrue(param.getExecutionDate().before(dateNow) || dateNow.equals(
+        param.getExecutionDate()));
     assertEquals(docRef, param.getBlogDocRef());
     assertEquals(0, param.getSubscribedToBlogs().size());
   }

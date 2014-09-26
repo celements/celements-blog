@@ -220,7 +220,7 @@ public class BlogService implements IBlogServiceRole {
       LOGGER.error("Error looking up engine components", exc);
     }
     if (engine != null) {
-      LOGGER.info("getBlogArticleEngine: got engine '" + engine + "' for hint '" 
+      LOGGER.info("getArticleEngine: got engine '" + engine + "' for hint '" 
           + engineHint + "'");
       return engine;
     } else {
