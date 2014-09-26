@@ -51,7 +51,7 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     
     expect(queryBuilderMock.build(same(param))).andReturn(query).once();
     expect(searchServiceMock.searchWithoutChecks(same(query), eq(sortFields), 
-        eq(Arrays.asList(language)))).andReturn(resultMock).once();
+        eq(Arrays.asList("default", language)))).andReturn(resultMock).once();
     expect(resultMock.setOffset(eq(offset))).andReturn(resultMock).once();
     expect(resultMock.setLimit(eq(limit))).andReturn(resultMock).once();
     expect(resultMock.getResults()).andReturn(Collections.<DocumentReference>emptyList()
@@ -99,7 +99,7 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     
     expect(queryBuilderMock.build(same(param))).andReturn(query).once();
     expect(searchServiceMock.searchWithoutChecks(same(query), eq(sortFields), 
-        eq(Arrays.asList(language)))).andReturn(resultMock).once();
+        eq(Arrays.asList("default", language)))).andReturn(resultMock).once();
     expect(resultMock.setOffset(eq(offset))).andReturn(resultMock).once();
     expect(resultMock.setLimit(eq(limit))).andReturn(resultMock).once();
     expect(resultMock.getResults()).andThrow(cause).once();
