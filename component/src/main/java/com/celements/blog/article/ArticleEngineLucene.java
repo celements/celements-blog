@@ -48,7 +48,7 @@ public class ArticleEngineLucene implements IArticleEngineRole {
       LuceneQuery query = queryBuilder.build(param);
       if (query != null) {
         LuceneSearchResult result = searchService.searchWithoutChecks(query, 
-            param.getSortFields(), Arrays.asList(param.getLanguage()));
+            param.getSortFields(), Arrays.asList("default", param.getLanguage()));
         result.setOffset(param.getOffset()).setLimit(param.getLimit());
         for (DocumentReference docRef : result.getResults()) {
           XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
