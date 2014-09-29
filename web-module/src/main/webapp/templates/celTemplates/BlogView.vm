@@ -99,11 +99,9 @@ $response.setDateHeader("Last-Modified", $lastChanged.getTime())
 ## blog editor: RTE or plain
 #set($blogeditor = "$!blogConfig_obj.getProperty('blogeditor').getValue()")
 ##
-#set($inbitems = "$!blogConfig_obj.getProperty('art_per_page').getValue()")
-#if("$!inbitems" == '')
-  #set($inbitems = 10)
-#else
-  #set($inbitems = $xwiki.parseInt($inbitems))
+#set($artPerPage = "$!blogConfig_obj.getProperty('art_per_page').getValue()")
+#if("$!artPerPage" != '')
+  #set($maxItems = $xwiki.parseInt($artPerPage))
 #end
 #if("$!context.getRequest().get('nbstart')" != "")
   #set($inbstart = $xwiki.parseInt($!context.getRequest().get("nbstart")))
