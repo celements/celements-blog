@@ -161,8 +161,8 @@ public class ArticleEngineHQL implements IArticleEngineRole {
               "hasEditOnBlog: '" + hasEditOnBlog + "'");
           if(hasRight){
             if(!articleDoc.getSpace().equals(blogArticleSpace)){
-              Boolean isSubscribed = article.isSubscribed();
-              
+              Boolean isSubscribed = article.isSubscribed(
+                  spaceBlogDoc.getDocumentReference());              
               if(isSubscribed == null){
                 if(!withUndecided || !hasEditOnBlog){
                   LOGGER.info("'" + article.getDocName() + "' - Removed reason: from " +

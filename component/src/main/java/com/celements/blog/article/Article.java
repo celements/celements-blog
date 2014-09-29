@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -104,18 +105,21 @@ public class Article extends Api{
     }
   }
   
-  private void setSubscribed() {
+  private void setSubscribed(DocumentReference blogConfDocRef) {
     XWikiDocument doc = null;
+    // TODO why loading doc&objects here when already loaded articleObjMap could be used?
     try {
       doc = context.getWiki().getDocument(getDocName(), context);
     } catch (XWikiException e) {
       LOGGER.error(e);
     }
     if(doc != null) {
+      String blogConfFN = Utils.getComponent(IWebUtilsService.class
+          ).getRefLocalSerializer().serialize(blogConfDocRef);
       BaseObject obj = doc.getObject("Celements2.BlogArticleSubscriptionClass",
-          "subscriber", context.getDoc().getFullName(), false);
-      LOGGER.info("Search for object with subscriber == '"
-          + context.getDoc().getFullName() + "' had result: " + obj);
+          "subscriber", blogConfFN, false);
+      LOGGER.info("Search for object with subscriber == '" + blogConfFN + "' had result: " 
+          + obj);
       if(obj != null){
         int isSubscr = obj.getIntValue("doSubscribe");
         LOGGER.info("'" + doc.getFullName() + "' doSubscribe is: '" + isSubscr + "'");
@@ -385,8 +389,19 @@ public class Article extends Api{
   }
 
   public Boolean isSubscribed() {
+    DocumentReference blogConfDocRef = getContext().getDoc().getDocumentReference();
+    if (getContext().get("vcontext") instanceof VelocityContext) {
+      VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
+      if (vcontext.get("celldoc") instanceof Document) {
+        blogConfDocRef = ((Document) vcontext.get("celldoc")).getDocumentReference();
+      }
+    }
+    return isSubscribed(blogConfDocRef);
+  }
+
+  public Boolean isSubscribed(DocumentReference blogConfDocRef) {
     if(isSubscribed == null){
-      setSubscribed();
+      setSubscribed(blogConfDocRef);
     }
     return isSubscribed;
   }
