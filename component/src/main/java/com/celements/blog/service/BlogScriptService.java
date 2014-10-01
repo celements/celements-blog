@@ -1,6 +1,8 @@
 package com.celements.blog.service;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -15,7 +17,10 @@ import org.xwiki.script.service.ScriptService;
 
 import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadParameter;
+import com.celements.blog.article.ArticleLoadParameter.DateMode;
+import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
 import com.celements.blog.plugin.EmailAddressDate;
+import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.plugin.NewsletterReceivers;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -95,15 +100,53 @@ public class BlogScriptService implements ScriptService {
     }
     return ret;
   }
-  
+
   public ArticleLoadParameter newArticleLoadParameter() {
     return new ArticleLoadParameter();
   }
-  
+
+  public ArticleLoadParameter getDefaultArticleLoadParameter() {
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
+        DateMode.FUTURE)));
+    param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNDECIDED)));
+    return param;
+  }
+
+  public ArticleLoadParameter getArchiveArticleLoadParameter() {
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.ARCHIVED)));
+    param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNDECIDED)));
+    return param;
+  }
+
+  public ArticleLoadParameter getSubsribedArticleLoadParameter() {
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setWithBlogArticles(false);
+    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
+        DateMode.FUTURE, DateMode.ARCHIVED)));
+    param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED, 
+        SubscriptionMode.UNDECIDED)));
+    return param;
+  }
+
+  public ArticleLoadParameter getUndecidedArticleLoadParameter() {
+    ArticleLoadParameter param = new ArticleLoadParameter();
+    param.setWithBlogArticles(false);
+    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
+        DateMode.FUTURE, DateMode.ARCHIVED)));
+    param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
+        SubscriptionMode.UNDECIDED)));
+    return param;
+  }
+ 
   public List<Article> getArticles(DocumentReference blogConfDocRef) {
     return getArticles(blogConfDocRef, null);
   }
-  
+
   public List<Article> getArticles(DocumentReference blogConfDocRef, 
       ArticleLoadParameter param) {
     List<Article> ret = Collections.emptyList();
@@ -116,6 +159,17 @@ public class BlogScriptService implements ScriptService {
           + param + "'", exc);
     }
     return ret;
+  }
+
+  public Article getArticle(DocumentReference articleDocRef) throws XWikiException {
+    Article article = null;
+    try{
+      article = new Article(getContext().getWiki().getDocument(articleDocRef, 
+          getContext()), getContext());
+    } catch (EmptyArticleException exc) {
+      LOGGER.info(exc);
+    }
+    return article;
   }
 
 }

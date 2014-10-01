@@ -30,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadException;
+import com.celements.blog.service.BlogScriptService;
 import com.celements.blog.service.INewsletterAttachmentServiceRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -72,6 +73,10 @@ public class BlogPluginApi extends Api {
     return null;
   }
 
+  /**
+   * @deprecated since 1.32 instead use {@link BlogScriptService}
+   */
+  @Deprecated
   public Article getArticle(Document doc) throws XWikiException {
     Article article = null;
     try{
@@ -83,14 +88,9 @@ public class BlogPluginApi extends Api {
   }
   
   /**
-   * Get all articles. Including not yet published, archived and
-   * @param blogArticleSpace
-   * @param subscribedBlogs
-   * @param language
-   * @param context
-   * @return
-   * @throws XWikiException
+   * @deprecated since 1.32 instead use {@link BlogScriptService}
    */
+  @Deprecated
   public List<Article> getAllArticles(String blogArticleSpace, String subscribedBlogs, 
       String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllArticles");
@@ -101,6 +101,10 @@ public class BlogPluginApi extends Api {
     return result;
   }
   
+  /**
+   * @deprecated since 1.32 instead use {@link BlogScriptService}
+   */
+  @Deprecated
   public List<Article> getAllWithRightsArticles(String blogArticleSpace, 
       String subscribedBlogs, String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllWithRightsArticles");
@@ -110,6 +114,11 @@ public class BlogPluginApi extends Api {
     return result;
   }
   
+  /**
+   * @deprecated since 1.32 instead use {@link BlogScriptService} with 
+   * {@link BlogScriptService#getDefaultArticleLoadParameter()}
+   */
+  @Deprecated
   public List<Article> getArticles(String blogArticleSpace, String subscribedBlogs, 
       String language) throws ArticleLoadException {
     LOGGER.info("ENTER getArticles");
@@ -120,6 +129,11 @@ public class BlogPluginApi extends Api {
     return result;
   }
   
+  /**
+   * @deprecated since 1.32 instead use {@link BlogScriptService} with 
+   * {@link BlogScriptService#getArchiveArticleLoadParameter()}
+   */
+  @Deprecated
   public List<Article> getArchivedArticles(String blogArticleSpace, 
       String subscribedBlogs, String language) throws ArticleLoadException {
     LOGGER.info("ENTER getArchivedArticles");
@@ -130,6 +144,11 @@ public class BlogPluginApi extends Api {
     return result;
   }
   
+  /**
+   * @deprecated since 1.32 instead use {@link BlogScriptService} with 
+   * {@link BlogScriptService#getSubsribedArticleLoadParameter()}
+   */
+  @Deprecated
   public List<Article> getAllFromSubscribedBlogs(String blogArticleSpace, 
       String subscribedBlogs, String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllFromSubscribedBlogs");
@@ -139,6 +158,11 @@ public class BlogPluginApi extends Api {
     return result;
   }
   
+  /**
+   * @deprecated since 1.32 instead use {@link BlogScriptService} with 
+   * {@link BlogScriptService#getUndecidedArticleLoadParameter()}
+   */
+  @Deprecated
   public List<Article> getAllNewSubscribable(String blogArticleSpace, String 
       subscribedBlogs, String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllNewSubscribable");
@@ -149,6 +173,10 @@ public class BlogPluginApi extends Api {
     return result;
   }
   
+  /**
+   * @deprecated since 1.32 instead use {@link BlogScriptService}
+   */
+  @Deprecated
   public int containsSubscribableArticles(List<Article> articles, 
       String blogArticleSpace){
     int subsArts = 0;
@@ -160,6 +188,10 @@ public class BlogPluginApi extends Api {
     return subsArts;
   }
   
+  /**
+   * @deprecated since 1.32 instead use {@link BlogScriptService}
+   */
+  @Deprecated
   public int containsUndecidedArticles(List<Article> articles, String blogArticleSpace) {
     int unSubsArts = 0;
     for (Iterator<Article> iterator = articles.iterator(); iterator.hasNext();) {
