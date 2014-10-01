@@ -1,35 +1,17 @@
-#set($space_blogName = '')
-#set($blogApi = $xwiki.celementsblog)
-#if("$!blogDoc" ==  '')
-#set($blogDoc = $doc)
-#end
-#set($blogConfig_obj = $!blogDoc.getObject('Celements2.BlogConfigClass'))
-#if("$!blogConfig_obj" != '')
-#set($spacename = "$!blogConfig_obj.getProperty('blogspace').getValue()")
-#end
-#if("$!spacename" == '')
-#set($spacename = "$!blogDoc.space")
-#end
-#set($viewtype = "$!blogConfig_obj.getProperty('viewtype').getValue()")
-#if("$!viewtype" == '')
-  #set($viewtype = 'extract')
-#end
-#set($space_blogName = "$!blogConfig_obj.getProperty('subscribe_to').getValue()")
-#set($articles = $blogApi.getArticles("$spacename", "$space_blogName", "$default_language"))
+## input: title, baseurl, articles, viewtype, [description]
+
 #set($rsvc= $xwiki.xWiki.getRightService())
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:wiki="http://purl.org/rss/1.0/modules/wiki/" 
 encoding="$xwiki.encoding" >
 <channel rdf:about="$baseurl">
 <title>$title</title>
 <link>$baseurl</link>
-<description>
-$!description
-</description>
+<description>$!description</description>
 <image rdf:resource="${baseurl}/xwiki/skins/default/logo.gif" />
-<dc:language>$doc.defaultLanguage</dc:language>
+<dc:language>$blogDoc.defaultLanguage</dc:language>
 <dc:rights>$xwiki.webCopyright</dc:rights>
-<dc:publisher>$doc.author</dc:publisher>
-<dc:creator>$doc.author</dc:creator>
+<dc:publisher>$blogDoc.author</dc:publisher>
+<dc:creator>$blogDoc.author</dc:creator>
 <items>
 <rdf:Seq>
 #foreach ($article in $articles)
@@ -64,7 +46,7 @@ $!description
 #set($currentdoc = $xwiki.getDocument($article.getDocumentReference()))
 #set($url = $currentdoc.getURL())
 #set($content = $article.getExtract("$language", $viewtypefull))
-#set($desc = $xwiki.getXMLEncoded($xwiki.renderText($content, $doc)))
+#set($desc = $xwiki.getXMLEncoded($xwiki.renderText($content, $blogDoc)))
 <item rdf:about="${baseurl}$url">
 <title>$creationDateStr : $article.getTitle($language)</title>
 <link>${baseurl}$url</link>
