@@ -1,3 +1,4 @@
+## DEPRECATED, use celements-tickerCell instead
 ## generateNewsTicker uses a predefined outputNewsArticle Macro to
 ## generate the NewsTicker XHTML output.
 ## input: maxNumArticle, spacename, maxNumChars
