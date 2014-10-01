@@ -4,48 +4,51 @@ $context.setCacheDuration(0)
   #set($blogDoc = $renderDocument)
 #end
 #if("$!pageDoc.documentReference" != '')
-#set($theDoc = $xwiki.getDocument($pageDoc.documentReference))
+  #set($theDoc = $xwiki.getDocument($pageDoc.documentReference))
 #elseif("$!celldoc" != '')
-#set($theDoc = $celldoc)
+  #set($theDoc = $celldoc)
 #else
-#set($theDoc = $doc)
+  #set($theDoc = $doc)
 #end
 #if("$!blogDoc" ==  '')
-#set($blogDoc = $theDoc)
+  #set($blogDoc = $theDoc)
 #end
-#if("$!suppressSubscribeable" == '')
-  #set($suppressSubscribeable = false)
+#set($isarchive = (("$request.get('archive')" == '1') || ("$cel_redParams_Map.get('archive')" == '1')))
+#set($subscribable = "$!request.get('subscribable')" == '1')
+#set($newSubscribable = "$!request.get('newSubscribable')" == '1')
+
+##render blog title
+#if("$!blogTitle" == '')
+  #if($isarchive)
+    #set($titleDoc = $theDoc)
+  #else
+    #set($titleDoc = $blogDoc)
+  #end
+  #if("$!titleDoc.getTitle()" == '')
+    #set($blogTitle = "$!titleDoc.getObject('Content.Title').getProperty('title').getValue()")
+  #else
+    #set($blogTitle = "$!titleDoc.getTitle()")
+  #end
+#end
+#if("$!supressBlogTitle" == '')
+  #set($supressBlogTitle = !$celementsweb.getPageType($blogDoc.fullName).hasPageTitle())
 #end
 #if("$!showArticleBlogName" == '')
   #set($showArticleBlogName = false)
 #end
-#set($isarchive = (("$request.archive" == '1') || ("$cel_redParams_Map.get('archive')" == '1')))
-#if("$!blogTitle" == '')
-#if($isarchive)
-#set($titleDoc = $theDoc)
-#else
-#set($titleDoc = $blogDoc)
-#end
-#if("$!titleDoc.getTitle()" == '')
-#set($blogTitle = "$!titleDoc.getObject('Content.Title').getProperty('title').getValue()")
-#else
-#set($blogTitle = "$!titleDoc.getTitle()")
-#end
-#end
-#if("$!supressBlogTitle" == '')
-#set($supressBlogTitle = !$celementsweb.getPageType($blogDoc.fullName).hasPageTitle())
-#end
+
 #set($blogConfig_obj = $!blogDoc.getObject('Celements2.BlogConfigClass'))
 #if("$!blogConfig_obj" != '')
-#set($spacename = "$!blogConfig_obj.getProperty('blogspace').getValue()")
+  #set($spacename = "$!blogConfig_obj.getProperty('blogspace').getValue()")
 #end
 #if("$!spacename" == '')
-#set($spacename = "$!blogDoc.space")
+  #set($spacename = "$!blogDoc.space")
 #end
 #set($blog_template = "$!blogConfig_obj.getProperty('template').getValue()")
 #if("$!blog_template" == '')
   #set($blog_template = 'BlogTemplates.ArticleClassTemplate')
 #end
+
 ##
 #set ($sql = " where")
 #set ($sql = "${sql} (doc.space = '$spacename'")
@@ -57,9 +60,9 @@ $context.setCacheDuration(0)
 #set ($sql = "${sql}) order by doc.date desc")
 #set($mostRecentChangedArticle = $xwiki.searchDocuments($sql, 1, 0))
 #if($mostRecentChangedArticle.size() > 0)
-#set($lastChanged = $xwiki.getDocument($mostRecentChangedArticle.get(0)).getDate()) 
+  #set($lastChanged = $xwiki.getDocument($mostRecentChangedArticle.get(0)).getDate()) 
 #else
-#set($lastChanged = $blogDoc) 
+  #set($lastChanged = $blogDoc) 
 #end
 #set($reqIfModifiedSince = $request.getDateHeader("If-Modified-Since"))
 #set($If_Modified_Since = ($lastChanged.getTime() == $reqIfModifiedSince))
@@ -69,7 +72,7 @@ $response.setStatus(304)
 $context.setFinished(true)
 #else
 #if($If_Not_loggedIn)
-$response.setDateHeader("Last-Modified", $lastChanged.getTime())
+  $response.setDateHeader("Last-Modified", $lastChanged.getTime())
 #end
 #if("$!request.xpage" == 'rdf')
 ## RSS mode
@@ -96,63 +99,56 @@ $response.setDateHeader("Last-Modified", $lastChanged.getTime())
 #else
   #set($has_comments = false)
 #end
-## blog editor: RTE or plain
-#set($blogeditor = "$!blogConfig_obj.getProperty('blogeditor').getValue()")
-##
+
+## TODO paging
 #set($artPerPage = "$!blogConfig_obj.getProperty('art_per_page').getValue()")
 #if("$!artPerPage" != '')
   #set($maxItems = $xwiki.parseInt($artPerPage))
 #end
-#if("$!context.getRequest().get('nbstart')" != "")
-  #set($inbstart = $xwiki.parseInt($!context.getRequest().get("nbstart")))
-#else
-  #set($inbstart = 0)
-#end
-#set($subscribable = "$!request.get('subscribable')" == '1')
-#set($newSubscribable = "$!request.get('newSubscribable')" == '1')
-##
-#set($isoldblog = ("$!blogeditor" == ''))
 
-#set($space_blogName = "$!blogConfig_obj.getProperty('subscribe_to').getValue()")
-#set($blogApi = $xwiki.celementsblog)
 #if($isarchive)
-  #set($articles = $blogApi.getArchivedArticles("$spacename", "$space_blogName", "$default_language"))
+  #set($articleParam = $services.celblog.getArchiveArticleLoadParameter())
 #elseif($subscribable)
-  #set($articles = $blogApi.getAllFromSubscribedBlogs("$spacename", "$space_blogName", "$default_language"))
+  #set($articleParam = $services.celblog.getSubsribedArticleLoadParameter())
 #elseif($newSubscribable)
-  #set($articles = $blogApi.getAllNewSubscribable("$spacename", "$space_blogName", "$default_language"))
+  #set($articleParam = $services.celblog.getUndecidedArticleLoadParameter())
 #else
-  #set($articles = $blogApi.getArticles("$spacename", "$space_blogName", "$default_language"))
+  #set($articleParam = $services.celblog.getDefaultArticleLoadParameter())
 #end
-  #if($blogDoc.hasAccessLevel("edit"))
-    #set($allArticles = $blogApi.getAllWithRightsArticles("$spacename", "$space_blogName", "$default_language"))
-    #if("$!request.get('newSubscribable')" != 1)
-      #set($undecidedArticles = $blogApi.containsUndecidedArticles($allArticles, "$spacename"))
-      #if($undecidedArticles == 1)
-        ## write warning 
-        <div class="newSubscribableArticleWarning">
-            $adminMsg.get('rls_newSubscribableArticleWarning')
-            <a href="?newSubscribable=1">$adminMsg.get('rls_newSubscribableArticleViewLink')</a>
-        </div>
-      #elseif($undecidedArticles > 1)
-        ## write warning 
-        <div class="newSubscribableArticleWarning">
-            $adminMsg.get('rls_newSubscribableArticlesWarning', ["$!undecidedArticles"])
-            <a href="?newSubscribable=1">$adminMsg.get('rls_newSubscribableArticlesViewLink')</a>
-        </div>
-      #end
-    #end
-    #if("$!request.get('subscribable')" != '1')
-      #set($subscribableArticles = $blogApi.containsSubscribableArticles($allArticles, "$spacename"))
-      #if($subscribableArticles > 0)
-        $adminMsg.get('rls_showAllSubscribable', ["$!blogPageName"]) <a href="?subscribable=1">$adminMsg.get('rls_showAllSubscribableLink')</a>
-      #end
+#set($devNull = $articleParam.setLanguage("$default_language"))
+#set($articles = $services.celblog.getArticles($blogConfDocRef, $articleParam))
+#if("$!maxItems" != '') ##TODO remove after paging added
+  #set($articles = $articles.subList(0, $mathtool.min($articles.size(), $maxItems)))
+#end
+
+##move to RLS
+#if($blogDoc.hasAccessLevel("edit"))
+  #set($allArticles = $blogApi.getAllWithRightsArticles("$spacename", "$space_blogName", "$default_language"))
+  #if("$!request.get('newSubscribable')" != 1)
+    #set($undecidedArticles = $blogApi.containsUndecidedArticles($allArticles, "$spacename"))
+    #if($undecidedArticles == 1)
+      ## write warning 
+      <div class="newSubscribableArticleWarning">
+        $adminMsg.get('rls_newSubscribableArticleWarning')
+        <a href="?newSubscribable=1">$adminMsg.get('rls_newSubscribableArticleViewLink')</a>
+      </div>
+    #elseif($undecidedArticles > 1)
+      ## write warning 
+      <div class="newSubscribableArticleWarning">
+        $adminMsg.get('rls_newSubscribableArticlesWarning', ["$!undecidedArticles"])
+        <a href="?newSubscribable=1">$adminMsg.get('rls_newSubscribableArticlesViewLink')</a>
+      </div>
     #end
   #end
-## render Blog
-#if("$!maxItems" != '')
-#set($articles = $articles.subList(0, $mathtool.min($articles.size(), $maxItems)))
+  #if("$!request.get('subscribable')" != '1')
+    #set($subscribableArticles = $blogApi.containsSubscribableArticles($allArticles, "$spacename"))
+    #if($subscribableArticles > 0)
+      $adminMsg.get('rls_showAllSubscribable', ["$!blogPageName"]) <a href="?subscribable=1">$adminMsg.get('rls_showAllSubscribableLink')</a>
+    #end
+  #end
 #end
+  
+## render Blog
 #if(("$!blogTitle" != '') && !$supressBlogTitle)
 <h1 class="pageTitle">$blogTitle<!--iE6.0--></h1>
 #end
