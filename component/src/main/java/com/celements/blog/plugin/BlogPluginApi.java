@@ -102,7 +102,8 @@ public class BlogPluginApi extends Api {
   }
   
   /**
-   * @deprecated since 1.32 instead use {@link BlogScriptService}
+   * @deprecated since 1.32 instead use {@link BlogScriptService} with 
+   * {@link BlogScriptService#getAllArticleLoadParameter()}
    */
   @Deprecated
   public List<Article> getAllWithRightsArticles(String blogArticleSpace, 
@@ -146,7 +147,7 @@ public class BlogPluginApi extends Api {
   
   /**
    * @deprecated since 1.32 instead use {@link BlogScriptService} with 
-   * {@link BlogScriptService#getSubsribedArticleLoadParameter()}
+   * {@link BlogScriptService#getAllSubsribedArticleLoadParameter()}
    */
   @Deprecated
   public List<Article> getAllFromSubscribedBlogs(String blogArticleSpace, 

@@ -143,9 +143,8 @@ public class BlogScriptService implements ScriptService {
     return param;
   }
 
-  public ArticleLoadParameter getSubsribedArticleLoadParameter() {
+  public ArticleLoadParameter getAllArticleLoadParameter() {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setWithBlogArticles(false);
     param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
         DateMode.FUTURE, DateMode.ARCHIVED)));
     param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
@@ -154,13 +153,19 @@ public class BlogScriptService implements ScriptService {
     return param;
   }
 
+  public ArticleLoadParameter getAllSubsribedArticleLoadParameter() {
+    ArticleLoadParameter param = getAllArticleLoadParameter();
+    param.setWithBlogArticles(false);
+    return param;
+  }
+
   public ArticleLoadParameter getUndecidedArticleLoadParameter() {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setWithBlogArticles(false);
     param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
         DateMode.FUTURE, DateMode.ARCHIVED)));
     param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.UNDECIDED)));
+    param.setWithBlogArticles(false);
     return param;
   }
  
