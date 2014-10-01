@@ -100,6 +100,27 @@ public class BlogScriptService implements ScriptService {
     }
     return ret;
   }
+  
+  public SpaceReference getBlogSpaceRef(DocumentReference blogConfDocRef) {
+    SpaceReference ret = null;
+    try {
+      ret = blogService.getBlogSpaceRef(blogConfDocRef);
+    } catch (Exception exc) {
+      LOGGER.error("Error getting blog space ref for '" + blogConfDocRef + "'", exc);
+    }
+    return ret;
+  }
+  
+  public List<SpaceReference> getSubribedToBlogs(DocumentReference blogConfDocRef) {
+    List<SpaceReference> ret;
+    try {
+      ret = blogService.getSubribedToBlogsSpaceRefs(blogConfDocRef);
+    } catch (Exception exc) {
+      LOGGER.error("Error getting blog space ref for '" + blogConfDocRef + "'", exc);
+      ret = Collections.emptyList();
+    }
+    return ret;
+  }
 
   public ArticleLoadParameter newArticleLoadParameter() {
     return new ArticleLoadParameter();
