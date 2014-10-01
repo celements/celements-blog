@@ -145,6 +145,9 @@ public class BlogService implements IBlogServiceRole {
       if (StringUtils.isNotBlank(spaceName)) {
         spaceRef = webUtils.resolveSpaceReference(spaceName, docRef.getWikiReference());
       }
+      if (spaceRef == null) {
+        spaceRef = new SpaceReference(docRef.getName(), docRef.getWikiReference());
+      }
     }
     LOGGER.debug("getBlogSpace: resolved for '" + docRef + "' space:" + spaceRef);
     return spaceRef;

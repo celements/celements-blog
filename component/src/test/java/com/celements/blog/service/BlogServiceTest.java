@@ -129,7 +129,7 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetBlogSpaceRef() throws Exception {
-    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");   
+    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog"); 
     SpaceReference spaceRef = new SpaceReference("blogSpace", wikiRef);
     XWikiDocument doc = getBlogDoc(docRef, BlogClasses.PROPERTY_BLOG_CONFIG_BLOGSPACE, 
         spaceRef.getName());
@@ -145,7 +145,8 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetBlogSpaceRef_notSet() throws Exception {
-    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
+    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog"); 
+    SpaceReference spaceRef = new SpaceReference(docRef.getName(), wikiRef);
     XWikiDocument doc = getBlogDoc(docRef, null, null);
     
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
@@ -154,7 +155,7 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
     SpaceReference ret = blogService.getBlogSpaceRef(docRef);
     verifyDefault();
     
-    assertNull(ret);
+    assertEquals(spaceRef, ret);
   }
   
   @Test
