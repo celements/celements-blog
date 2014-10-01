@@ -318,6 +318,49 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
   }
   
   @Test
+  public void testGetSubribedToBlogsSpaceRefs() throws Exception {
+    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
+    String space1 = "space1";
+    String space2 = "space2";
+    String space3 = "space3";
+    XWikiDocument doc = getBlogDoc(docRef, BlogClasses.PROPERTY_BLOG_CONFIG_SUBSCRIBE_TO, 
+        space1 + "," + space2 + "," + space3 + ",space4");
+    DocumentReference docRef1 = new DocumentReference(wikiRef.getName(), "space", "blog1");
+    XWikiDocument doc1 = getBlogDoc(docRef1, BlogClasses.PROPERTY_BLOG_CONFIG_BLOGSPACE, 
+        space1);
+    doc1.getXObject(blogService.getBlogConfigClassRef(wikiRef)).setIntValue(
+        BlogClasses.PROPERTY_BLOG_CONFIG_IS_SUBSCRIBABLE, 1);
+    DocumentReference docRef2 = new DocumentReference(wikiRef.getName(), "space", "blog2");
+    XWikiDocument doc2 = getBlogDoc(docRef2, BlogClasses.PROPERTY_BLOG_CONFIG_BLOGSPACE, 
+        space2);
+    doc2.getXObject(blogService.getBlogConfigClassRef(wikiRef)).setIntValue(
+        BlogClasses.PROPERTY_BLOG_CONFIG_IS_SUBSCRIBABLE, 0);
+    DocumentReference docRef3 = new DocumentReference(wikiRef.getName(), "space", "blog3");
+    XWikiDocument doc3 = getBlogDoc(docRef3, BlogClasses.PROPERTY_BLOG_CONFIG_BLOGSPACE, 
+        space3);
+    doc3.getXObject(blogService.getBlogConfigClassRef(wikiRef)).setIntValue(
+        BlogClasses.PROPERTY_BLOG_CONFIG_IS_SUBSCRIBABLE, 1);
+    Map<SpaceReference, List<DocumentReference>> blogCache = 
+        new HashMap<SpaceReference, List<DocumentReference>>();
+    blogCache.put(new SpaceReference(space1, wikiRef), Arrays.asList(docRef1));
+    blogCache.put(new SpaceReference(space2, wikiRef), Arrays.asList(docRef2));
+    blogCache.put(new SpaceReference(space3, wikiRef), Arrays.asList(docRef3));
+    blogService.injectBlogCache(blogCache);
+
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
+    expect(xwiki.getDocument(eq(docRef1), same(context))).andReturn(doc1).times(2);
+    expect(xwiki.getDocument(eq(docRef2), same(context))).andReturn(doc2).once();
+    expect(xwiki.getDocument(eq(docRef3), same(context))).andReturn(doc3).times(2);
+
+    replayDefault();
+    List<SpaceReference> ret = blogService.getSubribedToBlogsSpaceRefs(docRef);
+    verifyDefault();
+    
+    assertEquals(Arrays.asList(new SpaceReference(space1, wikiRef), new SpaceReference(
+        space3, wikiRef)), ret);
+  }
+  
+  @Test
   public void testGetArticles() throws Exception {
     DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
     ArticleLoadParameter param = new ArticleLoadParameter();
