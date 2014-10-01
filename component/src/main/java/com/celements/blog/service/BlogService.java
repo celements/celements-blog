@@ -103,7 +103,11 @@ public class BlogService implements IBlogServiceRole {
     List<DocumentReference> docRefs = getBlogCache(wikiRef).get(spaceRef);
     if ((docRefs != null) && (docRefs.size() > 0)) {
       ret = docRefs.get(0);
+    } else {
+      LOGGER.warn("getBlogConfigDocRef: got multiple blogs for space '" + spaceRef + "': " 
+          + docRefs);
     }
+    LOGGER.debug("getBlogConfigDocRef: for space '" + spaceRef + "' got:" + ret);
     return ret;
   }
 
@@ -149,19 +153,19 @@ public class BlogService implements IBlogServiceRole {
         spaceRef = new SpaceReference(docRef.getName(), docRef.getWikiReference());
       }
     }
-    LOGGER.debug("getBlogSpace: resolved for '" + docRef + "' space:" + spaceRef);
+    LOGGER.debug("getBlogSpaceRef: resolved for '" + docRef + "' space:" + spaceRef);
     return spaceRef;
   }
 
   @Override
   public boolean isSubscribable(DocumentReference blogConfDocRef) throws XWikiException {
-    boolean isSubscribable = false;
+    boolean ret = false;
     BaseObject confObj = getBlogConfigObject(blogConfDocRef);
     if (confObj != null) {
-      isSubscribable = confObj.getIntValue(
-          BlogClasses.PROPERTY_BLOG_CONFIG_IS_SUBSCRIBABLE, -1) == 1;
+      ret = confObj.getIntValue(BlogClasses.PROPERTY_BLOG_CONFIG_IS_SUBSCRIBABLE, -1) == 1;
     }
-    return isSubscribable;
+    LOGGER.debug("isSubscribable: for blog '" + blogConfDocRef + "' got:" + ret);
+    return ret;
   }
   
   @Override
@@ -182,6 +186,7 @@ public class BlogService implements IBlogServiceRole {
         }
       }
     }
+    LOGGER.debug("getSubribedToBlogs: for blog '" + blogConfDocRef + "' got:" + ret);
     return Collections.unmodifiableList(ret);
   }
   
