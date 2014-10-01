@@ -74,6 +74,17 @@ public interface IBlogServiceRole {
    */
   public List<DocumentReference> getSubribedToBlogs(DocumentReference blogConfDocRef
       ) throws QueryException, XWikiException;
+
+  /**
+   * gets all subscribed blog space refs for the given blog ref
+   * 
+   * @param blogConfDocRef
+   * @return
+   * @throws QueryException
+   * @throws XWikiException
+   */
+  public List<SpaceReference> getSubribedToBlogsSpaceRefs(DocumentReference blogConfDocRef
+      ) throws QueryException, XWikiException;
   
   /**
    * gets articles as list for given {@link ArticleLoadParameter}

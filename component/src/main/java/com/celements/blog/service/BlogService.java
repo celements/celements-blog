@@ -181,6 +181,16 @@ public class BlogService implements IBlogServiceRole {
     }
     return Collections.unmodifiableList(ret);
   }
+  
+  @Override
+  public List<SpaceReference> getSubribedToBlogsSpaceRefs(DocumentReference blogConfDocRef
+      ) throws QueryException, XWikiException {
+    List<SpaceReference> ret = new ArrayList<SpaceReference>();
+    for (DocumentReference docRef : getSubribedToBlogs(blogConfDocRef)) {
+      ret.add(getBlogSpaceRef(docRef));
+    }
+    return Collections.unmodifiableList(ret);
+  }
 
   @Override
   public List<Article> getArticles(DocumentReference blogConfDocRef, 
