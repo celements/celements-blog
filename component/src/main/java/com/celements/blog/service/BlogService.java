@@ -139,12 +139,12 @@ public class BlogService implements IBlogServiceRole {
       DocumentReference docRef = webUtils.resolveDocumentReference(result, wikiRef);
       SpaceReference spaceRef = getBlogSpaceRef(docRef);
       if (spaceRef != null) {
-        Set<DocumentReference> list = cacheMap.get(spaceRef);
-        if (list == null) {
-          list = new HashSet<DocumentReference>();
-          cacheMap.put(spaceRef, list);
+        Set<DocumentReference> docRefs = cacheMap.get(spaceRef);
+        if (docRefs == null) {
+          docRefs = new HashSet<DocumentReference>();
+          cacheMap.put(spaceRef, docRefs);
         }
-        list.add(docRef);
+        docRefs.add(docRef);
       }
     }
     if (LOGGER.isDebugEnabled()) {
