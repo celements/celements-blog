@@ -160,9 +160,14 @@ public class BlogService implements IBlogServiceRole {
 
   /**
    * only used in {@link ClearBlogCacheListener}
+   * 
+   * @param wikiRef to clear cache for
    */
-  public synchronized void clearBlogCache() {
-    blogCache = new HashMap<WikiReference, Map<SpaceReference, Set<DocumentReference>>>();
+  public synchronized void clearBlogCache(WikiReference wikiRef) {
+    if (wikiRef != null) {
+      blogCache.remove(wikiRef);
+      LOGGER.trace("clearBlogCache: for db '" + wikiRef.getName() + "'");
+    }
   }
 
   @Override

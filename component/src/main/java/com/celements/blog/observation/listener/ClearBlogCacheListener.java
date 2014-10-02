@@ -14,6 +14,7 @@ import com.celements.blog.observation.event.BlogCreatedEvent;
 import com.celements.blog.observation.event.BlogDeletedEvent;
 import com.celements.blog.service.BlogService;
 import com.celements.blog.service.IBlogServiceRole;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component("celements.blog.clearBlogCache")
 public class ClearBlogCacheListener implements EventListener {
@@ -37,7 +38,8 @@ public class ClearBlogCacheListener implements EventListener {
   @Override
   public void onEvent(Event event, Object source, Object data) {
     if (blogService instanceof BlogService) {
-      ((BlogService) blogService).clearBlogCache();
+      ((BlogService) blogService).clearBlogCache(((XWikiDocument) source
+          ).getDocumentReference().getWikiReference());
     } else {
       LOGGER.error("Unknown blog service instance: " + blogService);
     }
