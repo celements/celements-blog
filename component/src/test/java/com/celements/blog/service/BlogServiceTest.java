@@ -81,10 +81,10 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
     SpaceReference spaceRef = new SpaceReference("blogSpace", wikiRef);
     XWikiDocument doc = getBlogDoc(docRef, BlogClasses.PROPERTY_BLOG_CONFIG_BLOGSPACE, 
         spaceRef.getName());
-    String xwql = "from doc.object(" + BlogClasses.BLOG_CONFIG_CLASS + ") as obj";
     Query query = new DefaultQuery("theStatement", Query.XWQL, queryExecutorMock);
     
-    expect(queryManagerMock.createQuery(eq(xwql), eq(Query.XWQL))).andReturn(query).once();
+    expect(queryManagerMock.createQuery(eq(blogService.getBlogConfigXWQL()), 
+        eq(Query.XWQL))).andReturn(query).once();
     expect(queryExecutorMock.execute(eq(query))).andReturn(Arrays.<Object>asList(
         "space.blog")).once();    
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
@@ -118,6 +118,7 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
     SpaceReference spaceRef = new SpaceReference("blogSpace", wikiRef);
     Map<SpaceReference, List<DocumentReference>> blogCache = 
         new HashMap<SpaceReference, List<DocumentReference>>();
+    blogCache.put(spaceRef, Collections.<DocumentReference>emptyList());
     blogService.injectBlogCache(blogCache);
 
     replayDefault();
@@ -125,6 +126,39 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
     
     assertNull(ret);
+  }
+
+  @Test
+  public void testGetBlogConfigDocRef_cache_otherDB() throws Exception {
+    DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");   
+    SpaceReference spaceRef = new SpaceReference("blogSpace", wikiRef);
+    XWikiDocument doc = getBlogDoc(docRef, BlogClasses.PROPERTY_BLOG_CONFIG_BLOGSPACE, 
+        spaceRef.getName());
+    Map<SpaceReference, List<DocumentReference>> blogCache = 
+        new HashMap<SpaceReference, List<DocumentReference>>();
+    blogCache.put(new SpaceReference(spaceRef.getName(), new WikiReference("otherWiki")), 
+        Arrays.asList(docRef));
+    blogService.injectBlogCache(blogCache);
+    Query query = new DefaultQuery("theStatement", Query.XWQL, queryExecutorMock);
+    
+    expect(queryManagerMock.createQuery(eq(blogService.getBlogConfigXWQL()), 
+        eq(Query.XWQL))).andReturn(query).once();
+    expect(queryExecutorMock.execute(eq(query))).andReturn(Arrays.<Object>asList(
+        "space.blog")).once();    
+    expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(doc).once();
+
+    replayDefault();
+    DocumentReference ret = blogService.getBlogConfigDocRef(spaceRef);
+    verifyDefault();
+    
+    assertEquals(docRef, ret);
+    assertEquals(wikiRef.getName(), query.getWiki());
+  }
+  
+  @Test
+  public void testGetBlogConfigXWQL() {
+    assertEquals("from doc.object(Celements2.BlogConfigClass) as obj "
+        + "where doc.translation = 0", blogService.getBlogConfigXWQL());
   }
   
   @Test
