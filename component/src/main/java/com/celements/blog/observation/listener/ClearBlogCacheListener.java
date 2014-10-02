@@ -1,12 +1,17 @@
 package com.celements.blog.observation.listener;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -38,11 +43,20 @@ public class ClearBlogCacheListener implements EventListener {
   @Override
   public void onEvent(Event event, Object source, Object data) {
     if (blogService instanceof BlogService) {
-      ((BlogService) blogService).clearBlogCache(((XWikiDocument) source
-          ).getDocumentReference().getWikiReference());
+      for (WikiReference wikiRef : getWikiRefsForDoc((XWikiDocument) source)) {
+        ((BlogService) blogService).clearBlogCache(wikiRef);
+      }
     } else {
       LOGGER.error("Unknown blog service instance: " + blogService);
     }
+  }
+
+  private Set<WikiReference> getWikiRefsForDoc(XWikiDocument doc) {
+    Set<WikiReference> wikiRefs = new HashSet<WikiReference>();
+    for (SpaceReference spaceRef : doc.getDocumentReference().getSpaceReferences()) {
+      wikiRefs.add((WikiReference) spaceRef.extractReference(EntityType.WIKI));
+    }
+    return wikiRefs;
   }
 
 }
