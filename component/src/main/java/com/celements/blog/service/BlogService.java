@@ -112,7 +112,7 @@ public class BlogService implements IBlogServiceRole {
             + "': " + docRefs);
       }
     }
-    LOGGER.info("getBlogConfigDocRef: for space '" + spaceRef + "' got:" + ret);
+    LOGGER.info("getBlogConfigDocRef: for space '" + spaceRef + "' got: " + ret);
     return ret;
   }
 
