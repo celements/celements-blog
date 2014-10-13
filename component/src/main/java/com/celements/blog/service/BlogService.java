@@ -154,8 +154,8 @@ public class BlogService implements IBlogServiceRole {
   }
   
   String getBlogConfigXWQL() {
-    return "from doc.object(" + BlogClasses.BLOG_CONFIG_CLASS + ") as obj "
-        + "where doc.translation = 0";
+    return "select distinct doc.fullName from Document doc, doc.object(" 
+        + BlogClasses.BLOG_CONFIG_CLASS + ") as obj";
   }
 
   /**

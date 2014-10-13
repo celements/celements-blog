@@ -157,8 +157,8 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
   
   @Test
   public void testGetBlogConfigXWQL() {
-    assertEquals("from doc.object(Celements2.BlogConfigClass) as obj "
-        + "where doc.translation = 0", blogService.getBlogConfigXWQL());
+    assertEquals("select distinct doc.fullName from Document doc, doc.object("
+        + "Celements2.BlogConfigClass) as obj", blogService.getBlogConfigXWQL());
   }
   
   @Test
