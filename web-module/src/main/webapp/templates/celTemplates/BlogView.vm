@@ -58,8 +58,10 @@ $context.setCacheDuration(0)
 #if(("$!start" != '') && ($start > 0))
   #set($devNull = $articleParam.setOffset($start))
 #end
-#set($nb = $util.parseInt("$request.get('nb')"))
-#if("$!nb" == '')
+
+#if("$!request.get('nb')" != '')
+  #set($nb = $util.parseInt("$request.get('nb')"))
+#else
   #set($nb = $util.parseInt("$!blogObj.getProperty('art_per_page').getValue()"))
 #end
 #if(("$!nb" != '') && ($nb > 0))
