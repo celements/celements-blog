@@ -116,7 +116,7 @@ $adminMsg.get('cel_tm_article_edit')
     #if($doc.isNew())
       #set($q = '"')
       #set($d = '$')
-      #set($publishdateEditStr = $publishdateEditStr.replaceAll("(.*value=['${q}])(['${q}].*)", "${d}1${datetool.get('dd.MM.yyyy HH:mm')}${d}2"))
+      #set($publishdateEditStr = $publishdateEditStr.replaceAll("(.*value=['${q}])[^'${q}]*(['${q}].*)", "${d}1${datetool.get('dd.MM.yyyy HH:mm')}${d}2"))
     #end
     <div class="editblock">$adminMsg.get('cel_tm_publish_date') (dd.MM.yyyy HH:mm): ${publishdateEditStr.replaceAll('\{/?pre\}','')}</div><!-- IE6 -->
     #if($services.celementsweb.isHighDate($!obj.getProperty('archivedate').getValue()))
