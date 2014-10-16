@@ -151,12 +151,16 @@ $adminMsg.get('cel_tm_article_edit')
     <!-- viewtype: "$blogDocument.getFullName()" - "$blogConfig_obj" - "$viewtype" -->
     #if("$!viewtype" == 'extract')
       <div id="con_extEdit" class="editblock">$adminMsg.get('cel_tm_extract'):     $adminMsg.get('cel_tm_extract_will_appear_on_news_page')<br />
-          <textarea class="$!{hasWysiwigEditor} fullwidth" id='XWiki.ArticleClass_${obj.number}_extract' rows='5' name='XWiki.ArticleClass_${obj.number}_extract' onfocus="setFocus('con_extEdit');" onblur="removeFocus('con_extEdit');">$xwiki.getXMLEncoded("$!obj.getProperty('extract').getValue()")</textarea>
+          <textarea class="$!{hasWysiwigEditor} celEditorBody_articleExtract fullwidth"##
+ id='XWiki.ArticleClass_${obj.number}_extract' rows='5'##
+ name='XWiki.ArticleClass_${obj.number}_extract' onfocus="setFocus('con_extEdit');"##
+ onblur="removeFocus('con_extEdit');"##
+>$xwiki.getXMLEncoded("$!obj.getProperty('extract').getValue()")</textarea>
       </div><!-- IE6 -->
     #end
     <!-- viewtype: $viewtype -->
     <div id="con_conEdit" class="editblock">$adminMsg.get('cel_tm_content'):     $adminMsg.get('cel_tm_content_will_appear_on_article_page')<br />
-        <textarea class="$!{hasWysiwigEditor} fullwidth" id='XWiki.ArticleClass_${obj.number}_content' rows='15' name='XWiki.ArticleClass_${obj.number}_content' onfocus="setFocus('con_conEdit');" onblur="removeFocus('con_conEdit');">$xwiki.getXMLEncoded("$!obj.getProperty('content').getValue()")</textarea>
+        <textarea class="$!{hasWysiwigEditor} celEditorBody_articleContent fullwidth" id='XWiki.ArticleClass_${obj.number}_content' rows='15' name='XWiki.ArticleClass_${obj.number}_content' onfocus="setFocus('con_conEdit');" onblur="removeFocus('con_conEdit');">$xwiki.getXMLEncoded("$!obj.getProperty('content').getValue()")</textarea>
     </div><!-- IE6 -->
     ## TODO: replace ch.News with if(blogIsSubscribable) 
     #set($hql = ", BaseObject as obj, StringProperty as str, IntegerProperty as int where")
