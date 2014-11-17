@@ -1,0 +1,58 @@
+$context.setCacheDuration(0)
+#if("$!renderDocument" != '')
+  #set($blogDoc = $renderDocument)
+#end
+#if("$!pageDoc.documentReference" != '')
+  #set($theDoc = $xwiki.getDocument($pageDoc.documentReference))
+#elseif("$!celldoc" != '')
+  #set($theDoc = $celldoc)
+#else
+  #set($theDoc = $doc)
+#end
+#if("$!blogDoc" ==  '')
+  #set($blogDoc = $theDoc)
+#end
+#set($blogDocRef = $blogDoc.getDocumentReference())
+#set($spaceRef = $services.celblog.getBlogSpaceRef($blogDocRef))
+#set($blogObj = $!blogDoc.getObject('Celements2.BlogConfigClass'))
+
+## set article load parameter & get articles
+#set($isarchive = (("$request.get('archive')" == '1') || ("$cel_redParams_Map.get('archive')" == '1')))
+#set($subscribable = "$!request.get('subscribable')" == '1')
+#set($newSubscribable = "$!request.get('newSubscribable')" == '1')
+#if($isarchive)
+  #set($articleParam = $services.celblog.getArchiveArticleLoadParameter())
+#elseif($subscribable)
+  #set($articleParam = $services.celblog.getAllSubsribedArticleLoadParameter())
+#elseif($newSubscribable)
+  #set($articleParam = $services.celblog.getUndecidedArticleLoadParameter())
+#else
+  #set($articleParam = $services.celblog.getDefaultArticleLoadParameter())
+#end
+#set($devNull = $articleParam.setLanguage("$default_language"))
+#set($start = $util.parseInt("$request.get('start')"))
+#if(("$!start" != '') && ($start > 0))
+  #set($devNull = $articleParam.setOffset($start))
+#end
+
+#if("$!request.get('nb')" != '')
+  #set($nb = $util.parseInt("$request.get('nb')"))
+#else
+  #set($nb = $util.parseInt("$!blogObj.getProperty('art_per_page').getValue()"))
+#end
+#if(("$!nb" != '') && ($nb > 0))
+  #set($devNull = $articleParam.setLimit($nb))
+#end
+#set($articles = $services.celblog.getArticles($blogDocRef, $articleParam))
+
+#set($viewtype = "$!blogObj.getProperty('viewtype').getValue()")
+#if("$!viewtype" == '')
+  #set($viewtype = 'extract')
+#end
+
+  #if(("$!renderArticlesMacro" == '') || !$xwiki.exists($renderArticlesMacro))
+    #set($renderArticlesMacro = 'celMacros/renderBlogArticles.vm')
+    #parse('celMacros/renderBlogArticles.vm')
+  #else
+    $xwiki.includeForm("$renderArticlesMacro", false)
+  #end
