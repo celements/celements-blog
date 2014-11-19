@@ -49,6 +49,9 @@ $context.setCacheDuration(0)
 #if("$!viewtype" == '')
   #set($viewtype = 'extract')
 #end
+#if("$!showArticleBlogName" == '')
+  #set($showArticleBlogName = false)
+#end
 
 ## set article macro to render
 #if(("$!renderArticlesMacro" == '') || !$xwiki.exists($renderArticlesMacro))

@@ -40,9 +40,6 @@
 #if("$!supressBlogTitle" == '')
   #set($supressBlogTitle = !$celementsweb.getPageType($blogDoc.fullName).hasPageTitle())
 #end
-#if("$!showArticleBlogName" == '')
-  #set($showArticleBlogName = false)
-#end
 
 #if("$!request.xpage" == 'rdf') ## RSS mode
   #set($title = $!xwiki.getSpacePreference("title"))
