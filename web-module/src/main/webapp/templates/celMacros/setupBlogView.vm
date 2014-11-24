@@ -52,8 +52,3 @@ $context.setCacheDuration(0)
 #if("$!showArticleBlogName" == '')
   #set($showArticleBlogName = false)
 #end
-
-## set article macro to render
-#if(("$!renderArticlesMacro" == '') || !$xwiki.exists($renderArticlesMacro))
-  #set($renderArticlesMacro = 'celMacros/renderBlogArticles.vm')
-#end

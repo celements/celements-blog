@@ -1,2 +1,7 @@
 #parse('celMacros/setupBlogView.vm')
-#parse("$!renderArticlesMacro")
+#if(("$!renderArticlesMacro" == '') || !$xwiki.exists($renderArticlesMacro))
+  #set($renderArticlesMacro = 'celMacros/renderBlogArticles.vm')
+  #parse('celMacros/renderBlogArticles.vm')
+#else
+  $xwiki.includeForm("$renderArticlesMacro", false)
+#end
