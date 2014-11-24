@@ -89,9 +89,12 @@
   #if(("$!blogTitle" != '') && !$supressBlogTitle)
     <h1 class="pageTitle">$blogTitle<!--iE6.0--></h1>
   #end
-  <div class="cel_cm_blog_article" id="articles_start:$isarchive:$!{spaceRef.getName()}:"##
-  #if($articleParam.getLimit() > 0) class="cel_paging"#end##
-  >
+  #set($blogCssClasses = 'cel_cm_blog_article ')
+  #if($articleParam.getLimit() > 0)
+    #set($blogCssClasses = "$!{blogCssClasses}cel_paging ")
+  #end
+  <div id="articles_start:$isarchive:$!{spaceRef.getName()}:"##
+  class="$!{blogCssClasses.trim()}"> 
 #set($jsonBuilder = $services.celementsweb.getNewJSONBuilder())
 $jsonBuilder.openDictionary()
 $jsonBuilder.openProperty('limit')
