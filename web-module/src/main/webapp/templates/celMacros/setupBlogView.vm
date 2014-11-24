@@ -52,3 +52,14 @@ $context.setCacheDuration(0)
 #if("$!showArticleBlogName" == '')
   #set($showArticleBlogName = false)
 #end
+#set($articleParamJSON = $services.celementsweb.getNewJSONBuilder())
+$articleParamJSON.openDictionary()
+#if("$!articleParam.getLimit()" != '')
+$articleParamJSON.openProperty('limit')
+$articleParamJSON.addInteger($articleParam.getLimit())
+#end
+#if("$!articleParam.getOffset()" != '')
+$articleParamJSON.openProperty('offset')
+$articleParamJSON.addInteger($articleParam.getOffset())
+#end
+$articleParamJSON.closeDictionary()

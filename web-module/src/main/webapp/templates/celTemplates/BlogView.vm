@@ -95,14 +95,7 @@
   #end
   <div id="articles_start:$isarchive:$!{spaceRef.getName()}:"##
   class="$!{blogCssClasses.trim()}"> 
-#set($jsonBuilder = $services.celementsweb.getNewJSONBuilder())
-$jsonBuilder.openDictionary()
-$jsonBuilder.openProperty('limit')
-$jsonBuilder.addInteger($articleParam.getLimit())
-$jsonBuilder.openProperty('offset')
-$jsonBuilder.addInteger($articleParam.getOffset())
-$jsonBuilder.closeDictionary()
-  <span class="cel_paging_details" style="display:none">$jsonBuilder.getJSON()</span>
+  <span class="cel_paging_details_json" style="display:none">$!articleParamJSON.getJSON()</span>
   #if(("$!renderArticlesMacro" == '') || !$xwiki.exists($renderArticlesMacro))
     #parse('celMacros/renderBlogArticles.vm')
   #else
