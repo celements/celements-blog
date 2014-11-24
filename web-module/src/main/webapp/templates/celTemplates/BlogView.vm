@@ -89,7 +89,9 @@
   #if(("$!blogTitle" != '') && !$supressBlogTitle)
     <h1 class="pageTitle">$blogTitle<!--iE6.0--></h1>
   #end
-  <div class="cel_cm_blog_article" id="articles_start:$isarchive:$!{spaceRef.getName()}:">
+  <div class="cel_cm_blog_article" id="articles_start:$isarchive:$!{spaceRef.getName()}:"##
+  #if($articleParam.getLimit() > 0) class="endlessContent"#end##
+  >
   #if(("$!renderArticlesMacro" == '') || !$xwiki.exists($renderArticlesMacro))
     #parse('celMacros/renderBlogArticles.vm')
   #else
