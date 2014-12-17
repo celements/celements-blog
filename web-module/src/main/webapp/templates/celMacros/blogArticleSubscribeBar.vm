@@ -38,6 +38,8 @@
       <div class="infoText">$adminMsg.get('cel_blog_subscriber_notice', ["$!blogPageName"])</div><!-- /infoText -->
     </div><!-- /subscribeToArticle -->
     <script type="text/javascript">
+    ##FIXME methods execAjax and ajax are defined once per article which could cause 
+    ##      problems e.g. if ${blogSaveSpace} isn't the same for all articles
       var execAjax = function(article, value){
         ajax('article=' + article + '&subscriber=${blogSaveSpace}&doSubscribe=' + value);
       }
