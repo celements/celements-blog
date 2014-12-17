@@ -13,7 +13,7 @@
     $subscriptionObj.set('doSubscribe', $value)
     $articleDoc.saveWithProgrammingRights()
     Changes saved.
-  #else
+  #elseif("$!{blogSaveSpace}" != "$!services.model.serialize($doc.documentReference, 'local')")
     #set($additionalClasses = '')
     #set($isSubscribed = '')
     #set($isNotSubscribed = '')
