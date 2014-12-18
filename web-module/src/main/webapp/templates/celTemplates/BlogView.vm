@@ -58,7 +58,7 @@
     #set($has_comments = false)
   #end
 
-#if(!$deactivateArticleMsgs)
+#if(!$deactivateArticleMsgs && $blogDoc.hasAccessLevel("edit"))
   #if(!$newSubscribable)
     #set($articleParam = $services.celblog.getUndecidedArticleLoadParameter())
     #set($devNull = $articleParam.setLanguage("$default_language"))
