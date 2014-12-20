@@ -56,7 +56,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-blog</artifactId>
-      <version>1.34</version>
+      <version>1.35</version>
     </dependency>
   </dependencies>
   <build>
