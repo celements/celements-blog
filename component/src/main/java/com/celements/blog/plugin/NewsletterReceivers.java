@@ -512,8 +512,10 @@ public class NewsletterReceivers {
       if((to != null) && (to.trim().length() == 0)){ to = null; }
       Map<String, String> otherHeader = new HashMap<String, String>();
       otherHeader.put("Content-Location", baseURL);
-      
-      CelSendMail sender = new CelSendMail(getContext());
+
+      LOGGER.info("NewsletterReceivers: sendMail from [" + from + "], replyTo ["
+          + replyTo + "], to [" + to + "], subject [" + subject + "].");
+      CelSendMail sender = new CelSendMail();
       sender.setFrom(from);
       sender.setReplyTo(replyTo);
       sender.setTo(to);
