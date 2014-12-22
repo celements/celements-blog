@@ -13,42 +13,46 @@
     $subscriptionObj.set('doSubscribe', $value)
     $articleDoc.saveWithProgrammingRights()
     Changes saved.
-  #elseif("$!{blogSaveSpace}" != "$!services.model.serialize($doc.documentReference, 'local')")
-    #set($additionalClasses = '')
-    #set($isSubscribed = '')
-    #set($isNotSubscribed = '')
-    #set($subscr = '')
-    #set($subscr = $article.isSubscribed())
-    #if("$!subscr" != '')
-      #if($subscr)
-        #set($additionalClasses = "$additionalClasses subscribed")
-        #set($isSubscribed = 'checked="checked"')
+  #else
+    #set($blogDoc = $xwiki.getDocument($blogSaveSpace))
+    #set($blogObj = $blogDoc.getObject('Celements2.BlogConfigClass'))
+    #if($blogSaveArticle.getSpace() != "$!{blogObj.getProperty('blogspace').getValue()}")
+      #set($additionalClasses = '')
+      #set($isSubscribed = '')
+      #set($isNotSubscribed = '')
+      #set($subscr = '')
+      #set($subscr = $article.isSubscribed())
+      #if("$!subscr" != '')
+        #if($subscr)
+          #set($additionalClasses = "$additionalClasses subscribed")
+          #set($isSubscribed = 'checked="checked"')
+        #else
+          #set($additionalClasses = "$additionalClasses unsubscribed")
+          #set($isNotSubscribed = 'checked="checked"')
+        #end
       #else
-        #set($additionalClasses = "$additionalClasses unsubscribed")
-        #set($isNotSubscribed = 'checked="checked"')
+        #set($additionalClasses = "$additionalClasses undecided")
       #end
-    #else
-      #set($additionalClasses = "$additionalClasses undecided")
+      <div class="subscribeToArticle $additionalClasses">
+        <div class="changeSubscription">$adminMsg.get('cel_blog_subscriber_show')
+          $adminMsg.get("yesno_1")<input type="radio" name="subscribe$!velocityCount" value="1" onclick="execAjax('${blogSaveArticle}', value);" $!isSubscribed/>
+          <input type="radio" name="subscribe$!velocityCount" value="0" onclick="execAjax('${blogSaveArticle}', value);" $!isNotSubscribed/>$adminMsg.get("yesno_0")
+        </div><!-- /changeSubscription -->
+        <div class="infoText">$adminMsg.get('cel_blog_subscriber_notice', ["$!blogPageName"])</div><!-- /infoText -->
+      </div><!-- /subscribeToArticle -->
+      <script type="text/javascript">
+      ##FIXME methods execAjax and ajax are defined once per article which could cause 
+      ##      problems e.g. if ${blogSaveSpace} isn't the same for all articles
+        var execAjax = function(article, value){
+          ajax('article=' + article + '&subscriber=${blogSaveSpace}&doSubscribe=' + value);
+        }
+        var ajax = function(url){
+          #set($extension = "xpage=plainpagetype&")
+          var urlPrefix = "/Macros/blogArticleSubscribeBar?$extension";
+          new Ajax.Request(urlPrefix + url, { method: 'get' });
+        }
+      </script>
     #end
-    <div class="subscribeToArticle $additionalClasses">
-      <div class="changeSubscription">$adminMsg.get('cel_blog_subscriber_show')
-        $adminMsg.get("yesno_1")<input type="radio" name="subscribe$!velocityCount" value="1" onclick="execAjax('${blogSaveArticle}', value);" $!isSubscribed/>
-        <input type="radio" name="subscribe$!velocityCount" value="0" onclick="execAjax('${blogSaveArticle}', value);" $!isNotSubscribed/>$adminMsg.get("yesno_0")
-      </div><!-- /changeSubscription -->
-      <div class="infoText">$adminMsg.get('cel_blog_subscriber_notice', ["$!blogPageName"])</div><!-- /infoText -->
-    </div><!-- /subscribeToArticle -->
-    <script type="text/javascript">
-    ##FIXME methods execAjax and ajax are defined once per article which could cause 
-    ##      problems e.g. if ${blogSaveSpace} isn't the same for all articles
-      var execAjax = function(article, value){
-        ajax('article=' + article + '&subscriber=${blogSaveSpace}&doSubscribe=' + value);
-      }
-      var ajax = function(url){
-        #set($extension = "xpage=plainpagetype&")
-        var urlPrefix = "/Macros/blogArticleSubscribeBar?$extension";
-        new Ajax.Request(urlPrefix + url, { method: 'get' });
-      }
-    </script>
   #end
 #else
 <!--  Abo needs edit  right -->
