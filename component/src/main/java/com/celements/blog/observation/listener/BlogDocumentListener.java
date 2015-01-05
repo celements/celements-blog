@@ -64,6 +64,8 @@ public class BlogDocumentListener extends AbstractDocumentListener {
     if ((doc.getXObject(classRef) != null) && (notifyEvent != null)) {
       getObservationManager().notify(notifyEvent, source, data);
     } else {
+      //FIXME check if originalDocument has an BlogConfig object THUS a BlogDeleted Event
+      //FIXME must be fired
       LOGGER.trace("no blog config object found on doc '" + doc + "', not notifiying event '" 
           + notifyEvent);
     }
