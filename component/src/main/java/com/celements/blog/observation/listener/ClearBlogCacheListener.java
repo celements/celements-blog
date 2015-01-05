@@ -17,6 +17,7 @@ import org.xwiki.observation.event.Event;
 
 import com.celements.blog.observation.event.BlogCreatedEvent;
 import com.celements.blog.observation.event.BlogDeletedEvent;
+import com.celements.blog.observation.event.BlogUpdatedEvent;
 import com.celements.blog.service.BlogService;
 import com.celements.blog.service.IBlogServiceRole;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -32,7 +33,8 @@ public class ClearBlogCacheListener implements EventListener {
 
   @Override
   public List<Event> getEvents() {
-    return Arrays.<Event> asList(new BlogCreatedEvent(), new BlogDeletedEvent());
+    return Arrays.<Event> asList(new BlogCreatedEvent(), new BlogUpdatedEvent(),
+        new BlogDeletedEvent());
   }
 
   @Override
