@@ -12,7 +12,7 @@ import com.celements.blog.observation.event.ArticleDeletedEvent;
 import com.celements.blog.observation.event.ArticleDeletingEvent;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.common.classes.IClassCollectionRole;
-import com.celements.observation.listener.AbstractDocumentDeleteListener;
+import com.celements.common.observation.listener.AbstractDocumentDeleteListener;
 
 @Component(ArticleDeleteListener.NAME)
 public class ArticleDeleteListener extends AbstractDocumentDeleteListener {

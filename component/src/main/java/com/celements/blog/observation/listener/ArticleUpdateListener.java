@@ -16,7 +16,7 @@ import com.celements.blog.observation.event.ArticleUpdatedEvent;
 import com.celements.blog.observation.event.ArticleUpdatingEvent;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.common.classes.IClassCollectionRole;
-import com.celements.observation.listener.AbstractDocumentUpdateListener;
+import com.celements.common.observation.listener.AbstractDocumentUpdateListener;
 
 @Component(ArticleUpdateListener.NAME)
 public class ArticleUpdateListener extends AbstractDocumentUpdateListener {

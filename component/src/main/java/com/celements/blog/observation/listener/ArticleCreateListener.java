@@ -12,7 +12,7 @@ import com.celements.blog.observation.event.ArticleCreatedEvent;
 import com.celements.blog.observation.event.ArticleCreatingEvent;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.common.classes.IClassCollectionRole;
-import com.celements.observation.listener.AbstractDocumentCreateListener;
+import com.celements.common.observation.listener.AbstractDocumentCreateListener;
 
 @Component(ArticleCreateListener.NAME)
 public class ArticleCreateListener extends AbstractDocumentCreateListener {

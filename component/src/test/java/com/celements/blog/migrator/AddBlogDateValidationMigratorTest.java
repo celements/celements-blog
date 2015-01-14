@@ -1,17 +1,12 @@
 package com.celements.blog.migrator;
 
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.same;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.blog.migrator.AddBlogDateValidationMigrator;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.migrations.celSubSystem.ICelementsMigrator;
 import com.xpn.xwiki.XWiki;
