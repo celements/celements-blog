@@ -8,20 +8,30 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.observation.event.Event;
 
 import com.celements.blog.observation.event.ArticleCreatingEvent;
 import com.celements.blog.observation.event.ArticleUpdatingEvent;
 import com.celements.blog.plugin.BlogClasses;
+import com.celements.common.classes.IClassCollectionRole;
+import com.celements.common.observation.listener.AbstractEventListener;
 import com.celements.search.lucene.ILuceneSearchService;
+import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component("celements.blog.articleDatesListener")
-public class ArticleDatesListener extends AbstractDocumentListener {
+public class ArticleDatesListener extends AbstractEventListener {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(
       ArticleDatesListener.class);
+
+  @Requirement
+  private IWebUtilsService webUtilsService;
+
+  @Requirement("celements.celBlogClasses")
+  private IClassCollectionRole blogClasses;
 
   @Override
   public List<Event> getEvents() {
@@ -35,22 +45,22 @@ public class ArticleDatesListener extends AbstractDocumentListener {
 
   @Override
   public void onEvent(Event event, Object source, Object data) {
-    XWikiDocument doc = getDocument(source, event);
-    if ((doc != null) && !remoteObservationManagerContext.isRemoteState()) {
+    XWikiDocument doc = (XWikiDocument) source;
+    if ((doc != null) && isLocalEvent()) {
       LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
           + doc.getDocumentReference() + "].");
       checkDatesNotNull(doc);
     } else {
-      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source ["
-          + source + "] and data [" + data + "], isLocalEvent ["
-          + !remoteObservationManagerContext.isRemoteState() + "] -> skip.");
+      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source [" 
+          + source + "] and data [" + data + "], isLocalEvent [" + isLocalEvent() 
+          + "] -> skip.");
     }
   }
   
   private void checkDatesNotNull(XWikiDocument articleDoc) {
     try {
       BaseObject articleObj = articleDoc.getXObject(getBlogClasses().getArticleClassRef(
-          articleDoc.getDocumentReference().getWikiReference().getName()));
+          webUtilsService.getWikiRef(articleDoc).getName()));
       if (articleObj != null) {
         checkDateNotNull(articleObj, BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE,  
             new Date());
@@ -70,6 +80,10 @@ public class ArticleDatesListener extends AbstractDocumentListener {
       articleObj.setDateValue(field, setTo);
       LOGGER.info("set empty date field '" + field + "' to '" + setTo + "'");
     }
+  }
+
+  BlogClasses getBlogClasses() {
+    return (BlogClasses) blogClasses;
   }
 
 }
