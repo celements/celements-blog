@@ -5,11 +5,15 @@ com.celements.blog.service.NewsletterAttachmentService
 com.celements.blog.migrator.NewsletterReceiversToLowerCaseMigrator
 com.celements.blog.migrator.NewsletterReceiversRemoveDoublesMigrator
 com.celements.blog.migrator.AddBlogDateValidationMigrator
-com.celements.blog.observation.listener.BlogDocumentListener
-com.celements.blog.observation.listener.ArticleDocumentListener
 com.celements.blog.observation.listener.ClearBlogCacheListener
 com.celements.blog.observation.listener.ArticleDatesListener
 com.celements.blog.article.ArticleEngineLucene
 com.celements.blog.article.ArticleEngineHQL
 com.celements.blog.article.ArticleLuceneQueryBuilder
 com.celements.blog.migrator.ArticleNullDatesMigrator
+com.celements.blog.observation.listener.BlogCreateListener
+com.celements.blog.observation.listener.BlogUpdateListener
+com.celements.blog.observation.listener.BlogDeleteListener
+com.celements.blog.observation.listener.ArticleCreateListener
+com.celements.blog.observation.listener.ArticleUpdateListener
+com.celements.blog.observation.listener.ArticleDeleteListener
