@@ -40,24 +40,20 @@ public class BlogCreateListenerTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testCreatingEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getCreatingEvent(docRef);
+    Event event = listener.getCreatingEvent(null);
     assertNotNull(event);
     assertSame(BlogCreatingEvent.class, event.getClass());
-    assertTrue(event.matches(new BlogCreatingEvent(docRef)));
-    assertFalse(event.matches(new BlogCreatingEvent()));
-    assertNotSame(listener.getCreatingEvent(docRef), event);
+    assertTrue(event.matches(new BlogCreatingEvent()));
+    assertNotSame(listener.getCreatingEvent(null), event);
   }
 
   @Test
   public void testCreatedEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getCreatedEvent(docRef);
+    Event event = listener.getCreatedEvent(null);
     assertNotNull(event);
     assertSame(BlogCreatedEvent.class, event.getClass());
-    assertTrue(event.matches(new BlogCreatedEvent(docRef)));
-    assertFalse(event.matches(new BlogCreatedEvent()));
-    assertNotSame(listener.getCreatedEvent(docRef), event);
+    assertTrue(event.matches(new BlogCreatedEvent()));
+    assertNotSame(listener.getCreatedEvent(null), event);
   }
 
   @Test

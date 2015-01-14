@@ -36,12 +36,12 @@ public class BlogCreateListener extends AbstractDocumentCreateListener {
 
   @Override
   protected Event getCreatingEvent(DocumentReference docRef) {
-    return new BlogCreatingEvent(docRef);
+    return new BlogCreatingEvent();
   }
 
   @Override
   protected Event getCreatedEvent(DocumentReference docRef) {
-    return new BlogCreatedEvent(docRef);
+    return new BlogCreatedEvent();
   }
 
   @Override

@@ -44,68 +44,56 @@ public class ArticleUpdateListenerTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testCreatingEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getCreatingEvent(docRef);
+    Event event = listener.getCreatingEvent(null);
     assertNotNull(event);
     assertSame(ArticleCreatingEvent.class, event.getClass());
-    assertTrue(event.matches(new ArticleCreatingEvent(docRef)));
-    assertFalse(event.matches(new ArticleCreatingEvent()));
-    assertNotSame(listener.getCreatingEvent(docRef), event);
+    assertTrue(event.matches(new ArticleCreatingEvent()));
+    assertNotSame(listener.getCreatingEvent(null), event);
   }
 
   @Test
   public void testCreatedEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getCreatedEvent(docRef);
+    Event event = listener.getCreatedEvent(null);
     assertNotNull(event);
     assertSame(ArticleCreatedEvent.class, event.getClass());
-    assertTrue(event.matches(new ArticleCreatedEvent(docRef)));
-    assertFalse(event.matches(new ArticleCreatedEvent()));
-    assertNotSame(listener.getCreatedEvent(docRef), event);
+    assertTrue(event.matches(new ArticleCreatedEvent()));
+    assertNotSame(listener.getCreatedEvent(null), event);
   }
 
   @Test
   public void testUpdatingEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getUpdatingEvent(docRef);
+    Event event = listener.getUpdatingEvent(null);
     assertNotNull(event);
     assertSame(ArticleUpdatingEvent.class, event.getClass());
-    assertTrue(event.matches(new ArticleUpdatingEvent(docRef)));
-    assertFalse(event.matches(new ArticleUpdatingEvent()));
-    assertNotSame(listener.getUpdatingEvent(docRef), event);
+    assertTrue(event.matches(new ArticleUpdatingEvent()));
+    assertNotSame(listener.getUpdatingEvent(null), event);
   }
 
   @Test
   public void testUpdatedEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getUpdatedEvent(docRef);
+    Event event = listener.getUpdatedEvent(null);
     assertNotNull(event);
     assertSame(ArticleUpdatedEvent.class, event.getClass());
-    assertTrue(event.matches(new ArticleUpdatedEvent(docRef)));
-    assertFalse(event.matches(new ArticleUpdatedEvent()));
-    assertNotSame(listener.getUpdatedEvent(docRef), event);
+    assertTrue(event.matches(new ArticleUpdatedEvent()));
+    assertNotSame(listener.getUpdatedEvent(null), event);
   }
 
   @Test
   public void testDeletingEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getDeletingEvent(docRef);
+    Event event = listener.getDeletingEvent(null);
     assertNotNull(event);
     assertSame(ArticleDeletingEvent.class, event.getClass());
-    assertTrue(event.matches(new ArticleDeletingEvent(docRef)));
-    assertFalse(event.matches(new ArticleDeletingEvent()));
-    assertNotSame(listener.getDeletingEvent(docRef), event);
+    assertTrue(event.matches(new ArticleDeletingEvent()));
+    assertNotSame(listener.getDeletingEvent(null), event);
   }
 
   @Test
   public void testDeletedEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getDeletedEvent(docRef);
+    Event event = listener.getDeletedEvent(null);
     assertNotNull(event);
     assertSame(ArticleDeletedEvent.class, event.getClass());
-    assertTrue(event.matches(new ArticleDeletedEvent(docRef)));
-    assertFalse(event.matches(new ArticleDeletedEvent()));
-    assertNotSame(listener.getDeletedEvent(docRef), event);
+    assertTrue(event.matches(new ArticleDeletedEvent()));
+    assertNotSame(listener.getDeletedEvent(null), event);
   }
 
   @Test

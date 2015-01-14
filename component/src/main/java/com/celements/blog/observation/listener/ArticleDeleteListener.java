@@ -37,12 +37,12 @@ public class ArticleDeleteListener extends AbstractDocumentDeleteListener {
 
   @Override
   protected Event getDeletingEvent(DocumentReference docRef) {
-    return new ArticleDeletingEvent(docRef);
+    return new ArticleDeletingEvent();
   }
 
   @Override
   protected Event getDeletedEvent(DocumentReference docRef) {
-    return new ArticleDeletedEvent(docRef);
+    return new ArticleDeletedEvent();
   }
 
   @Override

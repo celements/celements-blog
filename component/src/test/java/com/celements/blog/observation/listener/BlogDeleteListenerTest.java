@@ -40,24 +40,20 @@ public class BlogDeleteListenerTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testDeletingEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getDeletingEvent(docRef);
+    Event event = listener.getDeletingEvent(null);
     assertNotNull(event);
     assertSame(BlogDeletingEvent.class, event.getClass());
-    assertTrue(event.matches(new BlogDeletingEvent(docRef)));
-    assertFalse(event.matches(new BlogDeletingEvent()));
-    assertNotSame(listener.getDeletingEvent(docRef), event);
+    assertTrue(event.matches(new BlogDeletingEvent()));
+    assertNotSame(listener.getDeletingEvent(null), event);
   }
 
   @Test
   public void testDeletedEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getDeletedEvent(docRef);
+    Event event = listener.getDeletedEvent(null);
     assertNotNull(event);
     assertSame(BlogDeletedEvent.class, event.getClass());
-    assertTrue(event.matches(new BlogDeletedEvent(docRef)));
-    assertFalse(event.matches(new BlogDeletedEvent()));
-    assertNotSame(listener.getDeletedEvent(docRef), event);
+    assertTrue(event.matches(new BlogDeletedEvent()));
+    assertNotSame(listener.getDeletedEvent(null), event);
   }
 
   @Test

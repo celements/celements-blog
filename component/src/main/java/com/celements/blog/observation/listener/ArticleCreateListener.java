@@ -37,12 +37,12 @@ public class ArticleCreateListener extends AbstractDocumentCreateListener {
 
   @Override
   protected Event getCreatingEvent(DocumentReference docRef) {
-    return new ArticleCreatingEvent(docRef);
+    return new ArticleCreatingEvent();
   }
 
   @Override
   protected Event getCreatedEvent(DocumentReference docRef) {
-    return new ArticleCreatedEvent(docRef);
+    return new ArticleCreatedEvent();
   }
 
   @Override

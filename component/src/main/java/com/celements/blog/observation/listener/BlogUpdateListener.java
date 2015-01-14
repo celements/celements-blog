@@ -40,32 +40,32 @@ public class BlogUpdateListener extends AbstractDocumentUpdateListener {
 
   @Override
   protected Event getCreatingEvent(DocumentReference docRef) {
-    return new BlogCreatingEvent(docRef);
+    return new BlogCreatingEvent();
   }
 
   @Override
   protected Event getCreatedEvent(DocumentReference docRef) {
-    return new BlogCreatedEvent(docRef);
+    return new BlogCreatedEvent();
   }
 
   @Override
   protected Event getUpdatingEvent(DocumentReference docRef) {
-    return new BlogUpdatingEvent(docRef);
+    return new BlogUpdatingEvent();
   }
 
   @Override
   protected Event getUpdatedEvent(DocumentReference docRef) {
-    return new BlogUpdatedEvent(docRef);
+    return new BlogUpdatedEvent();
   }
 
   @Override
   protected Event getDeletingEvent(DocumentReference docRef) {
-    return new BlogDeletingEvent(docRef);
+    return new BlogDeletingEvent();
   }
 
   @Override
   protected Event getDeletedEvent(DocumentReference docRef) {
-    return new BlogDeletedEvent(docRef);
+    return new BlogDeletedEvent();
   }
 
   @Override

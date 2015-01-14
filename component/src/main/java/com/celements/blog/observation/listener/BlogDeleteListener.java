@@ -36,12 +36,12 @@ public class BlogDeleteListener extends AbstractDocumentDeleteListener {
 
   @Override
   protected Event getDeletingEvent(DocumentReference docRef) {
-    return new BlogDeletingEvent(docRef);
+    return new BlogDeletingEvent();
   }
 
   @Override
   protected Event getDeletedEvent(DocumentReference docRef) {
-    return new BlogDeletedEvent(docRef);
+    return new BlogDeletedEvent();
   }
 
   @Override

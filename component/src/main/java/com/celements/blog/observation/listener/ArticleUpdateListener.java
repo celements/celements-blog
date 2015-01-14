@@ -40,32 +40,32 @@ public class ArticleUpdateListener extends AbstractDocumentUpdateListener {
 
   @Override
   protected Event getCreatingEvent(DocumentReference docRef) {
-    return new ArticleCreatingEvent(docRef);
+    return new ArticleCreatingEvent();
   }
 
   @Override
   protected Event getCreatedEvent(DocumentReference docRef) {
-    return new ArticleCreatedEvent(docRef);
+    return new ArticleCreatedEvent();
   }
 
   @Override
   protected Event getUpdatingEvent(DocumentReference docRef) {
-    return new ArticleUpdatingEvent(docRef);
+    return new ArticleUpdatingEvent();
   }
 
   @Override
   protected Event getUpdatedEvent(DocumentReference docRef) {
-    return new ArticleUpdatedEvent(docRef);
+    return new ArticleUpdatedEvent();
   }
 
   @Override
   protected Event getDeletingEvent(DocumentReference docRef) {
-    return new ArticleDeletingEvent(docRef);
+    return new ArticleDeletingEvent();
   }
 
   @Override
   protected Event getDeletedEvent(DocumentReference docRef) {
-    return new ArticleDeletedEvent(docRef);
+    return new ArticleDeletedEvent();
   }
 
   @Override

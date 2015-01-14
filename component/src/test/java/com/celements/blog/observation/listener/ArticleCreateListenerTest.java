@@ -40,24 +40,20 @@ public class ArticleCreateListenerTest extends AbstractBridgedComponentTestCase 
 
   @Test
   public void testCreatingEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getCreatingEvent(docRef);
+    Event event = listener.getCreatingEvent(null);
     assertNotNull(event);
     assertSame(ArticleCreatingEvent.class, event.getClass());
-    assertTrue(event.matches(new ArticleCreatingEvent(docRef)));
-    assertFalse(event.matches(new ArticleCreatingEvent()));
-    assertNotSame(listener.getCreatingEvent(docRef), event);
+    assertTrue(event.matches(new ArticleCreatingEvent()));
+    assertNotSame(listener.getCreatingEvent(null), event);
   }
 
   @Test
   public void testCreatedEvent() {
-    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
-    Event event = listener.getCreatedEvent(docRef);
+    Event event = listener.getCreatedEvent(null);
     assertNotNull(event);
     assertSame(ArticleCreatedEvent.class, event.getClass());
-    assertTrue(event.matches(new ArticleCreatedEvent(docRef)));
-    assertFalse(event.matches(new ArticleCreatedEvent()));
-    assertNotSame(listener.getCreatedEvent(docRef), event);
+    assertTrue(event.matches(new ArticleCreatedEvent()));
+    assertNotSame(listener.getCreatedEvent(null), event);
   }
 
   @Test
