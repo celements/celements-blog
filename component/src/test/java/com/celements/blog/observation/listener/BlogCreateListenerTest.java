@@ -1,0 +1,63 @@
+package com.celements.blog.observation.listener;
+
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.Event;
+
+import com.celements.blog.observation.event.BlogCreatedEvent;
+import com.celements.blog.observation.event.BlogCreatingEvent;
+import com.celements.blog.plugin.BlogClasses;
+import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.web.Utils;
+
+public class BlogCreateListenerTest extends AbstractBridgedComponentTestCase {
+
+  private BlogCreateListener listener;
+
+  @Before
+  public void setUp_BlogCreateListenerTest() throws Exception {
+    listener = (BlogCreateListener) Utils.getComponent(EventListener.class, 
+        BlogCreateListener.NAME);
+  }
+
+  @Test
+  public void testGetName() {
+    assertEquals("BlogCreateListener", listener.getName());
+  }
+
+  @Test
+  public void testGetRequiredObjClassRef() {
+    String wikiName = "myWiki";
+    DocumentReference classRef = new DocumentReference(wikiName, 
+        BlogClasses.BLOG_CONFIG_CLASS_SPACE, BlogClasses.BLOG_CONFIG_CLASS_DOC);
+    assertEquals(classRef, listener.getRequiredObjClassRef(new WikiReference(wikiName)));
+  }
+
+  @Test
+  public void testCreatingEvent() {
+    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
+    Event event = listener.getCreatingEvent(docRef);
+    assertNotNull(event);
+    assertSame(BlogCreatingEvent.class, event.getClass());
+    assertTrue(event.matches(new BlogCreatingEvent(docRef)));
+    assertFalse(event.matches(new BlogCreatingEvent()));
+    assertNotSame(listener.getCreatingEvent(docRef), event);
+  }
+
+  @Test
+  public void testCreatedEvent() {
+    DocumentReference docRef = new DocumentReference("myWiki", "mySpace", "myDoc");
+    Event event = listener.getCreatedEvent(docRef);
+    assertNotNull(event);
+    assertSame(BlogCreatedEvent.class, event.getClass());
+    assertTrue(event.matches(new BlogCreatedEvent(docRef)));
+    assertFalse(event.matches(new BlogCreatedEvent()));
+    assertNotSame(listener.getCreatedEvent(docRef), event);
+  }
+
+}
