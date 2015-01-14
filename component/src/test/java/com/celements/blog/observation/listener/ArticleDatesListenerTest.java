@@ -23,6 +23,7 @@ import com.xpn.xwiki.web.Utils;
 public class ArticleDatesListenerTest extends AbstractBridgedComponentTestCase {
   
   private ArticleDatesListener listener;
+
   @Before
   public void setUp_EventChangedListenerTest() throws Exception {
     listener = (ArticleDatesListener) Utils.getComponent(EventListener.class, 

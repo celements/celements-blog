@@ -60,4 +60,9 @@ public class BlogDeleteListenerTest extends AbstractBridgedComponentTestCase {
     assertNotSame(listener.getDeletedEvent(docRef), event);
   }
 
+  @Test
+  public void testGetLogger() {
+    assertNotNull(listener.getLogger());
+  }
+
 }

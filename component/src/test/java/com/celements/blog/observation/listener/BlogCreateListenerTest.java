@@ -60,4 +60,9 @@ public class BlogCreateListenerTest extends AbstractBridgedComponentTestCase {
     assertNotSame(listener.getCreatedEvent(docRef), event);
   }
 
+  @Test
+  public void testGetLogger() {
+    assertNotNull(listener.getLogger());
+  }
+
 }
