@@ -66,6 +66,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
       if (!blogOrSubsGrp.isEmpty()) {
         String database = param.getBlogDocRef().getWikiReference().getName();
         query = searchService.createQuery(database);
+        query.add(searchService.createWikiPageTypeRestriction());
         DocumentReference articleClassRef = getBlogClasses().getArticleClassRef(database);
         query.add(searchService.createObjectRestriction(articleClassRef));
         if (StringUtils.isNotBlank(param.getLanguage())) {
