@@ -4,12 +4,13 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.search.lucene.ILuceneSearchService;
@@ -17,6 +18,7 @@ import com.celements.search.lucene.LuceneSearchException;
 import com.celements.search.lucene.LuceneSearchResult;
 import com.celements.search.lucene.query.LuceneQuery;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
@@ -27,12 +29,16 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
   private IArticleLuceneQueryBuilderRole queryBuilderMock;
 
   @Before
-  public void setUp_ArticleEngineLuceneTest() {
+  public void setUp_ArticleEngineLuceneTest() throws Exception {
     engine = (ArticleEngineLucene) Utils.getComponent(IArticleEngineRole.class, "lucene");
     searchServiceMock = createMockAndAddToDefault(ILuceneSearchService.class);
     engine.injectSearchService(searchServiceMock);
     queryBuilderMock = createMockAndAddToDefault(IArticleLuceneQueryBuilderRole.class);
     engine.injectQueryBuilder(queryBuilderMock);
+    DocumentReference xwikiPrefsDocRef = new DocumentReference("xwikidb", "XWiki", 
+        "XWikiPreferences");
+    expect(getWikiMock().getDocument(eq(xwikiPrefsDocRef), same(getContext()))
+        ).andReturn(new XWikiDocument(xwikiPrefsDocRef)).anyTimes();
   }
   
   @Test
@@ -48,20 +54,26 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     param.setLimit(limit);
     LuceneQuery query = new LuceneQuery("db");    
     LuceneSearchResult resultMock = createMockAndAddToDefault(LuceneSearchResult.class);
+    DocumentReference artDocRef = new DocumentReference("wiki", "blogSpace", "article");
+    XWikiDocument artDoc = new XWikiDocument(artDocRef);
+    AttachmentReference attRef = new AttachmentReference("file", artDocRef);
     
     expect(queryBuilderMock.build(same(param))).andReturn(query).once();
     expect(searchServiceMock.searchWithoutChecks(same(query), eq(sortFields), 
         eq(Arrays.asList("default", language)))).andReturn(resultMock).once();
     expect(resultMock.setOffset(eq(offset))).andReturn(resultMock).once();
     expect(resultMock.setLimit(eq(limit))).andReturn(resultMock).once();
-    expect(resultMock.getResults()).andReturn(Collections.<DocumentReference>emptyList()
+    expect(getWikiMock().getDocument(eq(artDocRef), same(getContext()))).andReturn(artDoc
         ).once();
+    expect(resultMock.getResults()).andReturn(Arrays.<EntityReference>asList(artDocRef, 
+        attRef)).once();
     
     replayDefault();
     List<Article> ret = engine.getArticles(param);
     verifyDefault();
     
     assertNotNull(ret);
+    // empty because of EmptyArticleException
     assertEquals(0, ret.size());
   }
   
