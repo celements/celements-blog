@@ -19,6 +19,7 @@ import com.celements.search.lucene.LuceneSearchResult;
 import com.celements.search.lucene.query.LuceneQuery;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.lucene.LucenePlugin;
 import com.xpn.xwiki.web.Utils;
 
 public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
@@ -52,7 +53,7 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     param.setOffset(offset);
     int limit = 10;
     param.setLimit(limit);
-    LuceneQuery query = new LuceneQuery("db");    
+    LuceneQuery query = new LuceneQuery(Arrays.asList(LucenePlugin.DOCTYPE_WIKIPAGE));    
     LuceneSearchResult resultMock = createMockAndAddToDefault(LuceneSearchResult.class);
     DocumentReference artDocRef = new DocumentReference("wiki", "blogSpace", "article");
     XWikiDocument artDoc = new XWikiDocument(artDocRef);
@@ -105,7 +106,7 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     param.setOffset(offset);
     int limit = 10;
     param.setLimit(limit);
-    LuceneQuery query = new LuceneQuery("db");    
+    LuceneQuery query = new LuceneQuery(Arrays.asList(LucenePlugin.DOCTYPE_WIKIPAGE));    
     LuceneSearchResult resultMock = createMockAndAddToDefault(LuceneSearchResult.class);
     Throwable cause = createMockAndAddToDefault(LuceneSearchException.class);
     
