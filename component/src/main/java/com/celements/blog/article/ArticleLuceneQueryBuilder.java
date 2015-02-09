@@ -66,7 +66,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
       blogOrSubsGrp.add(getSubsRestrictions(param));
       if (!blogOrSubsGrp.isEmpty()) {
         WikiReference wikiRef = param.getBlogDocRef().getWikiReference();
-        query = searchService.createWikiPageQuery();
+        query = searchService.createQuery();
         query.setWiki(wikiRef);
         DocumentReference articleClassRef = getBlogClasses().getArticleClassRef(
             wikiRef.getName());
