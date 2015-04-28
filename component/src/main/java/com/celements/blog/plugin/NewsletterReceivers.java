@@ -85,6 +85,8 @@ public class NewsletterReceivers {
   }
 
   void addNewsletterReceiver(XWikiDocument blogDoc) throws XWikiException {
+    String blogFN = getWebUtilsService().serializeRef(blogDoc.getDocumentReference(), 
+        true);
     String xwql = "from doc.object(Celements.NewsletterReceiverClass) as nr "
         + "where nr.isactive = '1' and nr.subscribed = :subscribed";
 //    String hql = "select nr.email,doc.date from Celements.NewsletterReceiverClass as nr, "
@@ -97,40 +99,46 @@ public class NewsletterReceivers {
         getContext().getDatabase());
     try {
       List<String> nlRegReceiverList = Utils.getComponent(QueryManager.class).createQuery(
-          xwql, Query.XWQL).bindValue("subscribed", blogDoc.getFullName()).execute();
+          xwql, Query.XWQL).bindValue("subscribed", blogFN).execute();
       if(nlRegReceiverList != null) {
         LOGGER.info("Found " + nlRegReceiverList.size()
             + " Celements.NewsletterReceiverClass" + " object-subscriptions for blog "
-            + blogDoc.getFullName());
+            + blogFN);
         String blogSpace = blogDoc.getXObject(getBlogClasses().getBlogConfigClassRef(
             getContext().getDatabase())).getStringValue("blogspace");
         for (String nlRegReceiverFN : nlRegReceiverList) {
-          XWikiDocument receiverDoc = getContext().getWiki().getDocument(nlRegReceiverFN,
-              getContext());
+          DocumentReference nlRegReceiverDocRef = getWebUtilsService(
+              ).resolveDocumentReference(nlRegReceiverFN);
+          XWikiDocument receiverDoc = getContext().getWiki().getDocument(
+              nlRegReceiverDocRef, getContext());
           List<BaseObject> recieverObjs = receiverDoc.getXObjects(receverClassRef);
           for(BaseObject receiverObj : recieverObjs) {
-            String address = receiverObj.getStringValue("email");
-            address = address.toLowerCase();
-            if(!allAddresses.contains(address)) {
-              String language = receiverObj.getStringValue("language");
-              String firstname = "";
-              String name = "";
-              BaseObject contactObj = receiverDoc.getXObject(new DocumentReference(
-                  getContext().getWiki().getDatabase(), "Celements", "ContactClass"));
-              if (contactObj != null) {
-                firstname = contactObj.getStringValue("firstname");
-                name = contactObj.getStringValue("lastname");
+            String subscribedBlogs = receiverObj.getStringValue("subscribed");
+            if((subscribedBlogs != null) && (("," + subscribedBlogs + ",").indexOf("," 
+                + blogFN + ",") >= 0)) {
+              String address = receiverObj.getStringValue("email");
+              address = address.toLowerCase();
+              if(!allAddresses.contains(address)) {
+                String language = receiverObj.getStringValue("language");
+                String firstname = "";
+                String name = "";
+                BaseObject contactObj = receiverDoc.getXObject(new DocumentReference(
+                    getContext().getWiki().getDatabase(), "Celements", "ContactClass"));
+                if (contactObj != null) {
+                  firstname = contactObj.getStringValue("firstname");
+                  name = contactObj.getStringValue("lastname");
+                }
+                if (getWebUtilsService().getAllowedLanguages(blogSpace).contains(language)) {
+                  addrLangs.add(new String[]{"XWiki.XWikiGuest", address, language, 
+                      firstname, name});
+                } else {
+                  addresses.add(address);
+                }
+                allAddresses.add(address);
+                emailAddressDateList.add(new EmailAddressDate(address, 
+                    receiverDoc.getDate(), language));
+                LOGGER.info("reveiver added: " + address);
               }
-              if (getWebUtilsService().getAllowedLanguages(blogSpace).contains(language)) {
-                addrLangs.add(new String[]{"XWiki.XWikiGuest", address, language, 
-                    firstname, name});
-              } else {
-                addresses.add(address);
-              }
-              allAddresses.add(address);
-              emailAddressDateList.add(new EmailAddressDate(address, 
-                  receiverDoc.getDate(), language));
-              LOGGER.info("reveiver added: " + address);
             }
           }
         }
