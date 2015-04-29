@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 
 import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.search.lucene.ILuceneSearchService;
@@ -23,8 +24,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component("lucene")
 public class ArticleEngineLucene implements IArticleEngineRole {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
-      ArticleEngineLucene.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArticleEngineLucene.class);
   
   @Requirement
   private ILuceneSearchService searchService;
@@ -50,12 +50,18 @@ public class ArticleEngineLucene implements IArticleEngineRole {
         LuceneSearchResult result = searchService.searchWithoutChecks(query, 
             param.getSortFields(), Arrays.asList("default", param.getLanguage()));
         result.setOffset(param.getOffset()).setLimit(param.getLimit());
-        for (DocumentReference docRef : result.getResults()) {
-          XWikiDocument doc = getContext().getWiki().getDocument(docRef, getContext());
-          try {
-            articles.add(new Article(doc, getContext()));
-          } catch (EmptyArticleException exc) {
-            LOGGER.warn("empty article: " + doc, exc);
+        for (EntityReference ref : result.getResults()) {
+          if (ref instanceof DocumentReference) {
+            XWikiDocument doc = getContext().getWiki().getDocument((DocumentReference) ref, 
+                getContext());
+            try {
+              articles.add(new Article(doc, getContext()));
+            } catch (EmptyArticleException exc) {
+              LOGGER.warn("getArticles: empty article '{}'", exc, doc);
+            }
+          } else {
+            LOGGER.warn("getArticles: not expecting Attachment as search result '{}' "
+                + "for search '{}'", ref, param);
           }
         }
       } else {

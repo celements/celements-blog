@@ -11,6 +11,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.celements.blog.article.ArticleLoadParameter.DateMode;
 import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
@@ -64,9 +65,11 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
       blogOrSubsGrp.add(getBlogRestriction(param));
       blogOrSubsGrp.add(getSubsRestrictions(param));
       if (!blogOrSubsGrp.isEmpty()) {
-        String database = param.getBlogDocRef().getWikiReference().getName();
-        query = searchService.createQuery(database);
-        DocumentReference articleClassRef = getBlogClasses().getArticleClassRef(database);
+        WikiReference wikiRef = param.getBlogDocRef().getWikiReference();
+        query = searchService.createQuery();
+        query.setWiki(wikiRef);
+        DocumentReference articleClassRef = getBlogClasses().getArticleClassRef(
+            wikiRef.getName());
         query.add(searchService.createObjectRestriction(articleClassRef));
         if (StringUtils.isNotBlank(param.getLanguage())) {
           query.add(searchService.createFieldRestriction(articleClassRef, 
