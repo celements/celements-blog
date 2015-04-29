@@ -86,7 +86,7 @@
             #end
           </li>
         #end
-        #foreach($rec in $receiverObj.getAddresses())
+        #foreach($rec in $util.sort($receiverObj.getAllAddresses()))
           #if("$!rowClass" != "cel_newsletter_row_even")
             #set($rowClass = "cel_newsletter_row_even")
           #else
