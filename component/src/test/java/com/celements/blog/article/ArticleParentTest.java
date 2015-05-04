@@ -13,21 +13,17 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.parents.IDocParentProviderRole;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
 public class ArticleParentTest extends AbstractBridgedComponentTestCase {
   private XWikiContext context;
-  private XWiki xwiki;
   private IBlogServiceRole blogServiceMock;
   private ArticleParent articleParentProvider;
 
   @Before
   public void setUp_ArticleParentTest() throws Exception {
     context = getContext();
-    xwiki = createMock(XWiki.class);
-    context.setWiki(xwiki);
     blogServiceMock = createMockAndAddToDefault(IBlogServiceRole.class);
     articleParentProvider = (ArticleParent) Utils.getComponent(
         IDocParentProviderRole.class, ArticleParent.DOC_PROVIDER_NAME);
@@ -40,8 +36,6 @@ public class ArticleParentTest extends AbstractBridgedComponentTestCase {
         "MyBlog", "ArticleChild");
     DocumentReference parentDocRef = new DocumentReference(context.getDatabase(),
         "content", "BlogParent");
-    System.out.println("docRef: " + docRef);
-    System.out.println("parentDocRef: " + parentDocRef);
     ArrayList<DocumentReference> expectedDocParents = 
         new ArrayList<DocumentReference>();
     expectedDocParents.add(parentDocRef);
