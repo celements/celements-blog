@@ -5,13 +5,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryException;
 
-import com.celements.blog.service.BlogService;
+import com.celements.blog.service.IBlogServiceRole;
 import com.celements.parents.IDocParentProviderRole;
 import com.xpn.xwiki.XWikiException;
 
@@ -21,18 +20,16 @@ public class ArticleParent implements IDocParentProviderRole {
   private static Logger _LOGGER = LoggerFactory.getLogger(ArticleParent.class);
 
   public static final String DOC_PROVIDER_NAME = "celblog";
-
-  @Requirement
-  private DocumentAccessBridge docAccessBridge;
   
   @Requirement
-  private BlogService blogService;
+  private IBlogServiceRole blogService;
 
   @Override
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef) {
     ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
     try {
-      DocumentReference nextParent = getParentRef(docRef);
+      DocumentReference nextParent = blogService.getBlogConfigDocRef(
+          docRef.getLastSpaceReference());
       if(nextParent != null) {
         docParents.add(nextParent);
       }
@@ -43,10 +40,9 @@ public class ArticleParent implements IDocParentProviderRole {
     }
     return docParents;
   }
-
-  private DocumentReference getParentRef(DocumentReference docRef) throws QueryException, 
-    XWikiException {
-    return blogService.getBlogConfigDocRef(docRef.getLastSpaceReference());
+  
+  void injectBlogService(IBlogServiceRole blogService) {
+    this.blogService = blogService;
   }
 
 }
