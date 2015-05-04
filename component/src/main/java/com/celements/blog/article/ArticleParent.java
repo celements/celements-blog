@@ -11,14 +11,13 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.parents.IDocParentProviderRole;
-import com.celements.parents.XDocParents;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-@Component(XDocParents.DOC_PROVIDER_NAME)
+@Component(ArticleParent.DOC_PROVIDER_NAME)
 public class ArticleParent implements IDocParentProviderRole {
   
-  private static Logger _LOGGER = LoggerFactory.getLogger(XDocParents.class);
+  private static Logger _LOGGER = LoggerFactory.getLogger(ArticleParent.class);
 
   public static final String DOC_PROVIDER_NAME = "xwiki";
 
