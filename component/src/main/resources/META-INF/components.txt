@@ -17,3 +17,4 @@ com.celements.blog.observation.listener.BlogDeleteListener
 com.celements.blog.observation.listener.ArticleCreateListener
 com.celements.blog.observation.listener.ArticleUpdateListener
 com.celements.blog.observation.listener.ArticleDeleteListener
+com.celements.blog.article.ArticleParent
