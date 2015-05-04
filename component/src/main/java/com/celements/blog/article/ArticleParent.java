@@ -9,47 +9,44 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.query.QueryException;
 
+import com.celements.blog.service.BlogService;
 import com.celements.parents.IDocParentProviderRole;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component(ArticleParent.DOC_PROVIDER_NAME)
 public class ArticleParent implements IDocParentProviderRole {
   
   private static Logger _LOGGER = LoggerFactory.getLogger(ArticleParent.class);
 
-  public static final String DOC_PROVIDER_NAME = "xwiki";
+  public static final String DOC_PROVIDER_NAME = "celblog";
 
   @Requirement
   private DocumentAccessBridge docAccessBridge;
+  
+  @Requirement
+  private BlogService blogService;
 
   @Override
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef) {
     ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
     try {
       DocumentReference nextParent = getParentRef(docRef);
-      while ((nextParent != null)
-          && docAccessBridge.exists(nextParent) && !docParents.contains(nextParent)) {
+      if(nextParent != null) {
         docParents.add(nextParent);
-        nextParent = getParentRef(nextParent);
       }
-    } catch (XWikiException e) {
-      _LOGGER.error("Failed to get parent reference. ", e);
+    } catch (QueryException exp) {
+      _LOGGER.error("Failed to get parent reference. ", exp);
+    } catch (XWikiException exp) {
+      _LOGGER.error("Failed to get parent reference. ", exp);
     }
     return docParents;
   }
 
-  private DocumentReference getParentRef(DocumentReference docRef) throws XWikiException {
-    try {
-      return ((XWikiDocument)docAccessBridge.getDocument(docRef)).getParentReference();
-    } catch (Exception exp) {
-      _LOGGER.error("Failed to get document [" + docRef + "].", exp);
-      throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
-          XWikiException.ERROR_XWIKI_UNKNOWN, "Failed to get document [" + docRef + "].",
-          exp);
-    }
-
+  private DocumentReference getParentRef(DocumentReference docRef) throws QueryException, 
+    XWikiException {
+    return blogService.getBlogConfigDocRef(docRef.getLastSpaceReference());
   }
 
 }
