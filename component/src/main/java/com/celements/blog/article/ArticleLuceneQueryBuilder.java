@@ -4,11 +4,10 @@ import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -18,44 +17,32 @@ import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.classes.IClassCollectionRole;
-import com.celements.nextfreedoc.INextFreeDocRole;
+import com.celements.rights.AccessLevel;
 import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.query.IQueryRestriction;
 import com.celements.search.lucene.query.LuceneQuery;
 import com.celements.search.lucene.query.QueryRestrictionGroup;
 import com.celements.search.lucene.query.QueryRestrictionGroup.Type;
 import com.celements.web.service.IWebUtilsService;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 @Component
 public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       ArticleLuceneQueryBuilder.class);
   
   @Requirement
-  private IBlogServiceRole blogService;
+  IBlogServiceRole blogService;
   
   @Requirement
-  private ILuceneSearchService searchService;
+  ILuceneSearchService searchService;
   
   @Requirement
-  private INextFreeDocRole nextFreeDocService;
-  
-  @Requirement
-  private IWebUtilsService webUtilsService;
+  IWebUtilsService webUtils;
   
   @Requirement("celements.celBlogClasses")
-  private IClassCollectionRole blogClasses;
-
-  @Requirement
-  private Execution execution;
-  
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
-  }
+  IClassCollectionRole blogClasses;
 
   @Override
   public LuceneQuery build(ArticleLoadParameter param) throws XWikiException {
@@ -86,9 +73,11 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
       ) throws XWikiException {
     QueryRestrictionGroup restr = null;
     SpaceReference blogSpaceRef = blogService.getBlogSpaceRef(param.getBlogDocRef());
-    if (param.isWithBlogArticles() && hasRights(blogSpaceRef, "view")) {
+    if (param.isWithBlogArticles() && webUtils.hasAccessLevel(blogSpaceRef, 
+        AccessLevel.VIEW)) {
       IQueryRestriction dateRestr = getDateRestrictions(param.getDateModes(), 
-          param.getExecutionDate(), hasRights(blogSpaceRef, "edit"));
+          param.getExecutionDate(), webUtils.hasAccessLevel(blogSpaceRef, 
+          AccessLevel.EDIT));
       if (dateRestr != null) {
         restr = searchService.createRestrictionGroup(Type.AND);
         restr.add(searchService.createSpaceRestriction(blogSpaceRef));
@@ -105,7 +94,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     QueryRestrictionGroup subsOrGrp = searchService.createRestrictionGroup(Type.OR);
     for (DocumentReference docRef : param.getSubscribedToBlogs()) {
       SpaceReference spaceRef = blogService.getBlogSpaceRef(docRef);
-      if (hasRights(spaceRef, "view")) {
+      if (webUtils.hasAccessLevel(spaceRef, AccessLevel.VIEW)) {
         subsOrGrp.add(getSubsSpaceRestriction(param, spaceRef));
       }
     }
@@ -124,7 +113,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
   QueryRestrictionGroup getSubsSpaceRestriction(ArticleLoadParameter param, 
       SpaceReference spaceRef) throws XWikiException {
     QueryRestrictionGroup subsSpaceGrp = null;
-    boolean hasEditRights = hasRights(spaceRef, "edit");
+    boolean hasEditRights = webUtils.hasAccessLevel(spaceRef, AccessLevel.EDIT);
     IQueryRestriction dateRestr = getDateRestrictions(param.getDateModes(), 
         param.getExecutionDate(), hasEditRights);
     IQueryRestriction artSubsRestr = getArticleSubsRestrictions(
@@ -208,35 +197,16 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
             BlogClasses.PROPERTY_ARTICLE_SUBSCRIPTION_SUBSCRIBER, blogConfDocRef));
         ret.setNegate(undecided);
       }
+      LOGGER.trace("getArticleSubsRestrictions: for modes '{}', hasEditRights '{}', "
+          + "undecided '{}' returns '{}'", modes, hasEditRights, undecided, ret);
     } else {
       ret = searchService.createRestrictionGroup(Type.AND);
     }
     return ret;
   }
-  
-  private boolean hasRights(SpaceReference spaceRef, String rights) throws XWikiException {
-    boolean ret = false;
-    if (spaceRef != null) {
-      DocumentReference docRef = nextFreeDocService.getNextUntitledPageDocRef(spaceRef);
-      String fullName = webUtilsService.getRefDefaultSerializer().serialize(docRef);
-      ret = getContext().getWiki().getRightService().hasAccessLevel(rights, getContext(
-          ).getUser(), fullName, getContext());
-    }
-    LOGGER.debug("hasRights for spaceRef [" + spaceRef + "] and rights [" + rights 
-        + "] returned [" + ret + "]");
-    return ret;
-  }
 
   private BlogClasses getBlogClasses() {
     return (BlogClasses) blogClasses;
-  }
-
-  void injectBlogService(IBlogServiceRole blogService) {
-    this.blogService = blogService;
-  }
-
-  void injectNextFreeDocService(INextFreeDocRole nextFreeDocService) {
-    this.nextFreeDocService = nextFreeDocService;
   }
 
 }
