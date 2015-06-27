@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,20 +16,19 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 
 import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadException;
 import com.celements.blog.article.ArticleLoadParameter;
 import com.celements.blog.article.IArticleEngineRole;
-import com.celements.blog.observation.listener.ClearBlogCacheListener;
+import com.celements.blog.cache.BlogCache;
 import com.celements.blog.plugin.BlogClasses;
+import com.celements.common.cache.CacheLoadingException;
+import com.celements.common.cache.IDocumentReferenceCache;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
@@ -43,15 +40,12 @@ import com.xpn.xwiki.objects.BaseObject;
 public class BlogService implements IBlogServiceRole {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(BlogService.class);
-  
-  private Map<WikiReference, Map<SpaceReference, Set<DocumentReference>>> blogCache = 
-      new HashMap<WikiReference, Map<SpaceReference, Set<DocumentReference>>>();
+
+  @Requirement(BlogCache.NAME)
+  IDocumentReferenceCache<SpaceReference> blogCache;
   
   @Requirement
   private ComponentManager componentManager;
-
-  @Requirement
-  private QueryManager queryManager;
 
   @Requirement
   private IWebUtilsService webUtils;
@@ -116,57 +110,20 @@ public class BlogService implements IBlogServiceRole {
     return ret;
   }
 
-  private synchronized Set<DocumentReference> getCachedBlogConfigDocRefs(
-      SpaceReference spaceRef) throws QueryException, XWikiException {
-    if (spaceRef != null) {
-      WikiReference wikiRef = (WikiReference) spaceRef.extractReference(EntityType.WIKI);
-      if (!blogCache.containsKey(wikiRef)) {
-        blogCache.put(wikiRef, getBlogCacheMap(wikiRef));
+  private Set<DocumentReference> getCachedBlogConfigDocRefs(SpaceReference spaceRef
+      ) throws QueryException, XWikiException {
+    try {
+      return blogCache.getCachedDocRefs(spaceRef);
+    } catch (CacheLoadingException exc) {
+      // FIXME get rid of this abominable code by introducing proper exception handling 
+      // to the class in the first place e.g. BlogConfigNotFoundException
+      if (exc.getCause() instanceof QueryException) {
+        throw (QueryException) exc.getCause();
+      } else if (exc.getCause() instanceof XWikiException) {
+          throw (XWikiException) exc.getCause();
+      } else {
+        throw new IllegalStateException();
       }
-      return blogCache.get(wikiRef).get(spaceRef);
-    } else {
-      return null;
-    }
-  }
-
-  private Map<SpaceReference, Set<DocumentReference>> getBlogCacheMap(
-      WikiReference wikiRef) throws QueryException, XWikiException {
-    Map<SpaceReference, Set<DocumentReference>> cacheMap = 
-        new HashMap<SpaceReference, Set<DocumentReference>>();
-    Query query = queryManager.createQuery(getBlogConfigXWQL(), Query.XWQL);
-    query.setWiki(wikiRef.getName());
-    for (String result : query.<String>execute()) {
-      DocumentReference docRef = webUtils.resolveDocumentReference(result, wikiRef);
-      SpaceReference spaceRef = getBlogSpaceRef(docRef);
-      if (spaceRef != null) {
-        Set<DocumentReference> docRefs = cacheMap.get(spaceRef);
-        if (docRefs == null) {
-          docRefs = new HashSet<DocumentReference>();
-          cacheMap.put(spaceRef, docRefs);
-        }
-        docRefs.add(docRef);
-      }
-    }
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Loaded blog cache for wiki '" + wikiRef.getName() + "': " + cacheMap);
-    }
-    return Collections.unmodifiableMap(cacheMap);
-  }
-  
-  String getBlogConfigXWQL() {
-    return "select distinct doc.fullName from Document doc, doc.object(" 
-        + BlogClasses.BLOG_CONFIG_CLASS + ") as obj";
-  }
-
-  /**
-   * only used in {@link ClearBlogCacheListener}
-   * 
-   * @param wikiRef to clear cache for
-   */
-  public synchronized void clearBlogCache(WikiReference wikiRef) {
-    if (wikiRef != null) {
-      blogCache.remove(wikiRef);
-      LOGGER.trace("clearBlogCache: for db '" + wikiRef.getName() + "'");
     }
   }
 
@@ -288,21 +245,6 @@ public class BlogService implements IBlogServiceRole {
   
   DocumentReference getBlogConfigClassRef(WikiReference wikiRef) {
     return ((BlogClasses) blogClasses).getBlogConfigClassRef(wikiRef.getName());
-  }
-  
-  void injectBlogCache(Map<SpaceReference, List<DocumentReference>> spaceMap) {
-    for (SpaceReference spaceRef : spaceMap.keySet()) {
-      WikiReference wikiRef = (WikiReference) spaceRef.extractReference(EntityType.WIKI);
-      if (!blogCache.containsKey(wikiRef)) {
-        blogCache.put(wikiRef, new HashMap<SpaceReference, Set<DocumentReference>>());
-      }
-      blogCache.get(wikiRef).put(spaceRef, new HashSet<DocumentReference>(spaceMap.get(
-          spaceRef)));
-    }
-  }
-
-  void injectQueryManager(QueryManager queryManager) {
-    this.queryManager = queryManager;
   }
 
 }
