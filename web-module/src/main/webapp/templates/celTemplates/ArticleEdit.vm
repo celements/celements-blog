@@ -80,7 +80,7 @@ $adminMsg.get('cel_tm_article_edit')
 #end
 <div id="cel_blog_article_editor" class="c3_scrollable">
 #if($services.celementsweb.useNewButtons())
-<form id="articleform" method="post" action="?" onsubmit="cancelCancelEdit()">
+<form id="articleform" method="post" action="?">
 <input type="hidden" name="xpage" value="celements_ajax" />
 <input type="hidden" name="ajax_mode" value="saveDocumentWithValidation" />
 <input type="hidden" name="createIfNotExists" value="true" />
