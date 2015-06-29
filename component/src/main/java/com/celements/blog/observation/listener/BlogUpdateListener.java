@@ -73,4 +73,9 @@ public class BlogUpdateListener extends AbstractDocumentUpdateListener {
     return LOGGER;
   }
 
+  @Override
+  protected boolean includeDocFields() {
+    return false;
+  }
+
 }

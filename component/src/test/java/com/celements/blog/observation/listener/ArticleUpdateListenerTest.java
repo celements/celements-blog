@@ -97,6 +97,11 @@ public class ArticleUpdateListenerTest extends AbstractBridgedComponentTestCase 
   }
 
   @Test
+  public void testIncludeDocFields() {
+    assertTrue(listener.includeDocFields());
+  }
+
+  @Test
   public void testGetLogger() {
     assertNotNull(listener.getLogger());
   }

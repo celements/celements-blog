@@ -73,4 +73,9 @@ public class ArticleUpdateListener extends AbstractDocumentUpdateListener {
     return LOGGER;
   }
 
+  @Override
+  protected boolean includeDocFields() {
+    return true;
+  }
+
 }
