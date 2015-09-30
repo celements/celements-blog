@@ -35,7 +35,7 @@ $context.setCacheDuration(0)
 #set($devNull = $articleParam.setLanguage("$default_language"))
 #if($setPublishdateASC)
 #set($devNull = $articleParam.setSortFields(["XWiki.ArticleClass.publishdate", "name"]))
-#set($devNull = $articleParam.setSearchTerm("${request.searchTerm}"))
+#set($devNull = $articleParam.setSearchTerm("$!request.get('searchTerm')"))
 #end
 #set($start = $util.parseInt("$request.get('start')"))
 #if(("$!start" != '') && ($start > 0))
