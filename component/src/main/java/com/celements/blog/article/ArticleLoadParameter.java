@@ -180,7 +180,8 @@ public class ArticleLoadParameter {
         + blogDocRef + ", withBlogArticles=" + withBlogArticles
         + ", subscribedToBlogs=" + subscribedToBlogs + ", dateModes=" + dateModes
         + ", subsModes=" + subsModes + ", language=" + language + ", offset=" + offset
-        + ", limit=" + limit + ", sortFields=" + sortFields + "]";
+        + ", limit=" + limit + ", sortFields=" + sortFields + ", searchTerm="
+        + searchTerm + "]";
   }
 
 }
