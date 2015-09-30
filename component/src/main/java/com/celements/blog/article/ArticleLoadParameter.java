@@ -32,6 +32,8 @@ public class ArticleLoadParameter {
       new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED)));
   private Set<SubscriptionMode> subsModes = Collections.emptySet();
   private String language = null;
+  private String searchTerm = null;
+
   private int offset = 0;
   private int limit = 0;
   private List<String> sortFields = Arrays.asList("-" + BlogClasses.ARTICLE_CLASS + "." 
@@ -119,10 +121,18 @@ public class ArticleLoadParameter {
   public String getLanguage() {
     return language;
   }
+  
+  public String getSearchTerm() {
+    return searchTerm;
+  }
 
   public ArticleLoadParameter setLanguage(String language) {
     this.language = language;
     return this;
+  }
+  
+  public void setSearchTerm(String searchTerm) {
+    this.searchTerm = searchTerm;
   }
 
   public int getOffset() {

@@ -21,6 +21,7 @@ import com.celements.rights.AccessLevel;
 import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.query.IQueryRestriction;
 import com.celements.search.lucene.query.LuceneQuery;
+import com.celements.search.lucene.query.QueryRestriction;
 import com.celements.search.lucene.query.QueryRestrictionGroup;
 import com.celements.search.lucene.query.QueryRestrictionGroup.Type;
 import com.celements.web.service.IWebUtilsService;
@@ -55,6 +56,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
         WikiReference wikiRef = param.getBlogDocRef().getWikiReference();
         query = searchService.createQuery();
         query.setWiki(wikiRef);
+        query.add(getBlogSearchTermRestriction(param));
         DocumentReference articleClassRef = getBlogClasses().getArticleClassRef(
             wikiRef.getName());
         query.add(searchService.createObjectRestriction(articleClassRef));
@@ -83,6 +85,19 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
         restr.add(searchService.createSpaceRestriction(blogSpaceRef));
         restr.add(dateRestr);
       }
+    }
+    LOGGER.trace("got blog restriction " + restr + "' for '" + param + "'");
+    return restr;
+  }
+  
+  IQueryRestriction getBlogSearchTermRestriction(ArticleLoadParameter param
+      ) throws XWikiException {
+    QueryRestrictionGroup restr = null;
+    if (param.isWithBlogArticles() && (param.getSearchTerm() != null)) {
+      restr = searchService.createRestrictionGroup(Type.OR);
+      restr.add(new QueryRestriction("XWiki.ArticleClass.extract", param.getSearchTerm()));
+      restr.add(new QueryRestriction("XWiki.ArticleClass.title", param.getSearchTerm()));
+      restr.add(new QueryRestriction("XWiki.ArticleClass.content", param.getSearchTerm()));
     }
     LOGGER.trace("got blog restriction " + restr + "' for '" + param + "'");
     return restr;
