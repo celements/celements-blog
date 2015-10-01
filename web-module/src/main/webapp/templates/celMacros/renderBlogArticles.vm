@@ -3,6 +3,7 @@
   #foreach($article in $articles)
    #parse('celMacros/renderOneBlogArticle.vm')
   #end
+  <span class="articlesCount" style="display:none">$!articlesCount</span>
 #elseif("$!request.ajax" != '1')
 $msg.get('cel_blog_empty')
 #end
