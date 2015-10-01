@@ -1,5 +1,6 @@
 #parse('celMacros/setupBlogView.vm')
   <span class="cel_paging_details_json" style="display:none">$!articleParamJSON.getJSON()</span>
+  <span class="articlesCount" style="display:none">$!articlesCount</span>
 #if(("$!renderArticlesMacro" == '') || !$xwiki.exists($renderArticlesMacro))
   #set($renderArticlesMacro = 'celMacros/renderBlogArticles.vm')
   #parse('celMacros/renderBlogArticles.vm')
