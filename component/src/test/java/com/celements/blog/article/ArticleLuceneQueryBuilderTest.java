@@ -352,27 +352,6 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
         + " AND " + getSubsQuery(false) + ")";
   }
   
-  @Test
-  public void testGetSubsSpaceRestriction_XWE() throws Exception {
-    ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setBlogDocRef(docRef);
-    param.setDateModes(Arrays.asList(DateMode.PUBLISHED.name(), DateMode.FUTURE.name()));
-    param.setSubscriptionModes(Arrays.asList(SubscriptionMode.SUBSCRIBED.name(), 
-        SubscriptionMode.UNSUBSCRIBED.name()));
-    SpaceReference spaceRef = new SpaceReference("artSpace", wikiRef);
-    
-    XWikiException cause = expectSpaceRightsCheckAndThrow(spaceRef, AccessLevel.EDIT);
-    
-    replayDefault();
-    try {
-      builder.getSubsSpaceRestriction(param, spaceRef);
-      fail("expecting XWE");
-    } catch (XWikiException xwe) {
-      assertSame(cause, xwe);
-    }
-    verifyDefault();
-  }
-  
   private void expectSpaceRightsCheck(SpaceReference spaceRef, Boolean viewRights, 
       Boolean editRights) throws Exception {
     if (viewRights != null) {
@@ -383,14 +362,6 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
       expect(builder.webUtils.hasAccessLevel(eq(spaceRef), eq(AccessLevel.EDIT))
           ).andReturn(editRights).once();
     }
-  }
-  
-  private XWikiException expectSpaceRightsCheckAndThrow(SpaceReference spaceRef, 
-      AccessLevel level) throws Exception {
-    XWikiException cause = new XWikiException();
-    expect(builder.webUtils.hasAccessLevel(eq(spaceRef), eq(level))).andThrow(cause
-        ).once();
-    return cause;
   }
   
   @Test

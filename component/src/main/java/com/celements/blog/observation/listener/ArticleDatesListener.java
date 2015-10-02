@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.observation.event.Event;
@@ -24,8 +24,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("celements.blog.articleDatesListener")
 public class ArticleDatesListener extends AbstractEventListener {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      ArticleDatesListener.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(ArticleDatesListener.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;
@@ -43,20 +42,6 @@ public class ArticleDatesListener extends AbstractEventListener {
     return "celements.blog.articleDatesListener";
   }
 
-  @Override
-  public void onEvent(Event event, Object source, Object data) {
-    XWikiDocument doc = (XWikiDocument) source;
-    if ((doc != null) && isLocalEvent()) {
-      LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
-          + doc.getDocumentReference() + "].");
-      checkDatesNotNull(doc);
-    } else {
-      LOGGER.trace("onEvent: got event for [" + event.getClass() + "] on source [" 
-          + source + "] and data [" + data + "], isLocalEvent [" + isLocalEvent() 
-          + "] -> skip.");
-    }
-  }
-  
   private void checkDatesNotNull(XWikiDocument articleDoc) {
     try {
       BaseObject articleObj = articleDoc.getXObject(getBlogClasses().getArticleClassRef(
@@ -84,6 +69,30 @@ public class ArticleDatesListener extends AbstractEventListener {
 
   BlogClasses getBlogClasses() {
     return (BlogClasses) blogClasses;
+  }
+
+  @Override
+  protected void onLocalEvent(Event event, Object source, Object data) {
+    XWikiDocument doc = (XWikiDocument) source;
+    if (doc != null) {
+      LOGGER.debug("onEvent: got event for [" + event.getClass() + "] on document ["
+          + doc.getDocumentReference() + "].");
+      checkDatesNotNull(doc);
+    } else {
+      LOGGER.trace("onEvent: got local event for [" + event.getClass() + "] on source [" 
+          + source + "] and data [" + data + "] -> skip.");
+    }
+  }
+
+  @Override
+  protected void onRemoteEvent(Event event, Object source, Object data) {
+    LOGGER.trace("onEvent: got remote event for [" + event.getClass() + "] on source [" 
+        + source + "] and data [" + data + "] -> skip.");
+  }
+
+  @Override
+  protected Logger getLogger() {
+    return LOGGER;
   }
 
 }
