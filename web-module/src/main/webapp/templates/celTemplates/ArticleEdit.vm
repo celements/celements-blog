@@ -2,9 +2,9 @@
 ## of the Page and not in the section ArticleEdit.vm
 ##$celementsweb.includeCSSPage(':celJS/jquery-datetimepicker/jquery.datetimepicker.css')
 <link rel="stylesheet" media="all" type="text/css" href="$celementsweb.getSkinFile(':celJS/jquery-datetimepicker/jquery.datetimepicker.css', 'file')" />
-$celementsweb.addLazyExtJSfile(':celJS/article-edit.js', 'file')
-$celementsweb.addLazyExtJSfile(':celJS/jquery-datetimepicker/jquery.datetimepicker.js', 'file')
-$celementsweb.addLazyExtJSfile(':celJS/celTabMenu/stickBlogDateTimePicker.js', 'file')
+$services.javascript.addLazyExtJSfile(':celJS/article-edit.js', 'file')
+$services.javascript.addLazyExtJSfile(':celJS/jquery-datetimepicker/jquery.datetimepicker.js', 'file')
+$services.javascript.addLazyExtJSfile(':celJS/celTabMenu/stickBlogDateTimePicker.js', 'file')
 #set($id = $!context.getRequest().get('id'))
 #set($blogeditor = $!context.getRequest().get('blogeditor'))
 #set($deflang_obj = $doc.getObject('XWiki.ArticleClass', 'lang', "$default_language", false))
