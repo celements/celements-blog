@@ -68,7 +68,7 @@ $adminMsg.get('cel_tm_article_edit')
 </div><!-- IE6 -->
 
 ##only allow to create new translations if language explicitly in request
-#if(!$doc.new && ($articleTransList.indexOf("$!language") < 0))
+#if(!$doc.new && ($articleTransList.indexOf("$!language") < 0) && ("$!request.language" == ''))
 #set($docDefLanguage = ${doc.defaultLanguage})
 #if("$!docDefLanguage")
 #set($docDefLanguage = "${default_language}")
