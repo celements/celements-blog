@@ -67,6 +67,15 @@ $adminMsg.get('cel_tm_article_edit')
 #end
 </div><!-- IE6 -->
 
+##only allow to create new translations if language explicitly in request
+#if(!$doc.new && ($articleTransList.indexOf("$!language") < 0))
+#set($docDefLanguage = ${doc.defaultLanguage})
+#if("$!docDefLanguage")
+#set($docDefLanguage = "${default_language}")
+#end
+#set($defLangURL = "$request.getRequestURL()?language=${docDefLanguage}&$request.getQueryString()")
+$response.sendRedirect($defLangURL)
+#end
 #set($docTransList = $articleTransList)
 #parse('celMacros/includeRTELanguageSelect.vm')
 
