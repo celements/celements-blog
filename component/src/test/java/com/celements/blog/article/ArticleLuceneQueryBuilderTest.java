@@ -36,7 +36,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   private static final String RESTR_ARTSUBS_OBJ = 
       "object:(+Celements2.BlogArticleSubscriptionClass*)";
   private static final String RESTR_ARTSUBS_SPACE = 
-      "Celements2.BlogArticleSubscriptionClass.subscriber:(+\"space.blog\")";
+      "(Celements2.BlogArticleSubscriptionClass.subscriber:(+\"wiki\\:space.blog\") " +
+      "OR Celements2.BlogArticleSubscriptionClass.subscriber:(+\"space.blog\"))";
+  
   private static final String RESTR_ARTSUBS_SUBS = 
       "Celements2.BlogArticleSubscriptionClass.doSubscribe:(+\"1\")";
   private static final String RESTR_ARTSUBS_UNSUBS = 
