@@ -20,11 +20,11 @@ import com.celements.blog.article.ArticleLoadParameter.DateMode;
 import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.test.AbstractBridgedComponentTestCase;
-import com.celements.rights.AccessLevel;
+import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.query.IQueryRestriction;
 import com.celements.search.lucene.query.QueryRestrictionGroup;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
@@ -57,13 +57,13 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     rightsServiceMock = createMockAndAddToDefault(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightsServiceMock).anyTimes();
     builder.blogService = createMockAndAddToDefault(IBlogServiceRole.class);
-    builder.webUtils = createMockAndAddToDefault(IWebUtilsService.class);
+    builder.rightsAccess = createMockAndAddToDefault(IRightsAccessFacadeRole.class);
   }
 
   @After
   public void tearDown_ArticleEngineLuceneTest() {
     builder.blogService = Utils.getComponent(IBlogServiceRole.class);
-    builder.webUtils = Utils.getComponent(IWebUtilsService.class);
+    builder.rightsAccess = Utils.getComponent(IRightsAccessFacadeRole.class);
   }
   
   @Test
@@ -354,11 +354,11 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   private void expectSpaceRightsCheck(SpaceReference spaceRef, Boolean viewRights, 
       Boolean editRights) throws Exception {
     if (viewRights != null) {
-      expect(builder.webUtils.hasAccessLevel(eq(spaceRef), eq(AccessLevel.VIEW))
+      expect(builder.rightsAccess.hasAccessLevel(eq(spaceRef), eq(EAccessLevel.VIEW))
           ).andReturn(viewRights).once();
     }
     if (editRights != null) {
-      expect(builder.webUtils.hasAccessLevel(eq(spaceRef), eq(AccessLevel.EDIT))
+      expect(builder.rightsAccess.hasAccessLevel(eq(spaceRef), eq(EAccessLevel.EDIT))
           ).andReturn(editRights).once();
     }
   }

@@ -17,14 +17,14 @@ import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.classes.IClassCollectionRole;
-import com.celements.rights.AccessLevel;
+import com.celements.rights.access.EAccessLevel;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.query.IQueryRestriction;
 import com.celements.search.lucene.query.LuceneQuery;
 import com.celements.search.lucene.query.QueryRestriction;
 import com.celements.search.lucene.query.QueryRestrictionGroup;
 import com.celements.search.lucene.query.QueryRestrictionGroup.Type;
-import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiException;
 
 @Component
@@ -40,7 +40,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
   ILuceneSearchService searchService;
   
   @Requirement
-  IWebUtilsService webUtils;
+  IRightsAccessFacadeRole rightsAccess;
   
   @Requirement("celements.celBlogClasses")
   IClassCollectionRole blogClasses;
@@ -75,11 +75,11 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
       ) throws XWikiException {
     QueryRestrictionGroup restr = null;
     SpaceReference blogSpaceRef = blogService.getBlogSpaceRef(param.getBlogDocRef());
-    if (param.isWithBlogArticles() && webUtils.hasAccessLevel(blogSpaceRef, 
-        AccessLevel.VIEW)) {
+    if (param.isWithBlogArticles() && rightsAccess.hasAccessLevel(blogSpaceRef, 
+        EAccessLevel.VIEW)) {
       IQueryRestriction dateRestr = getDateRestrictions(param.getDateModes(), 
-          param.getExecutionDate(), webUtils.hasAccessLevel(blogSpaceRef, 
-          AccessLevel.EDIT));
+          param.getExecutionDate(), rightsAccess.hasAccessLevel(blogSpaceRef, 
+          EAccessLevel.EDIT));
       if (dateRestr != null) {
         restr = searchService.createRestrictionGroup(Type.AND);
         restr.add(searchService.createSpaceRestriction(blogSpaceRef));
@@ -109,7 +109,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     QueryRestrictionGroup subsOrGrp = searchService.createRestrictionGroup(Type.OR);
     for (DocumentReference docRef : param.getSubscribedToBlogs()) {
       SpaceReference spaceRef = blogService.getBlogSpaceRef(docRef);
-      if (webUtils.hasAccessLevel(spaceRef, AccessLevel.VIEW)) {
+      if (rightsAccess.hasAccessLevel(spaceRef, EAccessLevel.VIEW)) {
         subsOrGrp.add(getSubsSpaceRestriction(param, spaceRef));
       }
     }
@@ -128,7 +128,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
   QueryRestrictionGroup getSubsSpaceRestriction(ArticleLoadParameter param, 
       SpaceReference spaceRef) throws XWikiException {
     QueryRestrictionGroup subsSpaceGrp = null;
-    boolean hasEditRights = webUtils.hasAccessLevel(spaceRef, AccessLevel.EDIT);
+    boolean hasEditRights = rightsAccess.hasAccessLevel(spaceRef, EAccessLevel.EDIT);
     IQueryRestriction dateRestr = getDateRestrictions(param.getDateModes(), 
         param.getExecutionDate(), hasEditRights);
     IQueryRestriction artSubsRestr = getArticleSubsRestrictions(
