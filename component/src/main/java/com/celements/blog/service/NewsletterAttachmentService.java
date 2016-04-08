@@ -7,19 +7,22 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
+import com.celements.filebase.IAttachmentServiceRole;
+import com.celements.model.access.exception.AttachmentNotExistsException;
+import com.celements.rights.access.exceptions.NoAccessRightsException;
 import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component
@@ -29,7 +32,7 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
 
   public static final String DEFAULT_NL_ATTACHMENT_LIST = "nlEmbedAttList";
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       NewsletterAttachmentService.class);
   
   @Requirement
@@ -37,6 +40,9 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
   
   @Requirement
   IWebUtilsService webUtils;
+  
+  @Requirement
+  IAttachmentServiceRole attService;
 
   public String embedImagesInContent(String content) {
     Pattern pattern = Pattern.compile("<img .*?>");
@@ -113,10 +119,15 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
       XWikiDocument attDoc = getContext().getWiki().getDocument(
           webUtils.resolveDocumentReference(attURL.getPageFullName(imgFullname)), 
           getContext());
-      att = (new Document(attDoc, getContext())).getAttachment(
+      XWikiAttachment xatt = attService.getAttachmentNameEqual(attDoc, 
           attURL.getAttachmentName(imgFullname));
+      att = attService.getApiAttachment(xatt);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception getting attachment Document.", xwe);
+    } catch (AttachmentNotExistsException anee) {
+      LOGGER.error("Attachment [{}] not found.", imgFullname, anee);
+    } catch (NoAccessRightsException nore) {
+      LOGGER.error("No access rights on attachment [{}]", imgFullname, nore);
     }
     return att;
   }
