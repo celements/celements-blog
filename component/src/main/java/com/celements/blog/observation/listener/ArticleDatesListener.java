@@ -32,9 +32,12 @@ public class ArticleDatesListener extends AbstractEventListener {
   @Requirement("celements.celBlogClasses")
   private IClassCollectionRole blogClasses;
 
+  @Requirement
+  private ILuceneSearchService luceneSearch;
+
   @Override
   public List<Event> getEvents() {
-    return Arrays.<Event> asList(new ArticleCreatingEvent(), new ArticleUpdatingEvent());
+    return Arrays.<Event>asList(new ArticleCreatingEvent(), new ArticleUpdatingEvent());
   }
 
   @Override
@@ -47,10 +50,9 @@ public class ArticleDatesListener extends AbstractEventListener {
       BaseObject articleObj = articleDoc.getXObject(getBlogClasses().getArticleClassRef(
           webUtilsService.getWikiRef(articleDoc).getName()));
       if (articleObj != null) {
-        checkDateNotNull(articleObj, BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE,  
-            new Date());
-        checkDateNotNull(articleObj, BlogClasses.PROPERTY_ARTICLE_ARCHIVE_DATE, 
-            ILuceneSearchService.SDF.parse(ILuceneSearchService.DATE_HIGH));
+        checkDateNotNull(articleObj, BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE, new Date());
+        checkDateNotNull(articleObj, BlogClasses.PROPERTY_ARTICLE_ARCHIVE_DATE,
+            luceneSearch.getSDF().parse(ILuceneSearchService.DATE_HIGH));
       } else {
         LOGGER.error("no article class object found on doc '" + articleDoc + "'");
       }
@@ -79,15 +81,15 @@ public class ArticleDatesListener extends AbstractEventListener {
           + doc.getDocumentReference() + "].");
       checkDatesNotNull(doc);
     } else {
-      LOGGER.trace("onEvent: got local event for [" + event.getClass() + "] on source [" 
-          + source + "] and data [" + data + "] -> skip.");
+      LOGGER.trace("onEvent: got local event for [" + event.getClass() + "] on source [" + source
+          + "] and data [" + data + "] -> skip.");
     }
   }
 
   @Override
   protected void onRemoteEvent(Event event, Object source, Object data) {
-    LOGGER.trace("onEvent: got remote event for [" + event.getClass() + "] on source [" 
-        + source + "] and data [" + data + "] -> skip.");
+    LOGGER.trace("onEvent: got remote event for [" + event.getClass() + "] on source [" + source
+        + "] and data [" + data + "] -> skip.");
   }
 
   @Override
