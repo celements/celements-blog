@@ -21,7 +21,7 @@ public class ArticleDeleteListenerTest extends AbstractBridgedComponentTestCase 
 
   @Before
   public void setUp_ArticleDeleteListenerTest() throws Exception {
-    listener = (ArticleDeleteListener) Utils.getComponent(EventListener.class, 
+    listener = (ArticleDeleteListener) Utils.getComponent(EventListener.class,
         ArticleDeleteListener.NAME);
   }
 
@@ -33,8 +33,8 @@ public class ArticleDeleteListenerTest extends AbstractBridgedComponentTestCase 
   @Test
   public void testGetRequiredObjClassRef() {
     String wikiName = "myWiki";
-    DocumentReference classRef = new DocumentReference(wikiName, 
-        BlogClasses.ARTICLE_CLASS_SPACE, BlogClasses.ARTICLE_CLASS_DOC);
+    DocumentReference classRef = new DocumentReference(wikiName, BlogClasses.ARTICLE_CLASS_SPACE,
+        BlogClasses.ARTICLE_CLASS_DOC);
     assertEquals(classRef, listener.getRequiredObjClassRef(new WikiReference(wikiName)));
   }
 

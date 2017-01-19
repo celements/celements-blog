@@ -23,7 +23,7 @@ import com.xpn.xwiki.plugin.lucene.LucenePlugin;
 import com.xpn.xwiki.web.Utils;
 
 public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
-  
+
   private ArticleEngineLucene engine;
 
   private ILuceneSearchService searchServiceMock;
@@ -36,12 +36,12 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     engine.injectSearchService(searchServiceMock);
     queryBuilderMock = createMockAndAddToDefault(IArticleLuceneQueryBuilderRole.class);
     engine.injectQueryBuilder(queryBuilderMock);
-    DocumentReference xwikiPrefsDocRef = new DocumentReference("xwikidb", "XWiki", 
+    DocumentReference xwikiPrefsDocRef = new DocumentReference("xwikidb", "XWiki",
         "XWikiPreferences");
-    expect(getWikiMock().getDocument(eq(xwikiPrefsDocRef), same(getContext()))
-        ).andReturn(new XWikiDocument(xwikiPrefsDocRef)).anyTimes();
+    expect(getWikiMock().getDocument(eq(xwikiPrefsDocRef), same(getContext()))).andReturn(
+        new XWikiDocument(xwikiPrefsDocRef)).anyTimes();
   }
-  
+
   @Test
   public void testGetArticles() throws Exception {
     ArticleLoadParameter param = new ArticleLoadParameter();
@@ -53,38 +53,37 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     param.setOffset(offset);
     int limit = 10;
     param.setLimit(limit);
-    LuceneQuery query = new LuceneQuery(Arrays.asList(LucenePlugin.DOCTYPE_WIKIPAGE));    
+    LuceneQuery query = new LuceneQuery(Arrays.asList(LucenePlugin.DOCTYPE_WIKIPAGE));
     LuceneSearchResult resultMock = createMockAndAddToDefault(LuceneSearchResult.class);
     DocumentReference artDocRef = new DocumentReference("wiki", "blogSpace", "article");
     XWikiDocument artDoc = new XWikiDocument(artDocRef);
     AttachmentReference attRef = new AttachmentReference("file", artDocRef);
-    
+
     expect(queryBuilderMock.build(same(param))).andReturn(query).once();
-    expect(searchServiceMock.searchWithoutChecks(same(query), eq(sortFields), 
-        eq(Arrays.asList("default", language)))).andReturn(resultMock).once();
+    expect(searchServiceMock.searchWithoutChecks(same(query), eq(sortFields), eq(Arrays.asList(
+        "default", language)))).andReturn(resultMock).once();
     expect(resultMock.setOffset(eq(offset))).andReturn(resultMock).once();
     expect(resultMock.setLimit(eq(limit))).andReturn(resultMock).once();
-    expect(getWikiMock().getDocument(eq(artDocRef), same(getContext()))).andReturn(artDoc
-        ).once();
-    expect(resultMock.getResults()).andReturn(Arrays.<EntityReference>asList(artDocRef, 
+    expect(getWikiMock().getDocument(eq(artDocRef), same(getContext()))).andReturn(artDoc).once();
+    expect(resultMock.getResults()).andReturn(Arrays.<EntityReference>asList(artDocRef,
         attRef)).once();
-    
+
     replayDefault();
     List<Article> ret = engine.getArticles(param);
     verifyDefault();
-    
+
     assertNotNull(ret);
     // empty because of EmptyArticleException
     assertEquals(0, ret.size());
   }
-  
+
   @Test
   public void testGetArticles_XWE() throws Exception {
     ArticleLoadParameter param = new ArticleLoadParameter();
     XWikiException cause = new XWikiException();
-    
+
     expect(queryBuilderMock.build(same(param))).andThrow(cause).once();
-    
+
     replayDefault();
     try {
       engine.getArticles(param);
@@ -94,7 +93,7 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     }
     verifyDefault();
   }
-  
+
   @Test
   public void testGetArticles_LSE() throws Exception {
     ArticleLoadParameter param = new ArticleLoadParameter();
@@ -106,17 +105,17 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     param.setOffset(offset);
     int limit = 10;
     param.setLimit(limit);
-    LuceneQuery query = new LuceneQuery(Arrays.asList(LucenePlugin.DOCTYPE_WIKIPAGE));    
+    LuceneQuery query = new LuceneQuery(Arrays.asList(LucenePlugin.DOCTYPE_WIKIPAGE));
     LuceneSearchResult resultMock = createMockAndAddToDefault(LuceneSearchResult.class);
     Throwable cause = createMockAndAddToDefault(LuceneSearchException.class);
-    
+
     expect(queryBuilderMock.build(same(param))).andReturn(query).once();
-    expect(searchServiceMock.searchWithoutChecks(same(query), eq(sortFields), 
-        eq(Arrays.asList("default", language)))).andReturn(resultMock).once();
+    expect(searchServiceMock.searchWithoutChecks(same(query), eq(sortFields), eq(Arrays.asList(
+        "default", language)))).andReturn(resultMock).once();
     expect(resultMock.setOffset(eq(offset))).andReturn(resultMock).once();
     expect(resultMock.setLimit(eq(limit))).andReturn(resultMock).once();
     expect(resultMock.getResults()).andThrow(cause).once();
-    
+
     replayDefault();
     try {
       engine.getArticles(param);

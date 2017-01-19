@@ -19,7 +19,8 @@
  */
 package com.celements.blog.plugin;
 
-public class EmptyArticleException extends Exception{
+public class EmptyArticleException extends Exception {
+
   private static final long serialVersionUID = 1L;
 
 }

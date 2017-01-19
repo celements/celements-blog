@@ -22,12 +22,11 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 @Component("ArticleNullDates")
 public class ArticleNullDatesMigrator extends AbstractCelementsHibernateMigrator {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      ArticleNullDatesMigrator.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(ArticleNullDatesMigrator.class);
 
   @Requirement
   private QueryManager queryManager;
-  
+
   @Requirement
   private IWebUtilsService webUtilsService;
 
@@ -42,26 +41,23 @@ public class ArticleNullDatesMigrator extends AbstractCelementsHibernateMigrator
   }
 
   /**
-   * getVersion is using days since
-   * 1.1.2010 until the day of committing this migration
-   * 19.09.2014 -> 1722
-   * http://www.wolframalpha.com/input/?i=days+since+01.01.2010
+   * getVersion is using days since 1.1.2010 until the day of committing this migration 19.09.2014
+   * -> 1722 http://www.wolframalpha.com/input/?i=days+since+01.01.2010
    */
   public XWikiDBVersion getVersion() {
     return new XWikiDBVersion(1722);
   }
 
-
   @Override
-  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context
-      ) throws XWikiException {
+  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context)
+      throws XWikiException {
     try {
       List<String> results = queryManager.createQuery(getXWQL(), Query.XWQL).execute();
       LOGGER.debug("Got results for xwql '" + getXWQL() + "': " + results);
       if (results != null) {
         for (String fullName : results) {
           DocumentReference docRef = webUtilsService.resolveDocumentReference(fullName);
-          context.getWiki().saveDocument(context.getWiki().getDocument(docRef, context), 
+          context.getWiki().saveDocument(context.getWiki().getDocument(docRef, context),
               "article null dates migration", context);
         }
       }
@@ -69,15 +65,15 @@ public class ArticleNullDatesMigrator extends AbstractCelementsHibernateMigrator
       LOGGER.error("Exception executing query: " + getXWQL(), qexc);
     }
   }
-  
+
   String getXWQL() {
-    return "from doc.object(" + BlogClasses.ARTICLE_CLASS + ") art where art." 
-        + BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE + " is null or art." 
+    return "from doc.object(" + BlogClasses.ARTICLE_CLASS + ") art where art."
+        + BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE + " is null or art."
         + BlogClasses.PROPERTY_ARTICLE_ARCHIVE_DATE + " is null";
   }
 
   void injectQueryManager(QueryManager queryManager) {
     this.queryManager = queryManager;
   }
-  
+
 }

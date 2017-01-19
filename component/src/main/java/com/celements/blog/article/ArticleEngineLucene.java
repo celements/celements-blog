@@ -25,34 +25,32 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class ArticleEngineLucene implements IArticleEngineRole {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticleEngineLucene.class);
-  
+
   @Requirement
   private ILuceneSearchService searchService;
-  
+
   @Requirement
   private IArticleLuceneQueryBuilderRole queryBuilder;
 
   @Requirement
   private Execution execution;
-  
+
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
+    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   @Override
-  public List<Article> getArticles(ArticleLoadParameter param
-      ) throws ArticleLoadException {
+  public List<Article> getArticles(ArticleLoadParameter param) throws ArticleLoadException {
     try {
       List<Article> articles = new ArrayList<Article>();
       LuceneQuery query = queryBuilder.build(param);
       if (query != null) {
-        LuceneSearchResult result = searchService.searchWithoutChecks(query, 
-            param.getSortFields(), Arrays.asList("default", param.getLanguage()));
+        LuceneSearchResult result = searchService.searchWithoutChecks(query, param.getSortFields(),
+            Arrays.asList("default", param.getLanguage()));
         result.setOffset(param.getOffset()).setLimit(param.getLimit());
         for (EntityReference ref : result.getResults()) {
           if (ref instanceof DocumentReference) {
-            XWikiDocument doc = getContext().getWiki().getDocument((DocumentReference) ref, 
+            XWikiDocument doc = getContext().getWiki().getDocument((DocumentReference) ref,
                 getContext());
             try {
               articles.add(new Article(doc, getContext()));

@@ -25,16 +25,14 @@ public class BlogCacheFlushingListenerTest extends AbstractBridgedComponentTestC
   @Before
   @SuppressWarnings("unchecked")
   public void setUp_BlogCacheFlushingListenerTest() throws Exception {
-    listener = (BlogCacheFlushingListener) Utils.getComponent(EventListener.class, 
-        BlogCache.NAME);
+    listener = (BlogCacheFlushingListener) Utils.getComponent(EventListener.class, BlogCache.NAME);
     listener.navCache = createMockAndAddToDefault(IDocumentReferenceCache.class);
   }
 
   @After
   @SuppressWarnings("unchecked")
   public void tearDown_BlogCacheFlushingListenerTest() throws Exception {
-    listener.navCache = Utils.getComponent(IDocumentReferenceCache.class, 
-        BlogCache.NAME);
+    listener.navCache = Utils.getComponent(IDocumentReferenceCache.class, BlogCache.NAME);
   }
 
   @Test
