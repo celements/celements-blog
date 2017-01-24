@@ -42,8 +42,8 @@ public class BlogCache extends AbstractDocumentReferenceCache<SpaceReference> {
   }
 
   @Override
-  protected Collection<SpaceReference> getKeysForResult(DocumentReference blogConfDocRef
-      ) throws XWikiException {
+  protected Collection<SpaceReference> getKeysForResult(DocumentReference blogConfDocRef)
+      throws XWikiException {
     SpaceReference spaceRef = getBlogService().getBlogSpaceRef(blogConfDocRef);
     if (spaceRef != null) {
       return Arrays.asList(spaceRef);

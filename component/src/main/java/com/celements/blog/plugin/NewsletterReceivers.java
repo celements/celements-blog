@@ -60,13 +60,13 @@ public class NewsletterReceivers {
   private UserNameForUserDataCommand userNameForUserDataCmd = new UserNameForUserDataCommand();
   private RenderCommand renderCommand = new RenderCommand();
 
-  private List<String> allAddresses = new ArrayList<String>();
-  private List<String[]> groups = new ArrayList<String[]>();
-  private List<String[]> groupUsers = new ArrayList<String[]>();
-  private List<String[]> users = new ArrayList<String[]>();
-  private List<String[]> addrLangs = new ArrayList<String[]>();
-  private List<String> addresses = new ArrayList<String>();
-  private List<EmailAddressDate> emailAddressDateList = new ArrayList<EmailAddressDate>();
+  private List<String> allAddresses = new ArrayList<>();
+  private List<String[]> groups = new ArrayList<>();
+  private List<String[]> groupUsers = new ArrayList<>();
+  private List<String[]> users = new ArrayList<>();
+  private List<String[]> addrLangs = new ArrayList<>();
+  private List<String> addresses = new ArrayList<>();
+  private List<EmailAddressDate> emailAddressDateList = new ArrayList<>();
 
   // use only if you inject the receivers!
   public NewsletterReceivers() {
@@ -241,7 +241,7 @@ public class NewsletterReceivers {
     }
 
     XWiki wiki = context.getWiki();
-    List<String[]> result = new ArrayList<String[]>();
+    List<String[]> result = new ArrayList<>();
     int successfullySent = 0;
 
     LOGGER.debug("articleName = " + articleName);
@@ -260,7 +260,7 @@ public class NewsletterReceivers {
         if (userObj != null) {
           String email = userObj.getStringValue("email");
           if (email.trim().length() > 0) {
-            allUserMailPairs = new ArrayList<String[]>();
+            allUserMailPairs = new ArrayList<>();
             String[] userFields = getUserAdminLanguage(user,
                 getWebUtilsService().getDefaultLanguage());
             allUserMailPairs.add((String[]) ArrayUtils.addAll(new String[] { user, email },
@@ -302,7 +302,7 @@ public class NewsletterReceivers {
       String from, String replyTo, String subject, XWikiDocument contentDoc, String baseURL) {
     List<String[]> results = Collections.emptyList();
     if ((receivers != null) && (receivers.size() > 0)) {
-      results = new ArrayList<String[]>();
+      results = new ArrayList<>();
       for (DocumentReference receiverDocRef : receivers) {
         try {
           XWikiDocument receiverDoc = getContext().getWiki().getDocument(receiverDocRef,
@@ -361,7 +361,7 @@ public class NewsletterReceivers {
     } else {
       LOGGER.warn("Tried to send " + doc + " to user " + userMailPair[0] + " which"
           + " has no view rights on this Document.");
-      List<String> params = new ArrayList<String>();
+      List<String> params = new ArrayList<>();
       params.add(doc.toString());
       XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
       result = new String[] { userMailPair[1], messageTool.get(
@@ -371,7 +371,7 @@ public class NewsletterReceivers {
   }
 
   List<String[]> getNewsletterReceiversList() {
-    ArrayList<String[]> allUserMailPairs = new ArrayList<String[]>();
+    ArrayList<String[]> allUserMailPairs = new ArrayList<>();
     allUserMailPairs.addAll(groupUsers);
     allUserMailPairs.addAll(users);
     allUserMailPairs.addAll(addrLangs);
@@ -429,7 +429,6 @@ public class NewsletterReceivers {
 
   String getUnsubscribeLink(String blogSpace, String emailAddresse, XWikiContext context)
       throws XWikiException {
-
     String unsubscribeLink = "";
     XWikiDocument blogDocument = BlogUtils.getInstance().getBlogPageByBlogSpace(blogSpace, context);
     BaseObject blogObj = blogDocument.getObject("Celements2.BlogConfigClass", false, context);
@@ -508,7 +507,7 @@ public class NewsletterReceivers {
       if ((to != null) && (to.trim().length() == 0)) {
         to = null;
       }
-      Map<String, String> otherHeader = new HashMap<String, String>();
+      Map<String, String> otherHeader = new HashMap<>();
       otherHeader.put("Content-Location", baseURL);
 
       LOGGER.info("NewsletterReceivers: sendMail from [" + from + "], replyTo [" + replyTo

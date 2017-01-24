@@ -32,15 +32,14 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
 
   public static final String DEFAULT_NL_ATTACHMENT_LIST = "nlEmbedAttList";
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      NewsletterAttachmentService.class);
-  
+  private static final Logger LOGGER = LoggerFactory.getLogger(NewsletterAttachmentService.class);
+
   @Requirement
   Execution execution;
-  
+
   @Requirement
   IWebUtilsService webUtils;
-  
+
   @Requirement
   IAttachmentServiceRole attService;
 
@@ -53,24 +52,23 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
     }
     return embedImagesInContent(content, images);
   }
-  
+
   String embedImagesInContent(String content, Set<String> imgTags) {
     for (String tag : imgTags) {
       String strippedTag = tag.replaceAll(".*src=\"(.*?)\\?.*?\".*", "$1");
-      String imgFullname = strippedTag.replaceAll("((http://)?[a-zA-Z0-9\\.-_]*)?/?" +
-          "(download)?/(.*)/(.*)/(.*?)", "$4.$5;$6");
+      String imgFullname = strippedTag.replaceAll("((http://)?[a-zA-Z0-9\\.-_]*)?/?"
+          + "(download)?/(.*)/(.*)/(.*?)", "$4.$5;$6");
       String replStr = Pattern.quote(tag.replaceAll(".*src=\"(.*?)\".*", "$1"));
       content = content.replaceAll(replStr, getImageURL(imgFullname, true));
     }
     return content;
   }
-  
+
   public String getImageURL(String imgFullname, boolean embedImage) {
     String imgURL = "";
     AttachmentURLCommand attURL = new AttachmentURLCommand();
-    if(embedImage) {
-      extendAttachmentList(getAttachmentForFullname(imgFullname),
-          DEFAULT_NL_ATTACHMENT_LIST);
+    if (embedImage) {
+      extendAttachmentList(getAttachmentForFullname(imgFullname), DEFAULT_NL_ATTACHMENT_LIST);
       imgURL = "cid:" + attURL.getAttachmentName(imgFullname);
     } else {
       imgURL = attURL.getAttachmentURL(imgFullname, "download", getContext());
@@ -83,44 +81,43 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
     extendAttachmentList(att, DEFAULT_NL_ATTACHMENT_LIST);
     extendAttachmentList(att, DEFAULT_NL_NO_IMG_ATT_LIST);
   }
-  
+
   public List<Attachment> getAttachmentList(boolean includingImages) {
     String param = DEFAULT_NL_ATTACHMENT_LIST;
-    if(!includingImages) {
+    if (!includingImages) {
       param = DEFAULT_NL_NO_IMG_ATT_LIST;
     }
     return getAttachmentList(param, false);
   }
-  
+
   @SuppressWarnings("unchecked")
   List<Attachment> getAttachmentList(String param, boolean create) {
     Object contextVal = getVcontext().get(param);
     List<Attachment> embedList = null;
-    if((contextVal instanceof List<?>) && !((List<Attachment>)contextVal).isEmpty() 
-        && (((List<Attachment>)contextVal).get(0) instanceof Attachment)){
-      embedList = (List<Attachment>)contextVal;
+    if ((contextVal instanceof List<?>) && !((List<Attachment>) contextVal).isEmpty()
+        && (((List<Attachment>) contextVal).get(0) instanceof Attachment)) {
+      embedList = (List<Attachment>) contextVal;
     }
-    if((embedList == null) && create) {
+    if ((embedList == null) && create) {
       embedList = new ArrayList<Attachment>();
     }
     return embedList;
   }
-  
+
   void extendAttachmentList(Attachment att, String param) {
     List<Attachment> attList = getAttachmentList(param, true);
     attList.add(att);
     getVcontext().put(param, attList);
   }
-  
+
   Attachment getAttachmentForFullname(String imgFullname) {
     AttachmentURLCommand attURL = new AttachmentURLCommand();
     Attachment att = null;
     try {
-      XWikiDocument attDoc = getContext().getWiki().getDocument(
-          webUtils.resolveDocumentReference(attURL.getPageFullName(imgFullname)), 
-          getContext());
-      XWikiAttachment xatt = attService.getAttachmentNameEqual(attDoc, 
-          attURL.getAttachmentName(imgFullname));
+      XWikiDocument attDoc = getContext().getWiki().getDocument(webUtils.resolveDocumentReference(
+          attURL.getPageFullName(imgFullname)), getContext());
+      XWikiAttachment xatt = attService.getAttachmentNameEqual(attDoc, attURL.getAttachmentName(
+          imgFullname));
       att = attService.getApiAttachment(xatt);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception getting attachment Document.", xwe);
@@ -131,13 +128,13 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
     }
     return att;
   }
-  
+
   XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
-  
+
   VelocityContext getVcontext() {
-    return (VelocityContext)(getContext().get("vcontext"));
+    return (VelocityContext) (getContext().get("vcontext"));
   }
 
   public void clearAttachmentList() {

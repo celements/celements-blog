@@ -21,8 +21,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component(BlogCache.NAME)
 public class BlogCacheFlushingListener implements EventListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      BlogCacheFlushingListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BlogCacheFlushingListener.class);
 
   @Requirement(BlogCache.NAME)
   IDocumentReferenceCache<String> navCache;
@@ -37,8 +36,8 @@ public class BlogCacheFlushingListener implements EventListener {
 
   @Override
   public List<Event> getEvents() {
-    return Arrays.<Event> asList(new BlogCreatedEvent(), 
-        new BlogUpdatedEvent(), new BlogDeletedEvent());
+    return Arrays.<Event>asList(new BlogCreatedEvent(), new BlogUpdatedEvent(),
+        new BlogDeletedEvent());
   }
 
   @Override
