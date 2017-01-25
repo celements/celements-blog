@@ -1,98 +1,101 @@
 #set($blogSpace = "$!request.get('space')")
+#if("$!theDoc" == '')
+  #set($theDoc = $doc)
+#end
 #if($xwiki.isMultiLingual())
-    #set($defObj = $doc.getObject("XWiki.ArticleClass", "lang", $!{default_language}, false))
-    #set($newsletterObj = $doc.getObject("XWiki.ArticleClass", "lang", $!{newsletter_language}, false))
+    #set($defObj = $theDoc.getObject("XWiki.ArticleClass", "lang", $!{default_language}, false))
+    #set($newsletterObj = $theDoc.getObject("XWiki.ArticleClass", "lang", $!{newsletter_language}, false))
     #if(("$!newsletter_language" != '') && ("$!newsletterObj" != '') && ($!newsletterObj.getProperty('content').getValue() != ""))
       #set($obj = $newsletterObj)
     #else
-      #set($obj = $doc.getObject("XWiki.ArticleClass","lang",$language, false))
+      #set($obj = $theDoc.getObject("XWiki.ArticleClass","lang",$language, false))
     #end
     #if(("$!obj" == '') || ($!obj.getProperty('content').getValue() == ""))
-		#set($obj = $defObj)
-	#end
+    #set($obj = $defObj)
+  #end
 #else
-	#set($defObj = $doc.getObject("XWiki.ArticleClass", 0))
+  #set($defObj = $theDoc.getObject("XWiki.ArticleClass", 0))
 #end
 ## if we still have not found a valid article object it might be that the Article
 ## class is not yet updated to multilingual or multilingual is switched off.
 #if("$!obj" == '')
-	#set($obj = $doc.getObject('XWiki.ArticleClass'))
+  #set($obj = $theDoc.getObject('XWiki.ArticleClass'))
 #end
 #if("$!obj" != '')
-	#set($has_comments = '0')
-	#if($obj.getProperty('hasComments').getValue() && ("$!obj.getProperty('hasComments').getValue()" == '1'))
-		#set($has_comments = '1')
-	#end
-	## blog editor: RTE or plain
-	#set($blogeditor = "$!defObj.getProperty('blogeditor').getValue()")
-	#set($isoldblog = ("$!blogeditor" == ''))
-	#if($isoldblog || ("$!defObj.getProperty('publishdate').getValue()" == ''))
-		#set($creationDate = $xwiki.formatDate($doc.creationDate,"dd. MMMM, yyyy"))
-	#else
-	#set($creationDate = $xwiki.formatDate($defObj.getProperty('publishdate').getValue(),"dd. MMMM, yyyy"))
-	#set($additionalArticleClass = '')
-	#if($xwiki.getCurrentDate().before($defObj.getProperty('publishdate').getValue()))
-		#set($additionalArticleClass = " future")
-	#end
+  #set($has_comments = '0')
+  #if($obj.getProperty('hasComments').getValue() && ("$!obj.getProperty('hasComments').getValue()" == '1'))
+    #set($has_comments = '1')
+  #end
+  ## blog editor: RTE or plain
+  #set($blogeditor = "$!defObj.getProperty('blogeditor').getValue()")
+  #set($isoldblog = ("$!blogeditor" == ''))
+  #if($isoldblog || ("$!defObj.getProperty('publishdate').getValue()" == ''))
+    #set($creationDate = $xwiki.formatDate($theDoc.creationDate,"dd. MMMM, yyyy"))
+  #else
+  #set($creationDate = $xwiki.formatDate($defObj.getProperty('publishdate').getValue(),"dd. MMMM, yyyy"))
+  #set($additionalArticleClass = '')
+  #if($xwiki.getCurrentDate().before($defObj.getProperty('publishdate').getValue()))
+    #set($additionalArticleClass = " future")
+  #end
 #end
-#set($bentrydoc = $doc)
+#set($bentrydoc = $theDoc)
 $xwiki.includeForm('celements2web:Macros.getArticleContext', false)
 <div class="article_detail$!{additionalArticleClass}" $!contextMenu>
-	<div class="article_date">$creationDate</div>
-	<div class="article_title $!{obj.getProperty('lang').getTitle()} h1">$doc.display("title", "view", $obj)</div>
-	<div class="text $!{obj.getProperty('lang').getTitle()}">$doc.display("content", "rendered", $obj)</div><!-- article_content -->
-	<div class="clearleft"><!-- required:floating images --></div>
-    #if(("$defObj.getProperty('isSubscribable').getValue()" == '1') && ("$!blogSpace" != '') && ("$doc.web" != "$!blogSpace"))
+  <div class="article_date">$creationDate</div>
+  <div class="article_title $!{obj.getProperty('lang').getTitle()} h1">$theDoc.display("title", "view", $obj)</div>
+  <div class="text $!{obj.getProperty('lang').getTitle()}">$theDoc.display("content", "rendered", $obj)</div><!-- article_content -->
+  <div class="clearleft"><!-- required:floating images --></div>
+    #if(("$defObj.getProperty('isSubscribable').getValue()" == '1') && ("$!blogSpace" != '') && ("$theDoc.web" != "$!blogSpace"))
       #set($blogArticleSubscriptionObj = '')
-      #set($blogArticleSubscriptionObj = $doc.getObject('Celements2.BlogArticleSubscriptionClass', 'subscriber', "$doc.fullName", false))
+      #set($blogArticleSubscriptionObj = $theDoc.getObject('Celements2.BlogArticleSubscriptionClass', 'subscriber', "$theDoc.fullName", false))
       $xwiki.includeForm("celements2web:Macros.blogArticleSubscribeBar", false)
     #end
 </div><!--article_detail-->
 <!-- has_comments : $has_comments -->
 #if("$!has_comments" == '1')
-	<div class="h1 comment_head">$adminMsg.get('cel_tm_post_comment')</div>
+  <div class="h1 comment_head">$adminMsg.get('cel_tm_post_comment')</div>
 $celementsweb.addExtJSfileOnce(':celJS/prototype.js')
 $celementsweb.addExtJSfileOnce(':celJS/validation.js')
-    <form action="$doc.getURL('commentadd')" id="commentform" method="post" name="commentform">
-	    #set($red = "$!{doc.getURL('view')}")
-	    <input type="hidden" name="xredirect" value="$red" />
-	    <input type="hidden" name="XWiki.XWikiComments_date" value=""/>
-	    <div class="formular_row spacer">
-	    	<div class="titel">$adminMsg.get('cel_tm_name')</div><!-- titel --><input class="input" size="40" maxlength="100" value="" name="XWiki.XWikiComments_author"/>
-	   		<div class="titel">$adminMsg.get('cel_tm_email')</div><!-- titel --><input class="input2 validate-email" size="40" maxlength="100" value="" name="XWiki.XWikiComments_highlight"/><!-- -->
-	    </div><!-- formular_row -->
-	    <div class="titel_kommentar">$adminMsg.get('cel_tm_comment')
-	    	<textarea class="input required" cols="40" row="5" name="XWiki.XWikiComments_comment"></textarea>
-	    </div> <!-- titel -->
-	   <a href="" class="submit reg_button" onclick="if (valid.validate()) { document.forms.commentform.submit();} return false;" style="cursor:pointer">$adminMsg.get('cel_tm_comment')<!--click--></a>
-	</form>
-	<script type="text/javascript">
-		var valid = new Validation('commentform',{immediate : true , useTitles : true, stopOnFirst : false}); // OR new Validation(document.forms[0]);
-	</script>  
-	<div class="h1 comment_title">$adminMsg.get('cel_tm_comments')</div>
- #if($!doc.getObjects('XWiki.XWikiComments').size() > 0)
-  #foreach($num in $xwiki.search("select obj.number from BaseObject as obj where obj.name = '$doc.fullName' and obj.className = 'XWiki.XWikiComments' order by obj.number desc"))
-  	#set($comment = $doc.getObject('XWiki.XWikiComments', $num))
+    <form action="$theDoc.getURL('commentadd')" id="commentform" method="post" name="commentform">
+      #set($red = "$!{theDoc.getURL('view')}")
+      <input type="hidden" name="xredirect" value="$red" />
+      <input type="hidden" name="XWiki.XWikiComments_date" value=""/>
+      <div class="formular_row spacer">
+        <div class="titel">$adminMsg.get('cel_tm_name')</div><!-- titel --><input class="input" size="40" maxlength="100" value="" name="XWiki.XWikiComments_author"/>
+         <div class="titel">$adminMsg.get('cel_tm_email')</div><!-- titel --><input class="input2 validate-email" size="40" maxlength="100" value="" name="XWiki.XWikiComments_highlight"/><!-- -->
+      </div><!-- formular_row -->
+      <div class="titel_kommentar">$adminMsg.get('cel_tm_comment')
+        <textarea class="input required" cols="40" row="5" name="XWiki.XWikiComments_comment"></textarea>
+      </div> <!-- titel -->
+     <a href="" class="submit reg_button" onclick="if (valid.validate()) { document.forms.commentform.submit();} return false;" style="cursor:pointer">$adminMsg.get('cel_tm_comment')<!--click--></a>
+  </form>
+  <script type="text/javascript">
+    var valid = new Validation('commentform',{immediate : true , useTitles : true, stopOnFirst : false}); // OR new Validation(document.forms[0]);
+  </script>
+  <div class="h1 comment_title">$adminMsg.get('cel_tm_comments')</div>
+ #if($!theDoc.getObjects('XWiki.XWikiComments').size() > 0)
+  #foreach($num in $xwiki.search("select obj.number from BaseObject as obj where obj.name = '$theDoc.fullName' and obj.className = 'XWiki.XWikiComments' order by obj.number desc"))
+    #set($comment = $theDoc.getObject('XWiki.XWikiComments', $num))
     <div class="article_date">
 $xwiki.formatDate($comment.getProperty('date').getValue(),"dd. MMMM, yyyy")
     </div>
     <div class="text kommentar_text">
       <p>$comment.getProperty('comment').getValue()</p>
       <div class="author_box">
-      	<div class="author_name">$adminMsg.get('cel_rte_author'): $!comment.getProperty('author').getValue()</div><!-- author_name -->
+        <div class="author_name">$adminMsg.get('cel_rte_author'): $!comment.getProperty('author').getValue()</div><!-- author_name -->
         <div class="author_email">$adminMsg.get('cel_email'): <a href="mailto:$!comment.getProperty('highlight').getValue()" target="_blank">$!comment.getProperty('highlight').getValue()</a></div><!-- author_email -->
       </div> <!-- author_box -->
     #if($hasedit)
       #set($queryStr = "classname=XWiki.XWikiComments&classid=${comment.number}&xredirect=$!{red}")
-      <a class="delete_comment" href="$doc.getURL('objectremove', $queryStr)">$adminMsg.get('cel_delete')</a>
-	#end
+      <a class="delete_comment" href="$theDoc.getURL('objectremove', $queryStr)">$adminMsg.get('cel_delete')</a>
+  #end
     </div> <!-- article_content -->
   #end
  #else
 <div class="text kommentar_text nocomments">
-	<p>$adminMsg.get('cel_tm_no_comments')</p>
+  <p>$adminMsg.get('cel_tm_no_comments')</p>
 </div>
  #end ## size() > 0
 #end
 #end ## #if("$!obj" != '')
-#set($renderDocumentRecursionHistory = "${renderDocumentRecursionHistory}${doc.fullName} ")
+#set($renderDocumentRecursionHistory = "${renderDocumentRecursionHistory}${theDoc.fullName} ")
