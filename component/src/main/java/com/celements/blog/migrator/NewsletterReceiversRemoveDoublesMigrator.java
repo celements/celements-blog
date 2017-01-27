@@ -43,8 +43,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.web.Utils;
 
 @Component("NewsletterReceiversRemoveDoubles")
-public class NewsletterReceiversRemoveDoublesMigrator
-    extends AbstractCelementsHibernateMigrator {
+public class NewsletterReceiversRemoveDoublesMigrator extends AbstractCelementsHibernateMigrator {
 
   @Requirement
   QueryManager queryManager;
@@ -53,47 +52,46 @@ public class NewsletterReceiversRemoveDoublesMigrator
       NewsletterReceiversRemoveDoublesMigrator.class);
 
   @Override
-  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context
-      ) throws XWikiException {
-    DocumentReference recObjRef = new DocumentReference(context.getDatabase(), 
-        "Celements", "NewsletterReceiverClass");
+  public void migrate(SubSystemHibernateMigrationManager manager, XWikiContext context)
+      throws XWikiException {
+    DocumentReference recObjRef = new DocumentReference(context.getDatabase(), "Celements",
+        "NewsletterReceiverClass");
     String xwql = "from doc.object(Celements.NewsletterReceiverClass) as obj";
     try {
       List<String> receivers = queryManager.createQuery(xwql, Query.XWQL).execute();
       Map<String, Object[]> receiversMap = new HashMap<String, Object[]>();
-      if(receivers != null) {
-        for(String docName : receivers) {
-          if(docName != null) {
-            XWikiDocument recDoc = context.getWiki().getDocument(getWebUtils(
-                ).resolveDocumentReference(docName), context);
+      if (receivers != null) {
+        for (String docName : receivers) {
+          if (docName != null) {
+            XWikiDocument recDoc = context.getWiki().getDocument(
+                getWebUtils().resolveDocumentReference(docName), context);
             BaseObject recObj = recDoc.getXObject(recObjRef);
             String recMail = recObj.getStringValue("email");
             int isActive = recObj.getIntValue("isactive", 0);
-            if(!"".equals(recMail)) {
+            if (!"".equals(recMail)) {
               String recSubscr = recObj.getStringValue("subscribed");
               String recKey = recMail + "," + recSubscr;
-              if(receiversMap.containsKey(recKey)) {
-                int duplActive = (Integer)receiversMap.get(recKey)[0];
-                XWikiDocument duplDoc = (XWikiDocument)receiversMap.get(recKey)[1];
-                if(!recDoc.getDocumentReference().equals(duplDoc.getDocumentReference())) {
-                  if((isActive == 1) || (duplActive != 1)) {
+              if (receiversMap.containsKey(recKey)) {
+                int duplActive = (Integer) receiversMap.get(recKey)[0];
+                XWikiDocument duplDoc = (XWikiDocument) receiversMap.get(recKey)[1];
+                if (!recDoc.getDocumentReference().equals(duplDoc.getDocumentReference())) {
+                  if ((isActive == 1) || (duplActive != 1)) {
                     recDoc.removeXObject(recObj);
                     context.getWiki().saveDocument(recDoc, "Removed douplicate", context);
                   } else {
-                    duplDoc.removeXObject((BaseObject)receiversMap.get(recKey)[2]);
+                    duplDoc.removeXObject((BaseObject) receiversMap.get(recKey)[2]);
                     context.getWiki().saveDocument(duplDoc, "Removed douplicate", context);
-                    receiversMap.put(recMail + "," + recSubscr, new Object[]{isActive, 
-                        recDoc, recObj});
+                    receiversMap.put(recMail + "," + recSubscr, new Object[] { isActive, recDoc,
+                        recObj });
                   }
                 }
                 LOGGER.info("Remove duplicate of " + recMail + " - " + recSubscr);
               } else {
-                receiversMap.put(recMail + "," + recSubscr, new Object[]{isActive, 
-                    recDoc, recObj});
+                receiversMap.put(recMail + "," + recSubscr, new Object[] { isActive, recDoc,
+                    recObj });
               }
             } else {
-              LOGGER.info("Empty NewsletterReceiver found on doc " + 
-                  recDoc.getDocumentReference());
+              LOGGER.info("Empty NewsletterReceiver found on doc " + recDoc.getDocumentReference());
             }
           }
         }
@@ -102,9 +100,9 @@ public class NewsletterReceiversRemoveDoublesMigrator
       LOGGER.error("Exception cleaning duplicate newsletter receivers", qe);
     }
   }
-  
+
   IWebUtilsService getWebUtils() {
-    return (IWebUtilsService)Utils.getComponent(IWebUtilsService.class);
+    return (IWebUtilsService) Utils.getComponent(IWebUtilsService.class);
   }
 
   public String getDescription() {
@@ -116,10 +114,8 @@ public class NewsletterReceiversRemoveDoublesMigrator
   }
 
   /**
-   * getVersion is using days since
-   * 1.1.2010 until the day of committing this migration
-   * 28.06.2013 -> 1274
-   * use: http://www.wolframalpha.com
+   * getVersion is using days since 1.1.2010 until the day of committing this migration 28.06.2013
+   * -> 1274 use: http://www.wolframalpha.com
    */
   public XWikiDBVersion getVersion() {
     return new XWikiDBVersion(1275);

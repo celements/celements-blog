@@ -2,41 +2,41 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN"
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- -->
+  * See the NOTICE file distributed with this work for additional
+  * information regarding copyright ownership.
+  *
+  * This is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of
+  * the License, or (at your option) any later version.
+  *
+  * This software is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this software; if not, write to the Free
+  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 <hibernate-mapping>
   <class entity-name="Celements.NewsletterReceiverClass" table="cel_newsletterreceiverclass">
-  <id name="id" type="integer" unsaved-value="undefined">
-    <column name="NRC_ID" not-null="true" />
-    <generator class="assigned" />
-  </id>
-  <property name="email" type="string">
-    <column name="NRC_EMAIL" length="128"/>
-  </property>
-  <property name="language" type="string">
-    <column name="NRC_LANGUAGE" length="7"/>
-  </property>
-  <property name="isactive" type="integer">
-    <column name="NRC_ACTIVE" />
-  </property>
-  <property name="subscribed" type="text">
-    <column name="NRC_SUBSCRIBED" />
-  </property>
-</class>
+    <id name="id" type="integer" unsaved-value="undefined">
+      <column name="NRC_ID" not-null="true" />
+      <generator class="assigned" />
+    </id>
+    <property name="email" type="string">
+      <column name="NRC_EMAIL" length="128" />
+    </property>
+    <property name="language" type="string">
+      <column name="NRC_LANGUAGE" length="7" />
+    </property>
+    <property name="isactive" type="integer">
+      <column name="NRC_ACTIVE" />
+    </property>
+    <property name="subscribed" type="text">
+      <column name="NRC_SUBSCRIBED" />
+    </property>
+  </class>
 </hibernate-mapping>

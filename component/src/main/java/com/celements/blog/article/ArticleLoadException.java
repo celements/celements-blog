@@ -7,7 +7,7 @@ public class ArticleLoadException extends Exception {
   public ArticleLoadException(String msg) {
     super(msg);
   }
-  
+
   public ArticleLoadException(Throwable cause) {
     super(cause);
   }

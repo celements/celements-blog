@@ -14,13 +14,17 @@ import com.celements.blog.plugin.BlogClasses;
 // TODO javadoc for fields (also note if one isn't regarded by an engine, e.g. offset, 
 // limit, sortFields not regarded in ArticleEngineHQL)
 public class ArticleLoadParameter {
-  
+
   public enum SubscriptionMode {
-    SUBSCRIBED, UNSUBSCRIBED, UNDECIDED;
+    SUBSCRIBED,
+    UNSUBSCRIBED,
+    UNDECIDED;
   }
-  
+
   public enum DateMode {
-    PUBLISHED, ARCHIVED, FUTURE;
+    PUBLISHED,
+    ARCHIVED,
+    FUTURE;
   }
 
   // TODO test default
@@ -28,17 +32,17 @@ public class ArticleLoadParameter {
   private DocumentReference blogDocRef;
   private boolean withBlogArticles = true;
   private List<DocumentReference> subscribedToBlogs = Collections.emptyList();
-  private Set<DateMode> dateModes = Collections.unmodifiableSet(
-      new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED)));
+  private Set<DateMode> dateModes = Collections.unmodifiableSet(new HashSet<DateMode>(Arrays.asList(
+      DateMode.PUBLISHED)));
   private Set<SubscriptionMode> subsModes = Collections.emptySet();
   private String language = null;
   private String searchTerm = null;
 
   private int offset = 0;
   private int limit = 0;
-  private List<String> sortFields = Arrays.asList("-" + BlogClasses.ARTICLE_CLASS + "." 
+  private List<String> sortFields = Arrays.asList("-" + BlogClasses.ARTICLE_CLASS + "."
       + BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE, "name");
-  
+
   public ArticleLoadParameter() {
   }
 
@@ -57,7 +61,7 @@ public class ArticleLoadParameter {
   public DocumentReference getBlogDocRef() {
     return blogDocRef;
   }
-  
+
   public ArticleLoadParameter setBlogDocRef(DocumentReference blogDocRef) {
     this.blogDocRef = blogDocRef;
     return this;
@@ -121,7 +125,7 @@ public class ArticleLoadParameter {
   public String getLanguage() {
     return language;
   }
-  
+
   public String getSearchTerm() {
     return searchTerm;
   }
@@ -130,7 +134,7 @@ public class ArticleLoadParameter {
     this.language = language;
     return this;
   }
-  
+
   public void setSearchTerm(String searchTerm) {
     this.searchTerm = searchTerm;
   }
@@ -176,11 +180,10 @@ public class ArticleLoadParameter {
 
   @Override
   public String toString() {
-    return "ArticleLoadParameter [executionDate=" + executionDate + ", blogDocRef="
-        + blogDocRef + ", withBlogArticles=" + withBlogArticles
-        + ", subscribedToBlogs=" + subscribedToBlogs + ", dateModes=" + dateModes
-        + ", subsModes=" + subsModes + ", language=" + language + ", offset=" + offset
-        + ", limit=" + limit + ", sortFields=" + sortFields + ", searchTerm="
+    return "ArticleLoadParameter [executionDate=" + executionDate + ", blogDocRef=" + blogDocRef
+        + ", withBlogArticles=" + withBlogArticles + ", subscribedToBlogs=" + subscribedToBlogs
+        + ", dateModes=" + dateModes + ", subsModes=" + subsModes + ", language=" + language
+        + ", offset=" + offset + ", limit=" + limit + ", sortFields=" + sortFields + ", searchTerm="
         + searchTerm + "]";
   }
 

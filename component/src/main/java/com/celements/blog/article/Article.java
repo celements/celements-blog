@@ -45,10 +45,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class Article extends Api{
+public class Article extends Api {
 
   private static Log LOGGER = LogFactory.getFactory().getInstance(Article.class);
-  
+
   private Map<String, com.xpn.xwiki.api.Object> articleObjMap;
   private Boolean isSubscribed;
   private Map<String, String> extract;
@@ -65,34 +65,32 @@ public class Article extends Api{
     super(context);
   }
 
-  public Article(XWikiDocument articleDoc, XWikiContext context
-      ) throws XWikiException, EmptyArticleException {
+  public Article(XWikiDocument articleDoc, XWikiContext context) throws XWikiException,
+      EmptyArticleException {
     this(articleDoc.newDocument(context), context);
   }
-  
-  public Article(Document articleDoc, XWikiContext context
-      ) throws XWikiException, EmptyArticleException{
+
+  public Article(Document articleDoc, XWikiContext context) throws XWikiException,
+      EmptyArticleException {
     this(articleDoc.getObjects("XWiki.ArticleClass"), articleDoc.getSpace(), context);
   }
-  
-  public Article(List<com.xpn.xwiki.api.Object> objList, String space,
-      XWikiContext context) throws XWikiException, EmptyArticleException{
+
+  public Article(List<com.xpn.xwiki.api.Object> objList, String space, XWikiContext context)
+      throws XWikiException, EmptyArticleException {
     super(context);
-    for (Iterator<com.xpn.xwiki.api.Object> iterator = objList.iterator();
-        iterator.hasNext();) {
+    for (Iterator<com.xpn.xwiki.api.Object> iterator = objList.iterator(); iterator.hasNext();) {
       com.xpn.xwiki.api.Object artObj = iterator.next();
       init(artObj, space);
     }
-    if(articleObjMap == null) {
+    if (articleObjMap == null) {
       throw new EmptyArticleException();
     }
   }
-  
-  public void init(com.xpn.xwiki.api.Object obj, String space){
+
+  public void init(com.xpn.xwiki.api.Object obj, String space) {
     if (articleObjMap == null) {
       articleObjMap = new HashMap<String, com.xpn.xwiki.api.Object>();
-      defaultLang = context.getWiki().getSpacePreference("default_language", space, "",
-          context);
+      defaultLang = context.getWiki().getSpacePreference("default_language", space, "", context);
     }
     LOGGER.debug("Init Article Object");
     if (obj != null) {
@@ -104,7 +102,7 @@ public class Article extends Api{
       }
     }
   }
-  
+
   private void setSubscribed(DocumentReference blogConfDocRef) {
     XWikiDocument doc = null;
     // TODO why loading doc&objects here when already loaded articleObjMap could be used?
@@ -113,187 +111,191 @@ public class Article extends Api{
     } catch (XWikiException e) {
       LOGGER.error(e);
     }
-    if(doc != null) {
-      String blogConfFN = Utils.getComponent(IWebUtilsService.class
-          ).getRefLocalSerializer().serialize(blogConfDocRef);
-      BaseObject obj = doc.getObject("Celements2.BlogArticleSubscriptionClass",
-          "subscriber", blogConfFN, false);
-      LOGGER.info("Search for object with subscriber == '" + blogConfFN + "' had result: " 
-          + obj);
-      if(obj != null){
+    if (doc != null) {
+      String blogConfFN = Utils.getComponent(
+          IWebUtilsService.class).getRefLocalSerializer().serialize(blogConfDocRef);
+      BaseObject obj = doc.getObject("Celements2.BlogArticleSubscriptionClass", "subscriber",
+          blogConfFN, false);
+      LOGGER.info("Search for object with subscriber == '" + blogConfFN + "' had result: " + obj);
+      if (obj != null) {
         int isSubscr = obj.getIntValue("doSubscribe");
         LOGGER.info("'" + doc.getFullName() + "' doSubscribe is: '" + isSubscr + "'");
-        if(isSubscr == 1){
+        if (isSubscr == 1) {
           isSubscribed = true;
-        } else if(isSubscr == 0){
+        } else if (isSubscr == 0) {
           isSubscribed = false;
         }
-      } else{
+      } else {
         isSubscribed = null;
         LOGGER.info("'" + doc.getFullName() + "' doSubscribe is: '" + isSubscribed + "'");
       }
     }
   }
-  
-  public Date getPublishDate(){
+
+  public Date getPublishDate() {
     Date date = getDateProperty(getObj(defaultLang), "publishdate");
     return date;
   }
-  
-  public Date getPublishDate(String lang){
+
+  public Date getPublishDate(String lang) {
     Date date = getDateProperty(getObj(lang), "publishdate");
     return date;
   }
-  
-  public Date getArchiveDate(){
+
+  public Date getArchiveDate() {
     Date date = getDateProperty(getObj(defaultLang), "archivedate");
     return date;
   }
-  
-  public Date getArchiveDate(String lang){
+
+  public Date getArchiveDate(String lang) {
     Date date = getDateProperty(getObj(lang), "archivedate");
     return date;
   }
-  
+
   /**
-   * Get the effective language of the title. E.g. getTitleLang('fr') returns 'de' if 
-   * default is 'de' and there is no 'fr' translation.
+   * Get the effective language of the title. E.g. getTitleLang('fr') returns 'de' if default is
+   * 'de' and there is no 'fr' translation.
+   * 
    * @param lang
    * @return
    */
-  public String getTitleLang(String lang){
+  public String getTitleLang(String lang) {
     return getTitleDetailed(lang)[0];
   }
-  
-  public String getTitle(String lang){
+
+  public String getTitle(String lang) {
     return getTitleDetailed(lang)[1];
   }
-  
+
   String[] getTitleDetailed(String lang) {
     String title = getStringProperty(getObj(lang), "title");
-    if((title == null) || "".equals(title.trim())) {
+    if ((title == null) || "".equals(title.trim())) {
       title = getStringProperty(getObj(defaultLang), "title");
       lang = defaultLang;
     }
-    return new String[]{lang, title};
+    return new String[] { lang, title };
   }
-  
+
   int getMaxNumChars() {
     int maxNumChars = 250;
     String blogSpaceName = getDocumentReference().getLastSpaceReference().getName();
     XWikiDocument blogDoc = getBlogService().getBlogPageByBlogSpace(blogSpaceName);
     if (blogDoc != null) {
-      BaseObject blogConfigObj = blogDoc.getXObject(getBlogClasses(
-          ).getBlogConfigClassRef(getContext().getDatabase()));
+      BaseObject blogConfigObj = blogDoc.getXObject(getBlogClasses().getBlogConfigClassRef(
+          getContext().getDatabase()));
       if ((blogConfigObj != null) && (blogConfigObj.getIntValue(
           BlogClasses.PROPERTY_BLOG_CONFIG_MAX_NUM_CHARS_FIELD, -1) > 0)) {
         maxNumChars = blogConfigObj.getIntValue(
             BlogClasses.PROPERTY_BLOG_CONFIG_MAX_NUM_CHARS_FIELD);
       }
     } else {
-      LOGGER.info("BlogConfig document not found for space name [" + blogSpaceName
-          + "].");
+      LOGGER.info("BlogConfig document not found for space name [" + blogSpaceName + "].");
     }
     return maxNumChars;
   }
-  
+
   /**
-   * Get the effective language of the title. E.g. getExtractLang('fr', x) returns 'de' if 
-   * default is 'de' and there is no 'fr' translation.
+   * Get the effective language of the title. E.g. getExtractLang('fr', x) returns 'de' if default
+   * is 'de' and there is no 'fr' translation.
+   * 
    * @param lang
    * @return
    */
   public String getExtractLang(String lang, boolean isViewtypeFull) {
     return getExtractDetailed(lang, isViewtypeFull, getMaxNumChars())[0];
   }
-  
+
   public String getExtract(String lang, boolean isViewtypeFull) {
     return getExtractDetailed(lang, isViewtypeFull, getMaxNumChars())[1];
   }
 
-  public String getExtract(String lang, boolean isViewtypeFull, int maxNumChars){
+  public String getExtract(String lang, boolean isViewtypeFull, int maxNumChars) {
     return getExtractDetailed(lang, isViewtypeFull, maxNumChars)[1];
   }
-  
-  public String[] getExtractDetailed(String lang, boolean isViewtypeFull,
-      int maxNumChars) {
+
+  public String[] getExtractDetailed(String lang, boolean isViewtypeFull, int maxNumChars) {
     String effectiveLang = lang;
     LOGGER.info("getExtract('" + lang + "', " + isViewtypeFull + "')");
-    if((extract == null) || !extract.containsKey(lang)){
+    if ((extract == null) || !extract.containsKey(lang)) {
       String fullExtract = getStringProperty(getObj(lang), "extract");
       boolean needsMoreLink = true;
       boolean needsMoreLinkDots = false;
-      if(isEmptyStringAndNotDefLang(fullExtract, lang)){
+      if (isEmptyStringAndNotDefLang(fullExtract, lang)) {
         fullExtract = getStringProperty(getObj(defaultLang), "extract");
         effectiveLang = defaultLang;
       }
-      if(fullExtract.trim().equals("") || isViewtypeFull){
+      if (fullExtract.trim().equals("") || isViewtypeFull) {
         fullExtract = getFullArticle(lang);
         needsMoreLink = false;
-        if(isEmptyStringAndNotDefLang(fullExtract, lang)){
+        if (isEmptyStringAndNotDefLang(fullExtract, lang)) {
           fullExtract = getFullArticle(defaultLang);
           effectiveLang = defaultLang;
         } else {
           effectiveLang = lang;
         }
-        if(!isViewtypeFull && (fullExtract.length() > maxNumChars)){
-          fullExtract = fullExtract.substring(0, fullExtract.lastIndexOf(" ", maxNumChars
-              ) + 1);
+        if (!isViewtypeFull && (fullExtract.length() > maxNumChars)) {
+          fullExtract = fullExtract.substring(0, fullExtract.lastIndexOf(" ", maxNumChars) + 1);
           needsMoreLink = true;
           needsMoreLinkDots = true;
         }
       }
-      
-      if(extract == null){ extract = new HashMap<String, String>(); }
+
+      if (extract == null) {
+        extract = new HashMap<String, String>();
+      }
       extract.put(lang, fullExtract);
-      if(hasMoreLink == null){ hasMoreLink = new HashMap<String, Boolean>(); }
+      if (hasMoreLink == null) {
+        hasMoreLink = new HashMap<String, Boolean>();
+      }
       hasMoreLink.put(lang, needsMoreLink);
-      if(hasMoreLinkDots == null){ hasMoreLinkDots = new HashMap<String, Boolean>(); }
+      if (hasMoreLinkDots == null) {
+        hasMoreLinkDots = new HashMap<String, Boolean>();
+      }
       hasMoreLinkDots.put(lang, needsMoreLinkDots);
     }
-    
+
     String extr = extract.get(lang);
-//    mLogger.info("getExtract('" + lang + "', " + isViewtypeFull + "') => '" + extr + "'");
-    //TODO check if this code is unreachable / senseless since last refactoring, since 
-    //     fallback to default language is already handled earlier
-//    if(isEmptyStringAndNotDefLang(extr, lang)){
-//      extr = getExtract(defaultLang, isViewtypeFull);
-//    }
-    return new String[]{effectiveLang, extr};
+    // mLogger.info("getExtract('" + lang + "', " + isViewtypeFull + "') => '" + extr + "'");
+    // TODO check if this code is unreachable / senseless since last refactoring, since
+    // fallback to default language is already handled earlier
+    // if(isEmptyStringAndNotDefLang(extr, lang)){
+    // extr = getExtract(defaultLang, isViewtypeFull);
+    // }
+    return new String[] { effectiveLang, extr };
   }
 
   boolean isEmptyStringAndNotDefLang(String string, String lang) {
     return (string.trim().length() <= 0) && !lang.equals(defaultLang);
   }
-  
-  public String getFullArticle(String lang){
+
+  public String getFullArticle(String lang) {
     return getStringProperty(getObj(lang), "content");
   }
-  
-  public String getEditor(String lang){
+
+  public String getEditor(String lang) {
     return getStringProperty(getObj(lang), "blogeditor");
   }
-  
-  public Boolean isCommentable(){
+
+  public Boolean isCommentable() {
     return getBooleanProperty(getObj(defaultLang), "hasComments");
   }
-  
-  public Boolean isCommentable(String lang){
+
+  public Boolean isCommentable(String lang) {
     return getBooleanProperty(getObj(lang), "hasComments");
   }
 
-  public Boolean isSubscribable(){
+  public Boolean isSubscribable() {
     return getBooleanProperty(getObj(defaultLang), "isSubscribable");
   }
-  
-  //Attention! May return null if not set so use -> if(isSubscribable(lang) == true)
-  public Boolean isSubscribable(String lang){
+
+  // Attention! May return null if not set so use -> if(isSubscribable(lang) == true)
+  public Boolean isSubscribable(String lang) {
     return getBooleanProperty(getObj(lang), "isSubscribable");
   }
-  
-  public boolean isFromSubscribableBlog(String blogArticleSpace){
+
+  public boolean isFromSubscribableBlog(String blogArticleSpace) {
     boolean result = true;
-    if(getDocName().startsWith(blogArticleSpace + ".")){
+    if (getDocName().startsWith(blogArticleSpace + ".")) {
       result = false;
     }
     return result;
@@ -313,48 +315,47 @@ public class Article extends Api{
    * @deprecated since 2.18.0 instead use getDocumentReference()
    */
   @Deprecated
-  public String getDocName(){
-    for (Iterator<String> iterator = articleObjMap.keySet().iterator();
-        iterator.hasNext();) {
+  public String getDocName() {
+    for (Iterator<String> iterator = articleObjMap.keySet().iterator(); iterator.hasNext();) {
       String key = (String) iterator.next();
       return articleObjMap.get(key).getName();
     }
     return "";
   }
 
-  public String getStringProperty(com.xpn.xwiki.api.Object obj, String name){
+  public String getStringProperty(com.xpn.xwiki.api.Object obj, String name) {
     String result = "";
-    if(obj != null){
+    if (obj != null) {
       Property prop = obj.getProperty(name);
-      if(prop != null){
+      if (prop != null) {
         result = prop.getValue().toString();
       }
     }
     return result;
   }
-  
-  public Date getDateProperty(com.xpn.xwiki.api.Object obj, String name){
+
+  public Date getDateProperty(com.xpn.xwiki.api.Object obj, String name) {
     Date result = null;
-    if(obj != null){
+    if (obj != null) {
       Property prop = obj.getProperty(name);
-      if(prop != null){
-        result = (Date)prop.getValue();
+      if (prop != null) {
+        result = (Date) prop.getValue();
       }
     }
     return result;
   }
-  
+
   // not set = null, false = 0, true = 1
-  public Boolean getBooleanProperty(com.xpn.xwiki.api.Object obj, String name){
+  public Boolean getBooleanProperty(com.xpn.xwiki.api.Object obj, String name) {
     Boolean result = null;
-    if(obj != null){
+    if (obj != null) {
       Property prop = obj.getProperty(name);
-      if(prop != null){
-        Integer val = (Integer)prop.getValue();
-        if(val != null){
-          if(val == 1){
+      if (prop != null) {
+        Integer val = (Integer) prop.getValue();
+        if (val != null) {
+          if (val == 1) {
             result = true;
-          } else if(val == 0){
+          } else if (val == 0) {
             result = false;
           }
         }
@@ -362,16 +363,15 @@ public class Article extends Api{
     }
     return result;
   }
-  
-  public com.xpn.xwiki.api.Object getObj(String lang){
+
+  public com.xpn.xwiki.api.Object getObj(String lang) {
     com.xpn.xwiki.api.Object obj = null;
     if (articleObjMap.containsKey(lang)) {
       LOGGER.info("'" + getDocName() + "' - Getting object for lang '" + lang + "'");
       obj = articleObjMap.get(lang);
     } else {
       if (articleObjMap.containsKey(defaultLang)) {
-        LOGGER.info("'" + getDocName() + "' - Getting object for defaultLang '" + lang
-            + "'");
+        LOGGER.info("'" + getDocName() + "' - Getting object for defaultLang '" + lang + "'");
         obj = articleObjMap.get(defaultLang);
       } else {
         if (articleObjMap.containsKey("")) {
@@ -383,8 +383,8 @@ public class Article extends Api{
         }
       }
     }
-    LOGGER.info("Object found: doc name='" + ((obj != null) ? obj.getName() : "")
-        + "' obj='" + obj + "'");
+    LOGGER.info("Object found: doc name='" + ((obj != null) ? obj.getName() : "") + "' obj='" + obj
+        + "'");
     return obj;
   }
 
@@ -400,21 +400,21 @@ public class Article extends Api{
   }
 
   public Boolean isSubscribed(DocumentReference blogConfDocRef) {
-    if(isSubscribed == null){
+    if (isSubscribed == null) {
       setSubscribed(blogConfDocRef);
     }
     return isSubscribed;
   }
 
   public boolean hasMoreLink(String lang, boolean isViewtypeFull) {
-    if((hasMoreLink == null) || !hasMoreLink.containsKey(lang)){
+    if ((hasMoreLink == null) || !hasMoreLink.containsKey(lang)) {
       getExtract(lang, isViewtypeFull);
     }
     return hasMoreLink.get(lang);
   }
 
   public boolean hasMoreLinkDots(String lang, boolean isViewtypeFull) {
-    if(hasMoreLink(lang, isViewtypeFull)){
+    if (hasMoreLink(lang, isViewtypeFull)) {
       getExtract(lang, isViewtypeFull);
     }
     return hasMoreLinkDots.get(lang);
@@ -423,10 +423,9 @@ public class Article extends Api{
   private IWebUtilsService getWebService() {
     return Utils.getComponent(IWebUtilsService.class);
   }
-  
+
   private BlogClasses getBlogClasses() {
-    return (BlogClasses) Utils.getComponent(IClassCollectionRole.class,
-        "celements.celBlogClasses");
+    return (BlogClasses) Utils.getComponent(IClassCollectionRole.class, "celements.celBlogClasses");
   }
 
   IBlogServiceRole getBlogService() {
@@ -437,7 +436,7 @@ public class Article extends Api{
   }
 
   private XWikiContext getContext() {
-    return (XWikiContext)Utils.getComponent(Execution.class).getContext().getProperty(
+    return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty(
         "xwikicontext");
   }
 

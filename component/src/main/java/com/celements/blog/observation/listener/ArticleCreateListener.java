@@ -17,8 +17,7 @@ import com.celements.common.observation.listener.AbstractDocumentCreateListener;
 @Component(ArticleCreateListener.NAME)
 public class ArticleCreateListener extends AbstractDocumentCreateListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      ArticleCreateListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArticleCreateListener.class);
 
   public static final String NAME = "ArticleCreateListener";
 

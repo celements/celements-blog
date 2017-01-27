@@ -16,11 +16,11 @@ import com.xpn.xwiki.XWikiException;
 
 @Component(ArticleParent.DOC_PROVIDER_NAME)
 public class ArticleParent implements IDocParentProviderRole {
-  
+
   private static Logger _LOGGER = LoggerFactory.getLogger(ArticleParent.class);
 
   public static final String DOC_PROVIDER_NAME = "celblog";
-  
+
   @Requirement
   private IBlogServiceRole blogService;
 
@@ -30,7 +30,7 @@ public class ArticleParent implements IDocParentProviderRole {
     try {
       DocumentReference nextParent = blogService.getBlogConfigDocRef(
           docRef.getLastSpaceReference());
-      if(nextParent != null) {
+      if (nextParent != null) {
         docParents.add(nextParent);
       }
     } catch (QueryException exp) {
@@ -40,7 +40,7 @@ public class ArticleParent implements IDocParentProviderRole {
     }
     return docParents;
   }
-  
+
   void injectBlogService(IBlogServiceRole blogService) {
     this.blogService = blogService;
   }
