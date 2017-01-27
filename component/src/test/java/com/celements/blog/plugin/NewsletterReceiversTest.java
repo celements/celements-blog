@@ -51,7 +51,7 @@ public class NewsletterReceiversTest extends AbstractComponentTest {
     String docName = "BlogArticle";
     String urlParams = "xpage=celements_ajax&ajax_mode=BlogAjax&doaction=unsubscribe&emailadresse=";
     String urlStaticPart = "http://celements.com/" + spaceName + "/" + docName + "?" + urlParams;
-    URL url = new URL(urlStaticPart + URLEncoder.encode(email, "UTF-8"));
+    URL url = new URL(urlStaticPart + URLEncoder.encode(email, UTF_8.name()));
     IBlogServiceRole blogServiceMock = registerComponentMock(IBlogServiceRole.class);
     XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
         spaceName, docName));
