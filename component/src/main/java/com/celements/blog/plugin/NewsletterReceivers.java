@@ -19,10 +19,9 @@
  */
 package com.celements.blog.plugin;
 
-import static java.nio.charset.StandardCharsets.*;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -439,7 +438,7 @@ public class NewsletterReceivers {
       try {
         unsubscribeLink = blogDocument.getExternalURL("view",
             "xpage=celements_ajax&ajax_mode=BlogAjax&doaction=unsubscribe&emailadresse="
-                + URLEncoder.encode(emailAddresse, UTF_8.name()), getContext());
+                + URLEncoder.encode(emailAddresse, StandardCharsets.UTF_8.name()), getContext());
       } catch (UnsupportedEncodingException e) {
         LOGGER.error("UTF-8 unsupported.");
       }
@@ -487,14 +486,14 @@ public class NewsletterReceivers {
     if (getContext().getWiki().exists(footerRef, getContext())) {
       getContext().setLanguage(renderLang);
       LOGGER.debug("Additional footer found.");
-      LOGGER.debug("doc=" + doc + ", context.language=" + getContext().getLanguage());
-      LOGGER.debug("context=" + getContext());
+      LOGGER.debug("doc={} , context.language={}", doc, getContext().getLanguage());
+      LOGGER.debug("context={}", getContext());
       vcontext.put("msg", msgTool);
       vcontext.put("adminMsg", msgTool);
       footer += renderCommand.renderDocument(footerRef, renderLang) + "\n";
       LOGGER.debug("Additional footer rendered.");
     } else {
-      LOGGER.debug("No additional footer. Doc does not exist: " + footerRef);
+      LOGGER.debug("No additional footer. Doc does not exist: {} ", footerRef);
     }
     XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(renderLang);
     footer += messageTool.get("cel_newsletter_html_footer_message", Arrays.asList(
