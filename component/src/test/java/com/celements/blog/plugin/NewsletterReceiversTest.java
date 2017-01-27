@@ -42,7 +42,6 @@ public class NewsletterReceiversTest extends AbstractComponentTest {
   private NewsletterReceivers comp;
 
   @Before
-
   public void prepareTest() throws Exception {
     comp = new NewsletterReceivers();
   }

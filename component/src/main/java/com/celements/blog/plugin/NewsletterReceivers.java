@@ -459,7 +459,8 @@ public class NewsletterReceivers {
         "LocalMacros.NewsletterHTMLheader");
     if (getContext().getWiki().exists(headerRef, getContext())) {
       LOGGER.debug("Additional header found.");
-      LOGGER.debug("doc=" + doc + ", context.language=" + getContext().getLanguage());
+      LOGGER.debug("doc=" + doc + ", context.language=" + getContext().getLanguage(), doc,
+          getContext());
       LOGGER.debug("context=" + getContext());
       vcontext.put("msg", msgTool);
       vcontext.put("adminMsg", msgTool);
