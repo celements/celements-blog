@@ -20,6 +20,7 @@
 package com.celements.blog.plugin;
 
 import static com.celements.common.test.CelementsTestUtils.*;
+import static java.nio.charset.StandardCharsets.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -43,63 +44,42 @@ public class NewsletterReceiversTest extends AbstractComponentTest {
   @Before
   public void prepareTest() throws Exception {
     comp = new NewsletterReceivers();
+  }
 
+  public void unsubscribeLink(String email) throws Exception {
+    String spaceName = "TestSpace";
+    String docName = "BlogArticle";
+    String urlParams = "xpage=celements_ajax&ajax_mode=BlogAjax&doaction=unsubscribe&emailadresse=";
+    String urlStaticPart = "http://celements.com/" + spaceName + "/" + docName + "?" + urlParams;
+    URL url = new URL(urlStaticPart + URLEncoder.encode(email, "UTF-8"));
+    IBlogServiceRole blogServiceMock = registerComponentMock(IBlogServiceRole.class);
+    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
+        spaceName, docName));
+    BaseObject blogObj = new BaseObject();
+    blogObj.setXClassReference(new DocumentReference(getContext().getDatabase(), "Celements2",
+        "BlogConfigClass"));
+    blogObj.setIntValue("unsubscribe_info", 1);
+    doc.addXObject(blogObj);
+    expect(blogServiceMock.getBlogPageByBlogSpace(eq(spaceName))).andReturn(doc);
+    XWikiURLFactory urlFactoryMock = createMockAndAddToDefault(XWikiURLFactory.class);
+    getContext().setURLFactory(urlFactoryMock);
+    expect(urlFactoryMock.createExternalURL(eq(spaceName), eq(docName), eq("view"), eq(urlParams
+        + URLEncoder.encode(email, UTF_8.name())), (String) eq(null), eq(
+            getContext().getDatabase()), same(getContext()))).andReturn(url);
+    replayDefault();
+    String link = comp.getUnsubscribeLink(spaceName, email);
+    verifyDefault();
+    assertEquals(url.toString(), link);
   }
 
   @Test
   public void testGetUnsubscribeLink() throws Exception {
-    String spaceName = "TestSpace";
-    String docName = "BlogArticle";
-    String email = "test@celements.com";
-    String urlParams = "xpage=celements_ajax&ajax_mode=BlogAjax&doaction=unsubscribe&emailadresse=";
-    String urlStaticPart = "http://celements.com/" + spaceName + "/" + docName + "?" + urlParams;
-    URL url = new URL(urlStaticPart + URLEncoder.encode(email, "UTF-8"));
-    IBlogServiceRole blogServiceMock = registerComponentMock(IBlogServiceRole.class);
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
-        spaceName, docName));
-    BaseObject blogObj = new BaseObject();
-    blogObj.setXClassReference(new DocumentReference(getContext().getDatabase(), "Celements2",
-        "BlogConfigClass"));
-    blogObj.setIntValue("unsubscribe_info", 1);
-    doc.addXObject(blogObj);
-    expect(blogServiceMock.getBlogPageByBlogSpace(eq(spaceName))).andReturn(doc);
-    XWikiURLFactory urlFactoryMock = createMockAndAddToDefault(XWikiURLFactory.class);
-    getContext().setURLFactory(urlFactoryMock);
-    expect(urlFactoryMock.createExternalURL(eq(spaceName), eq(docName), eq("view"), eq(urlParams
-        + URLEncoder.encode(email, "UTF-8")), (String) eq(null), eq(getContext().getDatabase()),
-        same(getContext()))).andReturn(url);
-    replayDefault();
-    String link = comp.getUnsubscribeLink(spaceName, email, getContext());
-    verifyDefault();
-    assertEquals(url.toString(), link);
+    unsubscribeLink("test@clementes.com");
   }
 
   @Test
   public void testGetUnsubscribeLink_plusInEmail() throws Exception {
-    String spaceName = "TestSpace";
-    String docName = "BlogArticle";
-    String email = "test+test@celements.com";
-    String urlParams = "xpage=celements_ajax&ajax_mode=BlogAjax&doaction=unsubscribe&emailadresse=";
-    String urlStaticPart = "http://celements.com/" + spaceName + "/" + docName + "?" + urlParams;
-    URL url = new URL(urlStaticPart + URLEncoder.encode(email, "UTF-8"));
-    IBlogServiceRole blogServiceMock = registerComponentMock(IBlogServiceRole.class);
-    XWikiDocument doc = new XWikiDocument(new DocumentReference(getContext().getDatabase(),
-        spaceName, docName));
-    BaseObject blogObj = new BaseObject();
-    blogObj.setXClassReference(new DocumentReference(getContext().getDatabase(), "Celements2",
-        "BlogConfigClass"));
-    blogObj.setIntValue("unsubscribe_info", 1);
-    doc.addXObject(blogObj);
-    expect(blogServiceMock.getBlogPageByBlogSpace(eq(spaceName))).andReturn(doc);
-    XWikiURLFactory urlFactoryMock = createMockAndAddToDefault(XWikiURLFactory.class);
-    getContext().setURLFactory(urlFactoryMock);
-    expect(urlFactoryMock.createExternalURL(eq(spaceName), eq(docName), eq("view"), eq(urlParams
-        + URLEncoder.encode(email, "UTF-8")), (String) eq(null), eq(getContext().getDatabase()),
-        same(getContext()))).andReturn(url);
-    replayDefault();
-    String link = comp.getUnsubscribeLink(spaceName, email, getContext());
-    verifyDefault();
-    assertEquals(url.toString(), link);
+    unsubscribeLink("test+test@clementes..com");
   }
 
   @Test

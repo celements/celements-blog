@@ -19,6 +19,8 @@
  */
 package com.celements.blog.plugin;
 
+import static java.nio.charset.StandardCharsets.*;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -346,14 +348,14 @@ public class NewsletterReceivers {
     if (context.getWiki().checkAccess("view", doc, context)) {
       String senderContextLang = context.getLanguage();
       context.setLanguage(language);
-      String htmlContent = getHtmlContent(doc, baseURL, context);
+      String htmlContent = getHtmlContent(doc, baseURL);
       context.setLanguage(language);
-      htmlContent += getUnsubscribeFooter(userMailPair[1], doc, context);
+      htmlContent += getUnsubscribeFooter(userMailPair[1], doc);
       context.setLanguage(senderContextLang);
       XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
       String textContent = messageTool.get("cel_newsletter_text_only_message", Arrays.asList(
           doc.getExternalURL("view", context)));
-      textContent += getUnsubscribeFooter(userMailPair[1], doc, context);
+      textContent += getUnsubscribeFooter(userMailPair[1], doc);
 
       int singleResult = sendMail(from, replyTo, userMailPair[1], subject, baseURL, htmlContent,
           textContent, context);
@@ -416,28 +418,29 @@ public class NewsletterReceivers {
     return new String[] { userLanguage, firstname, name };
   }
 
-  private String getUnsubscribeFooter(String emailAddress, XWikiDocument blogDocument,
-      XWikiContext context) throws XWikiException {
+  private String getUnsubscribeFooter(String emailAddress, XWikiDocument blogDocument)
+      throws XWikiException {
     String unsubscribeFooter = "";
-    if (!"".equals(getUnsubscribeLink(blogDocument.getSpace(), emailAddress, context))) {
-      XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(context.getLanguage());
+    if (!"".equals(getUnsubscribeLink(blogDocument.getSpace(), emailAddress))) {
+      XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(
+          getContext().getLanguage());
       unsubscribeFooter = messageTool.get("cel_newsletter_unsubscribe_footer", Arrays.asList(
-          getUnsubscribeLink(blogDocument.getSpace(), emailAddress, context)));
+          getUnsubscribeLink(blogDocument.getSpace(), emailAddress)));
     }
     return unsubscribeFooter;
   }
 
-  String getUnsubscribeLink(String blogSpace, String emailAddresse, XWikiContext context)
-      throws XWikiException {
+  String getUnsubscribeLink(String blogSpace, String emailAddresse) throws XWikiException {
 
     String unsubscribeLink = "";
-    XWikiDocument blogDocument = BlogUtils.getInstance().getBlogPageByBlogSpace(blogSpace, context);
-    BaseObject blogObj = blogDocument.getObject("Celements2.BlogConfigClass", false, context);
+    XWikiDocument blogDocument = BlogUtils.getInstance().getBlogPageByBlogSpace(blogSpace,
+        getContext());
+    BaseObject blogObj = blogDocument.getObject("Celements2.BlogConfigClass", false, getContext());
     if ((blogObj != null) && (blogObj.getIntValue("unsubscribe_info") == 1)) {
       try {
         unsubscribeLink = blogDocument.getExternalURL("view",
             "xpage=celements_ajax&ajax_mode=BlogAjax&doaction=unsubscribe&emailadresse="
-                + URLEncoder.encode(emailAddresse, "UTF-8"), context);
+                + URLEncoder.encode(emailAddresse, UTF_8.name()), getContext());
       } catch (UnsupportedEncodingException e) {
         LOGGER.error("UTF-8 unsupported.");
       }
@@ -445,21 +448,20 @@ public class NewsletterReceivers {
     return unsubscribeLink;
   }
 
-  private String getHtmlContent(XWikiDocument doc, String baseURL, XWikiContext context)
-      throws XWikiException {
+  private String getHtmlContent(XWikiDocument doc, String baseURL) throws XWikiException {
     String header = "";
     if ((baseURL != null) && !"".equals(baseURL.trim())) {
       header = "<base href='" + baseURL + "' />\n";
     }
-    String renderLang = context.getLanguage();
-    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+    String renderLang = getContext().getLanguage();
+    VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
     XWikiMessageTool msgTool = getWebUtilsService().getMessageTool(renderLang);
     DocumentReference headerRef = getWebUtilsService().resolveDocumentReference(
         "LocalMacros.NewsletterHTMLheader");
-    if (getContext().getWiki().exists(headerRef, context)) {
+    if (getContext().getWiki().exists(headerRef, getContext())) {
       LOGGER.debug("Additional header found.");
-      LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
-      LOGGER.debug("context=" + context);
+      LOGGER.debug("doc=" + doc + ", context.language=" + getContext().getLanguage());
+      LOGGER.debug("context=" + getContext());
       vcontext.put("msg", msgTool);
       vcontext.put("adminMsg", msgTool);
       header += renderCommand.renderDocument(headerRef, renderLang);
@@ -468,13 +470,13 @@ public class NewsletterReceivers {
       LOGGER.debug("No additional header. Doc does not exist: " + headerRef);
     }
     LOGGER.debug("rendering content in " + renderLang);
-    context.setLanguage(renderLang);
+    getContext().setLanguage(renderLang);
     renderCommand.setDefaultPageType("RichText");
     vcontext.put("msg", msgTool);
     vcontext.put("adminMsg", msgTool);
     String content = renderCommand.renderCelementsDocument(doc.getDocumentReference(), renderLang,
         "view");
-    content = Utils.replacePlaceholders(content, context);
+    content = Utils.replacePlaceholders(content, getContext());
     if (getContext().getWiki().getXWikiPreferenceAsInt("newsletter_embed_all_images",
         "celements.newsletter.embedAllImages", 0, getContext()) == 1) {
       content = getNewsletterAttachmentService().embedImagesInContent(content);
@@ -482,11 +484,11 @@ public class NewsletterReceivers {
     String footer = "";
     DocumentReference footerRef = getWebUtilsService().resolveDocumentReference(
         "LocalMacros.NewsletterHTMLfooter");
-    if (getContext().getWiki().exists(footerRef, context)) {
-      context.setLanguage(renderLang);
+    if (getContext().getWiki().exists(footerRef, getContext())) {
+      getContext().setLanguage(renderLang);
       LOGGER.debug("Additional footer found.");
-      LOGGER.debug("doc=" + doc + ", context.language=" + context.getLanguage());
-      LOGGER.debug("context=" + context);
+      LOGGER.debug("doc=" + doc + ", context.language=" + getContext().getLanguage());
+      LOGGER.debug("context=" + getContext());
       vcontext.put("msg", msgTool);
       vcontext.put("adminMsg", msgTool);
       footer += renderCommand.renderDocument(footerRef, renderLang) + "\n";
@@ -496,7 +498,7 @@ public class NewsletterReceivers {
     }
     XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(renderLang);
     footer += messageTool.get("cel_newsletter_html_footer_message", Arrays.asList(
-        doc.getExternalURL("view", context)));
+        doc.getExternalURL("view", getContext())));
     LOGGER.debug("Header: [" + header + "]");
     LOGGER.debug("Footer: [" + footer + "]");
     return header + content + footer;
