@@ -58,7 +58,7 @@ public class BlogCacheTest extends AbstractBridgedComponentTestCase {
     SpaceReference spaceRef3 = new SpaceReference("blogSpace3", wikiRef);
     DocumentReference docRef1 = new DocumentReference(wikiRef.getName(), "space", "blog1");
     DocumentReference docRef2 = new DocumentReference(wikiRef.getName(), "space", "blog2");
-    
+
     expectXWQL(wikiRef, Arrays.asList(docRef1, docRef2));
     expect(cache.blogService.getBlogSpaceRef(eq(docRef1))).andReturn(spaceRef1).once();
     expect(cache.blogService.getBlogSpaceRef(eq(docRef2))).andReturn(spaceRef2).once();
@@ -77,7 +77,7 @@ public class BlogCacheTest extends AbstractBridgedComponentTestCase {
     SpaceReference spaceRef = new SpaceReference("blogSpace", wikiRef);
     DocumentReference docRef1 = new DocumentReference(wikiRef.getName(), "space", "blog1");
     DocumentReference docRef2 = new DocumentReference(wikiRef.getName(), "space", "blog2");
-    
+
     expectXWQL(wikiRef, Arrays.asList(docRef1, docRef2));
     expect(cache.blogService.getBlogSpaceRef(eq(docRef1))).andReturn(spaceRef).once();
     expect(cache.blogService.getBlogSpaceRef(eq(docRef2))).andReturn(spaceRef).once();
@@ -92,7 +92,7 @@ public class BlogCacheTest extends AbstractBridgedComponentTestCase {
   public void testGetCachedDocRefs_empty() throws Exception {
     WikiReference wikiRef = new WikiReference("wiki");
     SpaceReference spaceRef = new SpaceReference("blogSpace", wikiRef);
-    
+
     expectXWQL(wikiRef, Collections.<DocumentReference>emptyList());
 
     replayDefault();
@@ -109,7 +109,7 @@ public class BlogCacheTest extends AbstractBridgedComponentTestCase {
     SpaceReference spaceRef2 = new SpaceReference("blogSpace2", wikiRef2);
     DocumentReference docRef2 = new DocumentReference(wikiRef2.getName(), "space", "blog2");
     SpaceReference spaceRef3 = new SpaceReference("blogSpace3", wikiRef1);
-    
+
     expectXWQL(wikiRef1, Arrays.asList(docRef1));
     expect(cache.blogService.getBlogSpaceRef(eq(docRef1))).andReturn(spaceRef1).once();
     expectXWQL(wikiRef2, Arrays.asList(docRef2));
@@ -128,7 +128,7 @@ public class BlogCacheTest extends AbstractBridgedComponentTestCase {
   public void testGetCachedDocRefs_nullKey() throws Exception {
     WikiReference wikiRef = new WikiReference("wiki");
     DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
-    
+
     expectXWQL(wikiRef, Arrays.asList(docRef));
     expect(cache.blogService.getBlogSpaceRef(eq(docRef))).andReturn(null).once();
 
@@ -141,7 +141,7 @@ public class BlogCacheTest extends AbstractBridgedComponentTestCase {
   public void testGetCachedDocRefs_QueryException() throws Exception {
     WikiReference wikiRef = new WikiReference("wiki");
     SpaceReference spaceRef = new SpaceReference("blogSpace", wikiRef);
-    
+
     expectXWQL(wikiRef, null);
 
     replayDefault();
@@ -159,10 +159,9 @@ public class BlogCacheTest extends AbstractBridgedComponentTestCase {
     WikiReference wikiRef = new WikiReference("wiki");
     SpaceReference spaceRef = new SpaceReference("blogSpace", wikiRef);
     DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog1");
-    
+
     expectXWQL(wikiRef, Arrays.asList(docRef));
-    expect(cache.blogService.getBlogSpaceRef(eq(docRef))).andThrow(new XWikiException()
-        ).once();
+    expect(cache.blogService.getBlogSpaceRef(eq(docRef))).andThrow(new XWikiException()).once();
 
     replayDefault();
     try {
@@ -180,7 +179,7 @@ public class BlogCacheTest extends AbstractBridgedComponentTestCase {
     SpaceReference spaceRef = new SpaceReference("blogSpace", wikiRef);
     DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
     WikiReference otherWikiRef = new WikiReference("otherWiki");
-    
+
     expectXWQL(wikiRef, Arrays.asList(docRef));
     expectXWQL(wikiRef, Arrays.asList(docRef));
     expect(cache.blogService.getBlogSpaceRef(eq(docRef))).andReturn(spaceRef).times(2);
@@ -194,13 +193,11 @@ public class BlogCacheTest extends AbstractBridgedComponentTestCase {
     verifyDefault();
   }
 
-  private void expectXWQL(WikiReference wikiRef, List<DocumentReference> ret
-      ) throws Exception {
+  private void expectXWQL(WikiReference wikiRef, List<DocumentReference> ret) throws Exception {
     Query queryMock = createMockAndAddToDefault(Query.class);
     String xwql = "select distinct doc.fullName from Document doc, doc.object("
         + "Celements2.BlogConfigClass) as obj";
-    expect(queryManagerMock.createQuery(eq(xwql), eq(Query.XWQL))).andReturn(
-        queryMock).once();
+    expect(queryManagerMock.createQuery(eq(xwql), eq(Query.XWQL))).andReturn(queryMock).once();
     expect(queryMock.setWiki(eq(wikiRef.getName()))).andReturn(queryMock).once();
     IExpectationSetters<List<DocumentReference>> expSetter = expect(
         queryExecServiceMock.executeAndGetDocRefs(same(queryMock)));

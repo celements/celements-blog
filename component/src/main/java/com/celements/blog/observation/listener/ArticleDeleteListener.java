@@ -17,8 +17,7 @@ import com.celements.common.observation.listener.AbstractDocumentDeleteListener;
 @Component(ArticleDeleteListener.NAME)
 public class ArticleDeleteListener extends AbstractDocumentDeleteListener {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      ArticleDeleteListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArticleDeleteListener.class);
 
   public static final String NAME = "ArticleDeleteListener";
 

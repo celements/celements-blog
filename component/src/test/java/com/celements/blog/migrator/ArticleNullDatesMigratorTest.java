@@ -22,9 +22,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class ArticleNullDatesMigratorTest extends AbstractBridgedComponentTestCase {
-  
+
   private ArticleNullDatesMigrator migrator;
-  
+
   private XWikiContext context;
   private XWiki xwiki;
   private QueryManager queryManagerMock;
@@ -34,7 +34,7 @@ public class ArticleNullDatesMigratorTest extends AbstractBridgedComponentTestCa
   public void setUp_ArticleNullDatesMigratorTest() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
-    migrator = (ArticleNullDatesMigrator) Utils.getComponent(ICelementsMigrator.class, 
+    migrator = (ArticleNullDatesMigrator) Utils.getComponent(ICelementsMigrator.class,
         "ArticleNullDates");
     queryManagerMock = createMockAndAddToDefault(QueryManager.class);
     queryExecutorMock = createMockAndAddToDefault(QueryExecutor.class);
@@ -45,22 +45,22 @@ public class ArticleNullDatesMigratorTest extends AbstractBridgedComponentTestCa
   public void testGetName() {
     assertEquals("ArticleNullDates", migrator.getName());
   }
-  
+
   @Test
   public void testGetXWQL() {
     assertEquals("from doc.object(XWiki.ArticleClass) art where art.publishdate is null "
         + "or art.archivedate is null", migrator.getXWQL());
   }
-  
+
   @Test
   public void testMigrate() throws Exception {
-    Query query = new DefaultQuery("", queryExecutorMock);    
+    Query query = new DefaultQuery("", queryExecutorMock);
     expect(queryManagerMock.createQuery(eq(migrator.getXWQL()), eq("xwql"))).andReturn(
         query).once();
-    expect(queryExecutorMock.execute(same(query))).andReturn(Arrays.<Object>asList(
-        "space.article1", "space.article2")).once();
-    List<DocumentReference> docRefs = Arrays.asList(new DocumentReference("xwikidb", 
-        "space", "article1"), new DocumentReference("xwikidb", "space", "article2"));
+    expect(queryExecutorMock.execute(same(query))).andReturn(Arrays.<Object>asList("space.article1",
+        "space.article2")).once();
+    List<DocumentReference> docRefs = Arrays.asList(new DocumentReference("xwikidb", "space",
+        "article1"), new DocumentReference("xwikidb", "space", "article2"));
     XWikiDocument doc1 = new XWikiDocument(docRefs.get(0));
     expect(xwiki.getDocument(eq(docRefs.get(0)), same(context))).andReturn(doc1).once();
     xwiki.saveDocument(same(doc1), eq("article null dates migration"), same(context));
@@ -69,10 +69,10 @@ public class ArticleNullDatesMigratorTest extends AbstractBridgedComponentTestCa
     expect(xwiki.getDocument(eq(docRefs.get(1)), same(context))).andReturn(doc2).once();
     xwiki.saveDocument(same(doc2), eq("article null dates migration"), same(context));
     expectLastCall().once();
-    
+
     replayDefault();
     migrator.migrate(null, context);
     verifyDefault();
   }
-  
+
 }

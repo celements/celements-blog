@@ -28,17 +28,16 @@ import com.xpn.xwiki.XWikiException;
 @Component("celblog")
 public class BlogScriptService implements ScriptService {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
-      BlogScriptService.class);
+  private static Log LOGGER = LogFactory.getFactory().getInstance(BlogScriptService.class);
 
   @Requirement
   IBlogServiceRole blogService;
 
   @Requirement
   Execution execution;
-  
+
   private XWikiContext getContext() {
-    return (XWikiContext)execution.getContext().getProperty("xwikicontext");
+    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
   }
 
   public List<String> getAddresses(DocumentReference blogDocRef) {
@@ -79,7 +78,6 @@ public class BlogScriptService implements ScriptService {
 
   /**
    * @deprecated since 1.32 instead use {@link #getBlogDocRefForSpaceRef(SpaceReference)}
-   * 
    * @param blogSpaceName
    * @return
    */
@@ -100,7 +98,7 @@ public class BlogScriptService implements ScriptService {
     }
     return ret;
   }
-  
+
   public SpaceReference getBlogSpaceRef(DocumentReference blogConfDocRef) {
     SpaceReference ret = null;
     try {
@@ -110,7 +108,7 @@ public class BlogScriptService implements ScriptService {
     }
     return ret;
   }
-  
+
   public List<SpaceReference> getSubribedToBlogs(DocumentReference blogConfDocRef) {
     List<SpaceReference> ret;
     try {
@@ -128,28 +126,26 @@ public class BlogScriptService implements ScriptService {
 
   public ArticleLoadParameter getDefaultArticleLoadParameter() {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
-        DateMode.FUTURE)));
-    param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
+    param.setDateModes(new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE)));
+    param.setSubscriptionModes(new HashSet<>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNDECIDED)));
     return param;
   }
 
   public ArticleLoadParameter getArchiveArticleLoadParameter() {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.ARCHIVED)));
-    param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
+    param.setDateModes(new HashSet<>(Arrays.asList(DateMode.ARCHIVED)));
+    param.setSubscriptionModes(new HashSet<>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNDECIDED)));
     return param;
   }
 
   public ArticleLoadParameter getAllArticleLoadParameter() {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
-        DateMode.FUTURE, DateMode.ARCHIVED)));
-    param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
-        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED, 
-        SubscriptionMode.UNDECIDED)));
+    param.setDateModes(new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE,
+        DateMode.ARCHIVED)));
+    param.setSubscriptionModes(new HashSet<>(Arrays.asList(
+        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED, SubscriptionMode.UNDECIDED)));
     return param;
   }
 
@@ -161,37 +157,36 @@ public class BlogScriptService implements ScriptService {
 
   public ArticleLoadParameter getUndecidedArticleLoadParameter() {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, 
-        DateMode.FUTURE, DateMode.ARCHIVED)));
-    param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
+    param.setDateModes(new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE,
+        DateMode.ARCHIVED)));
+    param.setSubscriptionModes(new HashSet<>(Arrays.asList(
         SubscriptionMode.UNDECIDED)));
     param.setWithBlogArticles(false);
     return param;
   }
- 
+
   public List<Article> getArticles(DocumentReference blogConfDocRef) {
     return getArticles(blogConfDocRef, null);
   }
 
-  public List<Article> getArticles(DocumentReference blogConfDocRef, 
-      ArticleLoadParameter param) {
+  public List<Article> getArticles(DocumentReference blogConfDocRef, ArticleLoadParameter param) {
     List<Article> ret = Collections.emptyList();
     try {
       if (blogConfDocRef != null) {
         ret = blogService.getArticles(blogConfDocRef, param);
       }
     } catch (Exception exc) {
-      LOGGER.error("Error getting articles for '" + blogConfDocRef + "' and param '" 
-          + param + "'", exc);
+      LOGGER.error("Error getting articles for '" + blogConfDocRef + "' and param '" + param + "'",
+          exc);
     }
     return ret;
   }
 
   public Article getArticle(DocumentReference articleDocRef) throws XWikiException {
     Article article = null;
-    try{
-      article = new Article(getContext().getWiki().getDocument(articleDocRef, 
-          getContext()), getContext());
+    try {
+      article = new Article(getContext().getWiki().getDocument(articleDocRef, getContext()),
+          getContext());
     } catch (EmptyArticleException exc) {
       LOGGER.info(exc);
     }

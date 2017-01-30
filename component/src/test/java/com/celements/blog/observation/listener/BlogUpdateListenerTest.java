@@ -25,7 +25,7 @@ public class BlogUpdateListenerTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void setUp_BlogUpdateListenerTest() throws Exception {
-    listener = (BlogUpdateListener) Utils.getComponent(EventListener.class, 
+    listener = (BlogUpdateListener) Utils.getComponent(EventListener.class,
         BlogUpdateListener.NAME);
   }
 
@@ -37,7 +37,7 @@ public class BlogUpdateListenerTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetRequiredObjClassRef() {
     String wikiName = "myWiki";
-    DocumentReference classRef = new DocumentReference(wikiName, 
+    DocumentReference classRef = new DocumentReference(wikiName,
         BlogClasses.BLOG_CONFIG_CLASS_SPACE, BlogClasses.BLOG_CONFIG_CLASS_DOC);
     assertEquals(classRef, listener.getRequiredObjClassRef(new WikiReference(wikiName)));
   }

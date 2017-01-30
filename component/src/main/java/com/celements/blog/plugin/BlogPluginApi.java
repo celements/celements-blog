@@ -55,18 +55,17 @@ public class BlogPluginApi extends Api {
     this.plugin = plugin;
   }
 
-  public BlogPlugin getPlugin(){
+  public BlogPlugin getPlugin() {
     return plugin;
   }
 
   /**
-   * @deprecated since 1.9 blog-web release - instead use getBlogDocRefByBlogSpace
-   *             in celBlog script service
+   * @deprecated since 1.9 blog-web release - instead use getBlogDocRefByBlogSpace in celBlog script
+   *             service
    */
   @Deprecated
   public Document getBlogPageByBlogSpace(String blogSpaceName) throws XWikiException {
-    XWikiDocument blogPageByBlogSpace = plugin.getBlogPageByBlogSpace(blogSpaceName,
-        context);
+    XWikiDocument blogPageByBlogSpace = plugin.getBlogPageByBlogSpace(blogSpaceName, context);
     if (blogPageByBlogSpace != null) {
       return blogPageByBlogSpace.newDocument(context);
     }
@@ -79,116 +78,111 @@ public class BlogPluginApi extends Api {
   @Deprecated
   public Article getArticle(Document doc) throws XWikiException {
     Article article = null;
-    try{
+    try {
       article = new Article(doc, context);
     } catch (EmptyArticleException e) {
       LOGGER.info(e);
     }
     return article;
   }
-  
+
   /**
    * @deprecated since 1.32 instead use {@link BlogScriptService}
    */
   @Deprecated
-  public List<Article> getAllArticles(String blogArticleSpace, String subscribedBlogs, 
+  public List<Article> getAllArticles(String blogArticleSpace, String subscribedBlogs,
       String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllArticles");
-    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
-        language, false, false, false, true, true, true, true, true, true, false, 
-        context);
+    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, language,
+        false, false, false, true, true, true, true, true, true, false, context);
     LOGGER.info("END getAllArticles");
     return result;
   }
-  
+
   /**
-   * @deprecated since 1.32 instead use {@link BlogScriptService} with 
-   * {@link BlogScriptService#getAllArticleLoadParameter()}
+   * @deprecated since 1.32 instead use {@link BlogScriptService} with
+   *             {@link BlogScriptService#getAllArticleLoadParameter()}
    */
   @Deprecated
-  public List<Article> getAllWithRightsArticles(String blogArticleSpace, 
-      String subscribedBlogs, String language) throws ArticleLoadException {
+  public List<Article> getAllWithRightsArticles(String blogArticleSpace, String subscribedBlogs,
+      String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllWithRightsArticles");
-    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
-        language, false, false, false, true, true, true, true, true, true, true, context);
+    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, language,
+        false, false, false, true, true, true, true, true, true, true, context);
     LOGGER.info("END getAllWithRightsArticles");
     return result;
   }
-  
+
   /**
-   * @deprecated since 1.32 instead use {@link BlogScriptService} with 
-   * {@link BlogScriptService#getDefaultArticleLoadParameter()}
+   * @deprecated since 1.32 instead use {@link BlogScriptService} with
+   *             {@link BlogScriptService#getDefaultArticleLoadParameter()}
    */
   @Deprecated
-  public List<Article> getArticles(String blogArticleSpace, String subscribedBlogs, 
-      String language) throws ArticleLoadException {
+  public List<Article> getArticles(String blogArticleSpace, String subscribedBlogs, String language)
+      throws ArticleLoadException {
     LOGGER.info("ENTER getArticles");
-    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
-        language, false, false, false, false, true, true, true, false, true, true, 
-        context);
+    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, language,
+        false, false, false, false, true, true, true, false, true, true, context);
     LOGGER.info("END getArticles");
     return result;
   }
-  
+
   /**
-   * @deprecated since 1.32 instead use {@link BlogScriptService} with 
-   * {@link BlogScriptService#getArchiveArticleLoadParameter()}
+   * @deprecated since 1.32 instead use {@link BlogScriptService} with
+   *             {@link BlogScriptService#getArchiveArticleLoadParameter()}
    */
   @Deprecated
-  public List<Article> getArchivedArticles(String blogArticleSpace, 
-      String subscribedBlogs, String language) throws ArticleLoadException {
+  public List<Article> getArchivedArticles(String blogArticleSpace, String subscribedBlogs,
+      String language) throws ArticleLoadException {
     LOGGER.info("ENTER getArchivedArticles");
-    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
-        language, true, false, false, true, true, true, true, false, true, true, 
-        context);
+    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, language, true,
+        false, false, true, true, true, true, false, true, true, context);
     LOGGER.info("END getArchivedArticles");
     return result;
   }
-  
+
   /**
-   * @deprecated since 1.32 instead use {@link BlogScriptService} with 
-   * {@link BlogScriptService#getAllSubsribedArticleLoadParameter()}
+   * @deprecated since 1.32 instead use {@link BlogScriptService} with
+   *             {@link BlogScriptService#getAllSubsribedArticleLoadParameter()}
    */
   @Deprecated
-  public List<Article> getAllFromSubscribedBlogs(String blogArticleSpace, 
-      String subscribedBlogs, String language) throws ArticleLoadException {
+  public List<Article> getAllFromSubscribedBlogs(String blogArticleSpace, String subscribedBlogs,
+      String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllFromSubscribedBlogs");
-    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
-        language, false, false, true, true, true, true, true, true, true, true, context);
+    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, language,
+        false, false, true, true, true, true, true, true, true, true, context);
     LOGGER.info("END getAllFromSubscribedBlogs");
     return result;
   }
-  
+
   /**
-   * @deprecated since 1.32 instead use {@link BlogScriptService} with 
-   * {@link BlogScriptService#getUndecidedArticleLoadParameter()}
+   * @deprecated since 1.32 instead use {@link BlogScriptService} with
+   *             {@link BlogScriptService#getUndecidedArticleLoadParameter()}
    */
   @Deprecated
-  public List<Article> getAllNewSubscribable(String blogArticleSpace, String 
-      subscribedBlogs, String language) throws ArticleLoadException {
+  public List<Article> getAllNewSubscribable(String blogArticleSpace, String subscribedBlogs,
+      String language) throws ArticleLoadException {
     LOGGER.info("ENTER getAllNewSubscribable");
-    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, 
-        language, false, false, true, true, true, true, false, false, true, true, 
-        context);
+    List<Article> result = plugin.getBlogArticles(blogArticleSpace, subscribedBlogs, language,
+        false, false, true, true, true, true, false, false, true, true, context);
     LOGGER.info("END getAllNewSubscribable");
     return result;
   }
-  
+
   /**
    * @deprecated since 1.32 instead use {@link BlogScriptService}
    */
   @Deprecated
-  public int containsSubscribableArticles(List<Article> articles, 
-      String blogArticleSpace){
+  public int containsSubscribableArticles(List<Article> articles, String blogArticleSpace) {
     int subsArts = 0;
     for (Iterator<Article> iterator = articles.iterator(); iterator.hasNext();) {
-      if(iterator.next().isFromSubscribableBlog(blogArticleSpace)){
+      if (iterator.next().isFromSubscribableBlog(blogArticleSpace)) {
         subsArts++;
       }
     }
     return subsArts;
   }
-  
+
   /**
    * @deprecated since 1.32 instead use {@link BlogScriptService}
    */
@@ -197,87 +191,84 @@ public class BlogPluginApi extends Api {
     int unSubsArts = 0;
     for (Iterator<Article> iterator = articles.iterator(); iterator.hasNext();) {
       Article article = iterator.next();
-      if(article.isFromSubscribableBlog(blogArticleSpace) 
-          && (article.isSubscribed() == null)){
+      if (article.isFromSubscribableBlog(blogArticleSpace) && (article.isSubscribed() == null)) {
         unSubsArts++;
       }
     }
     return unSubsArts;
   }
-  
+
   public Map<String, String> batchImportReceivers(boolean asInactive) {
     String importData = context.getRequest().get("batchImportData");
     String newsletterName = context.getRequest().get("subsBlog");
-//    Removed since importing is not dangerous, sending a mail to all receivers is.
-//    if(hasProgrammingRights()) {
-    //We do not want XWiki.Guest being able to add or change e-mail addresses
+    // Removed since importing is not dangerous, sending a mail to all receivers is.
+    // if(hasProgrammingRights()) {
+    // We do not want XWiki.Guest being able to add or change e-mail addresses
     try {
       if (hasAccessLevel("edit", newsletterName)) {
-        return plugin.batchImportReceivers(asInactive, importData, newsletterName,
-            context);
+        return plugin.batchImportReceivers(asInactive, importData, newsletterName, context);
       }
     } catch (XWikiException exp) {
       LOGGER.error("Failed to check access rights on [" + newsletterName + "]", exp);
     }
-//    }
+    // }
     return null;
   }
-  
-  public String subscribeNewsletter() throws XWikiException{
+
+  public String subscribeNewsletter() throws XWikiException {
     return plugin.subscribeNewsletter(false, context);
   }
-  
-  public boolean unsubscribeNewsletter() throws XWikiException{
+
+  public boolean unsubscribeNewsletter() throws XWikiException {
     return plugin.unsubscribeNewsletter(context);
   }
-  
-  public boolean activateSubscriber() throws XWikiException{
+
+  public boolean activateSubscriber() throws XWikiException {
     return plugin.activateSubscriber(context);
   }
-  
-  //TODO make singleton (caching needed)
-  public NewsletterReceivers getNewsletterReceivers() throws XWikiException{
+
+  // TODO make singleton (caching needed)
+  public NewsletterReceivers getNewsletterReceivers() throws XWikiException {
     return new NewsletterReceivers(plugin.getBlogDoc(null, context), context);
   }
-  
+
   public List<String[]> sendArticleByMail() throws XWikiException {
     return getNewsletterReceivers().sendArticleByMail(context);
   }
-  
-  public List<String[]> sendNewsletterToInjectedReceiverList(
-      List<DocumentReference> receivers, String from, String replyTo, String subject, 
-      DocumentReference contentDocRef, String baseURL) {
+
+  public List<String[]> sendNewsletterToInjectedReceiverList(List<DocumentReference> receivers,
+      String from, String replyTo, String subject, DocumentReference contentDocRef,
+      String baseURL) {
     try {
       XWikiDocument contentDoc = context.getWiki().getDocument(contentDocRef, context);
-      return new NewsletterReceivers().sendNewsletterToInjectedReceiverList(receivers, 
-          from, replyTo, subject, contentDoc, baseURL);
+      return new NewsletterReceivers().sendNewsletterToInjectedReceiverList(receivers, from,
+          replyTo, subject, contentDoc, baseURL);
     } catch (XWikiException xwe) {
       LOGGER.error("Exception sending Newsletter to injected list", xwe);
     }
     return Collections.emptyList();
   }
-  
+
   public Article getPreviousArticle(Article article) {
     return plugin.getNeighbourArticle(article, false, context);
   }
-  
+
   public Article getNextArticle(Article article) {
     return plugin.getNeighbourArticle(article, true, context);
   }
-  
+
   public String getImageURL(String imgFullname, boolean embedImage) {
-    return ((INewsletterAttachmentServiceRole)Utils.getComponent(
-        INewsletterAttachmentServiceRole.class)).getImageURL(imgFullname, embedImage);
+    return Utils.getComponent(INewsletterAttachmentServiceRole.class).getImageURL(imgFullname,
+        embedImage);
   }
-  
+
   void addAttachment(String attFullname) {
-    ((INewsletterAttachmentServiceRole)Utils.getComponent(
-        INewsletterAttachmentServiceRole.class)).addAttachment(attFullname);
+    Utils.getComponent(INewsletterAttachmentServiceRole.class).addAttachment(attFullname);
   }
-  
+
   List<Attachment> getAttachmentList(boolean includeImages) {
-    return ((INewsletterAttachmentServiceRole)Utils.getComponent(
-        INewsletterAttachmentServiceRole.class)).getAttachmentList(includeImages);
+    return Utils.getComponent(INewsletterAttachmentServiceRole.class).getAttachmentList(
+        includeImages);
   }
 
 }

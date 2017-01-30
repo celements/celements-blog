@@ -27,10 +27,11 @@ import com.xpn.xwiki.web.Utils;
 
 @Deprecated
 public class BlogUtils {
-  
+
   private static BlogUtils utilsInstance;
-  
-  private BlogUtils() {}
+
+  private BlogUtils() {
+  }
 
   @Deprecated
   public static BlogUtils getInstance() {
@@ -41,12 +42,11 @@ public class BlogUtils {
   }
 
   /**
-   * @deprecated since 2.23.0 instead use BlogService.getBlogPageByBlogSpace(
-   *        String blogSpaceName)
+   * @deprecated since 2.23.0 instead use BlogService.getBlogPageByBlogSpace( String blogSpaceName)
    */
   @Deprecated
-  public XWikiDocument getBlogPageByBlogSpace(String blogSpaceName,
-      XWikiContext context) throws XWikiException {
+  public XWikiDocument getBlogPageByBlogSpace(String blogSpaceName, XWikiContext context)
+      throws XWikiException {
     return getBlogService().getBlogPageByBlogSpace(blogSpaceName);
   }
 

@@ -2,7 +2,7 @@ package com.celements.blog.plugin;
 
 import java.util.Date;
 
-public class EmailAddressDate implements Comparable<EmailAddressDate>{
+public class EmailAddressDate implements Comparable<EmailAddressDate> {
 
   private String emailAdr;
   private Date changeDate;
@@ -18,6 +18,7 @@ public class EmailAddressDate implements Comparable<EmailAddressDate>{
     this.language = language;
   }
 
+  @Override
   public int compareTo(EmailAddressDate emailAdrDate) {
     if (emailAdrDate.getChangeDate().compareTo(changeDate) != 0) {
       return emailAdrDate.getChangeDate().compareTo(changeDate);
@@ -33,7 +34,7 @@ public class EmailAddressDate implements Comparable<EmailAddressDate>{
   public String getEmailAdr() {
     return emailAdr;
   }
-  
+
   public String getLanguage() {
     return language;
   }

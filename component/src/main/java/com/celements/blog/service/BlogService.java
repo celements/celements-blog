@@ -43,22 +43,21 @@ public class BlogService implements IBlogServiceRole {
 
   @Requirement(BlogCache.NAME)
   IDocumentReferenceCache<SpaceReference> blogCache;
-  
+
   @Requirement
   private ComponentManager componentManager;
 
   @Requirement
   private IWebUtilsService webUtils;
-  
+
   @Requirement("celements.celBlogClasses")
   private IClassCollectionRole blogClasses;
 
   @Requirement
   private Execution execution;
-  
+
   private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty(
-        XWikiContext.EXECUTIONCONTEXT_KEY);
+    return (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
   }
 
   @Deprecated
@@ -66,15 +65,14 @@ public class BlogService implements IBlogServiceRole {
   public DocumentReference getBlogDocRefByBlogSpace(String blogSpaceName) {
     try {
       if (StringUtils.isNotBlank(blogSpaceName)) {
-        return getBlogConfigDocRef(webUtils.resolveSpaceReference(blogSpaceName, 
-            new WikiReference(getContext().getDatabase())));
+        return getBlogConfigDocRef(webUtils.resolveSpaceReference(blogSpaceName, new WikiReference(
+            getContext().getDatabase())));
       }
     } catch (QueryException qex) {
-      LOGGER.error("Failed to parse xwql query to get BlogDocRef for blog space ["
-          + blogSpaceName + "].", qex);
+      LOGGER.error("Failed to parse xwql query to get BlogDocRef for blog space [" + blogSpaceName
+          + "].", qex);
     } catch (XWikiException xwe) {
-      LOGGER.error("Failed to get blog document for blog space '" + blogSpaceName + "'", 
-          xwe);
+      LOGGER.error("Failed to get blog document for blog space '" + blogSpaceName + "'", xwe);
     }
     return null;
   }
@@ -87,40 +85,39 @@ public class BlogService implements IBlogServiceRole {
       try {
         return getContext().getWiki().getDocument(blogDocRef, getContext());
       } catch (XWikiException exp) {
-        LOGGER.error("Failed to get blog document for blog space [" + blogSpaceName
-            + "].", exp);
+        LOGGER.error("Failed to get blog document for blog space [" + blogSpaceName + "].", exp);
       }
     }
     return null;
   }
 
   @Override
-  public DocumentReference getBlogConfigDocRef(SpaceReference spaceRef
-      ) throws QueryException, XWikiException {
+  public DocumentReference getBlogConfigDocRef(SpaceReference spaceRef) throws QueryException,
+      XWikiException {
     DocumentReference ret = null;
     Set<DocumentReference> docRefs = getCachedBlogConfigDocRefs(spaceRef);
     if ((docRefs != null) && (docRefs.size() > 0)) {
       ret = docRefs.iterator().next();
       if (docRefs.size() > 1) {
-        LOGGER.warn("getBlogConfigDocRef: got multiple blogs for space '" + spaceRef 
-            + "': " + docRefs);
+        LOGGER.warn("getBlogConfigDocRef: got multiple blogs for space '" + spaceRef + "': "
+            + docRefs);
       }
     }
     LOGGER.info("getBlogConfigDocRef: for space '" + spaceRef + "' got: " + ret);
     return ret;
   }
 
-  private Set<DocumentReference> getCachedBlogConfigDocRefs(SpaceReference spaceRef
-      ) throws QueryException, XWikiException {
+  private Set<DocumentReference> getCachedBlogConfigDocRefs(SpaceReference spaceRef)
+      throws QueryException, XWikiException {
     try {
       return blogCache.getCachedDocRefs(spaceRef);
     } catch (CacheLoadingException exc) {
-      // FIXME get rid of this abominable code by introducing proper exception handling 
+      // FIXME get rid of this abominable code by introducing proper exception handling
       // to the class in the first place e.g. BlogConfigNotFoundException
       if (exc.getCause() instanceof QueryException) {
         throw (QueryException) exc.getCause();
       } else if (exc.getCause() instanceof XWikiException) {
-          throw (XWikiException) exc.getCause();
+        throw (XWikiException) exc.getCause();
       } else {
         throw new IllegalStateException();
       }
@@ -154,19 +151,18 @@ public class BlogService implements IBlogServiceRole {
     LOGGER.debug("isSubscribable: for blog '" + blogConfDocRef + "' got:" + ret);
     return ret;
   }
-  
+
   @Override
-  public List<DocumentReference> getSubribedToBlogs(DocumentReference blogConfDocRef
-      ) throws QueryException, XWikiException {
-    List<DocumentReference> ret = new ArrayList<DocumentReference>();
+  public List<DocumentReference> getSubribedToBlogs(DocumentReference blogConfDocRef)
+      throws QueryException, XWikiException {
+    List<DocumentReference> ret = new ArrayList<>();
     BaseObject confObj = getBlogConfigObject(blogConfDocRef);
     if (confObj != null) {
-      String spaceNames = confObj.getStringValue(
-          BlogClasses.PROPERTY_BLOG_CONFIG_SUBSCRIBE_TO);
+      String spaceNames = confObj.getStringValue(BlogClasses.PROPERTY_BLOG_CONFIG_SUBSCRIBE_TO);
       for (String spaceName : Arrays.asList(spaceNames.split(","))) {
         if (StringUtils.isNotBlank(spaceName)) {
-          DocumentReference docRef = getBlogConfigDocRef(webUtils.resolveSpaceReference(
-              spaceName, blogConfDocRef.getWikiReference()));
+          DocumentReference docRef = getBlogConfigDocRef(webUtils.resolveSpaceReference(spaceName,
+              blogConfDocRef.getWikiReference()));
           if (isSubscribable(docRef)) {
             ret.add(docRef);
           }
@@ -176,11 +172,11 @@ public class BlogService implements IBlogServiceRole {
     LOGGER.debug("getSubribedToBlogs: for blog '" + blogConfDocRef + "' got:" + ret);
     return Collections.unmodifiableList(ret);
   }
-  
+
   @Override
-  public List<SpaceReference> getSubribedToBlogsSpaceRefs(DocumentReference blogConfDocRef
-      ) throws QueryException, XWikiException {
-    List<SpaceReference> ret = new ArrayList<SpaceReference>();
+  public List<SpaceReference> getSubribedToBlogsSpaceRefs(DocumentReference blogConfDocRef)
+      throws QueryException, XWikiException {
+    List<SpaceReference> ret = new ArrayList<>();
     for (DocumentReference docRef : getSubribedToBlogs(blogConfDocRef)) {
       ret.add(getBlogSpaceRef(docRef));
     }
@@ -188,8 +184,8 @@ public class BlogService implements IBlogServiceRole {
   }
 
   @Override
-  public List<Article> getArticles(DocumentReference blogConfDocRef, 
-      ArticleLoadParameter param) throws ArticleLoadException {
+  public List<Article> getArticles(DocumentReference blogConfDocRef, ArticleLoadParameter param)
+      throws ArticleLoadException {
     try {
       if (param == null) {
         param = new ArticleLoadParameter();
@@ -225,24 +221,22 @@ public class BlogService implements IBlogServiceRole {
       LOGGER.error("Error looking up engine components", exc);
     }
     if (engine != null) {
-      LOGGER.info("getArticleEngine: got engine '" + engine + "' for hint '" 
-          + engineHint + "'");
+      LOGGER.info("getArticleEngine: got engine '" + engine + "' for hint '" + engineHint + "'");
       return engine;
     } else {
       throw new ArticleLoadException("Unable to load engine for hint");
     }
   }
-  
-  private BaseObject getBlogConfigObject(DocumentReference blogConfDocRef
-      ) throws XWikiException {
+
+  private BaseObject getBlogConfigObject(DocumentReference blogConfDocRef) throws XWikiException {
     BaseObject ret = null;
     if (blogConfDocRef != null) {
       XWikiDocument doc = getContext().getWiki().getDocument(blogConfDocRef, getContext());
-      ret = doc.getXObject(getBlogConfigClassRef(blogConfDocRef.getWikiReference()));    
+      ret = doc.getXObject(getBlogConfigClassRef(blogConfDocRef.getWikiReference()));
     }
     return ret;
   }
-  
+
   DocumentReference getBlogConfigClassRef(WikiReference wikiRef) {
     return ((BlogClasses) blogClasses).getBlogConfigClassRef(wikiRef.getName());
   }
