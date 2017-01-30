@@ -59,7 +59,7 @@ public class NewsletterReceiversRemoveDoublesMigrator extends AbstractCelementsH
     String xwql = "from doc.object(Celements.NewsletterReceiverClass) as obj";
     try {
       List<String> receivers = queryManager.createQuery(xwql, Query.XWQL).execute();
-      Map<String, Object[]> receiversMap = new HashMap<String, Object[]>();
+      Map<String, Object[]> receiversMap = new HashMap<>();
       if (receivers != null) {
         for (String docName : receivers) {
           if (docName != null) {
@@ -102,13 +102,15 @@ public class NewsletterReceiversRemoveDoublesMigrator extends AbstractCelementsH
   }
 
   IWebUtilsService getWebUtils() {
-    return (IWebUtilsService) Utils.getComponent(IWebUtilsService.class);
+    return Utils.getComponent(IWebUtilsService.class);
   }
 
+  @Override
   public String getDescription() {
     return "Delete all NewsletterReceivers duplicates, created by double clicking.";
   }
 
+  @Override
   public String getName() {
     return "NewsletterReceiversRemoveDoubles";
   }
@@ -117,6 +119,7 @@ public class NewsletterReceiversRemoveDoublesMigrator extends AbstractCelementsH
    * getVersion is using days since 1.1.2010 until the day of committing this migration 28.06.2013
    * -> 1274 use: http://www.wolframalpha.com
    */
+  @Override
   public XWikiDBVersion getVersion() {
     return new XWikiDBVersion(1275);
   }

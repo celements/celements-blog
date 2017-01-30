@@ -54,7 +54,7 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
     blogService.blogCache = blogCacheMock;
     articleEngineMock = createMockAndAddToDefault(IArticleEngineRole.class);
 
-    DefaultComponentDescriptor<IArticleEngineRole> descriptor = new DefaultComponentDescriptor<IArticleEngineRole>();
+    DefaultComponentDescriptor<IArticleEngineRole> descriptor = new DefaultComponentDescriptor<>();
     descriptor.setRole(IArticleEngineRole.class);
     descriptor.setRoleHint(testEngineHint);
     Utils.getComponentManager().registerComponent(descriptor, articleEngineMock);
@@ -62,7 +62,7 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
 
   @After
   public void breakDown_BlogServiceTest() {
-    DefaultComponentDescriptor<IArticleEngineRole> descriptor = new DefaultComponentDescriptor<IArticleEngineRole>();
+    DefaultComponentDescriptor<IArticleEngineRole> descriptor = new DefaultComponentDescriptor<>();
     descriptor.setRole(IArticleEngineRole.class);
     Utils.getComponentManager().unregisterComponent(IArticleEngineRole.class, testEngineHint);
   }
@@ -373,7 +373,7 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetArticles_nullparam() throws Exception {
     DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
-    Capture<ArticleLoadParameter> paramCapture = new Capture<ArticleLoadParameter>();
+    Capture<ArticleLoadParameter> paramCapture = new Capture<>();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(new XWikiDocument(
         docRef)).once();
     expect(xwiki.getXWikiPreference(eq("blog_article_engine"), eq("blog.article.engine"), isNull(

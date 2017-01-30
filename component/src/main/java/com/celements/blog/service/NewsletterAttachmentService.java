@@ -43,10 +43,11 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
   @Requirement
   IAttachmentServiceRole attService;
 
+  @Override
   public String embedImagesInContent(String content) {
     Pattern pattern = Pattern.compile("<img .*?>");
     Matcher matcher = pattern.matcher(content);
-    Set<String> images = new HashSet<String>();
+    Set<String> images = new HashSet<>();
     while (matcher.find()) {
       images.add(matcher.group());
     }
@@ -64,6 +65,7 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
     return content;
   }
 
+  @Override
   public String getImageURL(String imgFullname, boolean embedImage) {
     String imgURL = "";
     AttachmentURLCommand attURL = new AttachmentURLCommand();
@@ -76,12 +78,14 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
     return imgURL;
   }
 
+  @Override
   public void addAttachment(String attFullname) {
     Attachment att = getAttachmentForFullname(attFullname);
     extendAttachmentList(att, DEFAULT_NL_ATTACHMENT_LIST);
     extendAttachmentList(att, DEFAULT_NL_NO_IMG_ATT_LIST);
   }
 
+  @Override
   public List<Attachment> getAttachmentList(boolean includingImages) {
     String param = DEFAULT_NL_ATTACHMENT_LIST;
     if (!includingImages) {
@@ -99,7 +103,7 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
       embedList = (List<Attachment>) contextVal;
     }
     if ((embedList == null) && create) {
-      embedList = new ArrayList<Attachment>();
+      embedList = new ArrayList<>();
     }
     return embedList;
   }
@@ -137,6 +141,7 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
     return (VelocityContext) (getContext().get("vcontext"));
   }
 
+  @Override
   public void clearAttachmentList() {
     clearAttachmentList(DEFAULT_NL_ATTACHMENT_LIST);
     clearAttachmentList(DEFAULT_NL_NO_IMG_ATT_LIST);

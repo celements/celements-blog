@@ -51,8 +51,8 @@ public class NewsletterReceiversToLowerCaseMigrator extends AbstractCelementsHib
       throws XWikiException {
     DocumentReference recObjRef = new DocumentReference(context.getDatabase(), "Celements",
         "NewsletterReceiverClass");
-    Map<String, String> lowerMap = new HashMap<String, String>();
-    Map<String, String> upperMap = new LinkedHashMap<String, String>();
+    Map<String, String> lowerMap = new HashMap<>();
+    Map<String, String> upperMap = new LinkedHashMap<>();
     buildMaps(lowerMap, upperMap, context);
     mLogger.info(context.getDatabase() + ": found " + upperMap.size() + " / " + (upperMap.size()
         + lowerMap.size()) + " with upper case letters.");
@@ -157,10 +157,12 @@ public class NewsletterReceiversToLowerCaseMigrator extends AbstractCelementsHib
     this.store = store;
   }
 
+  @Override
   public String getDescription() {
     return "'Changing all NewsletterReceivers to lower case.'";
   }
 
+  @Override
   public String getName() {
     return "NewsletterReceiversToLowerCase";
   }
@@ -169,6 +171,7 @@ public class NewsletterReceiversToLowerCaseMigrator extends AbstractCelementsHib
    * getVersion is using days since 1.1.2010 until the day of committing this migration 21.6.2011 ->
    * 536
    */
+  @Override
   public XWikiDBVersion getVersion() {
     return new XWikiDBVersion(606);
   }

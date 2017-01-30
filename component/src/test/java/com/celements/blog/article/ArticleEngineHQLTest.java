@@ -50,7 +50,7 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
     DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace, "Article");
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
-    List<Object> artName = new ArrayList<Object>();
+    List<Object> artName = new ArrayList<>();
     String articleFN = artSpace + ".Article";
     artName.add(articleFN);
     expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context))).andReturn(artName).once();
@@ -79,7 +79,7 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
     obj.setDateValue("archivedate", new Date(10, 0, 1));
     obj.setStringValue("title", "the title");
     obj.setStringValue("content", "the content");
-    Vector<BaseObject> objVec = new Vector<BaseObject>();
+    Vector<BaseObject> objVec = new Vector<>();
     objVec.add(obj);
     expect(xdoc.getSpace()).andReturn(artSpace).atLeastOnce();
     DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
@@ -100,7 +100,7 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
     DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace, "Article");
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
-    List<Object> artName = new ArrayList<Object>();
+    List<Object> artName = new ArrayList<>();
     String articleFN = artSpace + ".Article";
     artName.add(articleFN);
     expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context))).andReturn(artName).once();
@@ -120,7 +120,7 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
     obj.setDateValue("archivedate", new Date(8099, 11, 31));
     obj.setStringValue("title", "the title");
     obj.setStringValue("content", "the content");
-    Vector<BaseObject> objVec = new Vector<BaseObject>();
+    Vector<BaseObject> objVec = new Vector<>();
     objVec.add(obj);
     DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
@@ -141,7 +141,7 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
     DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace, "Article");
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
-    List<Object> artName = new ArrayList<Object>();
+    List<Object> artName = new ArrayList<>();
     String articleFN = artSpace + ".Article";
     artName.add(articleFN);
     expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context))).andReturn(artName).once();
@@ -170,7 +170,7 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
     obj.setDateValue("archivedate", new Date(0, 0, 1));
     obj.setStringValue("title", "the title");
     obj.setStringValue("content", "the content");
-    Vector<BaseObject> objVec = new Vector<BaseObject>();
+    Vector<BaseObject> objVec = new Vector<>();
     objVec.add(obj);
     DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
@@ -192,7 +192,7 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
     DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace, "Article");
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
-    List<Object> artName = new ArrayList<Object>();
+    List<Object> artName = new ArrayList<>();
     String articleFN = artSpace + ".Article";
     artName.add(articleFN);
     expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context))).andReturn(artName).once();
@@ -221,7 +221,7 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
     obj.setDateValue("archivedate", new Date(0, 0, 1));
     obj.setStringValue("title", "the title");
     obj.setStringValue("content", "the content");
-    Vector<BaseObject> objVec = new Vector<BaseObject>();
+    Vector<BaseObject> objVec = new Vector<>();
     objVec.add(obj);
     DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();
@@ -242,7 +242,7 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
     DocumentReference articleDocRef = new DocumentReference("xwikidb", artSpace, "Article");
     XWikiDocument xdoc = createMock(XWikiDocument.class);
     Document doc = new Document(xdoc, context);
-    List<Object> artName = new ArrayList<Object>();
+    List<Object> artName = new ArrayList<>();
     String articleFN = artSpace + ".Article";
     artName.add(articleFN);
     expect(xwiki.search(eq(getAllArticlesHQL(artSpace)), same(context))).andReturn(artName).once();
@@ -264,7 +264,7 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
     obj.setDateValue("archivedate", null);
     obj.setStringValue("title", "the title");
     obj.setStringValue("content", "the content");
-    Vector<BaseObject> objVec = new Vector<BaseObject>();
+    Vector<BaseObject> objVec = new Vector<>();
     objVec.add(obj);
     DocumentReference articleClassRef = new DocumentReference("xwikidb", "XWiki", "ArticleClass");
     expect(xdoc.clone()).andReturn(xdoc).atLeastOnce();

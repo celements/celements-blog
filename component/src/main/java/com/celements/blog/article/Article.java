@@ -89,7 +89,7 @@ public class Article extends Api {
 
   public void init(com.xpn.xwiki.api.Object obj, String space) {
     if (articleObjMap == null) {
-      articleObjMap = new HashMap<String, com.xpn.xwiki.api.Object>();
+      articleObjMap = new HashMap<>();
       defaultLang = context.getWiki().getSpacePreference("default_language", space, "", context);
     }
     LOGGER.debug("Init Article Object");
@@ -155,7 +155,7 @@ public class Article extends Api {
   /**
    * Get the effective language of the title. E.g. getTitleLang('fr') returns 'de' if default is
    * 'de' and there is no 'fr' translation.
-   * 
+   *
    * @param lang
    * @return
    */
@@ -197,7 +197,7 @@ public class Article extends Api {
   /**
    * Get the effective language of the title. E.g. getExtractLang('fr', x) returns 'de' if default
    * is 'de' and there is no 'fr' translation.
-   * 
+   *
    * @param lang
    * @return
    */
@@ -241,15 +241,15 @@ public class Article extends Api {
       }
 
       if (extract == null) {
-        extract = new HashMap<String, String>();
+        extract = new HashMap<>();
       }
       extract.put(lang, fullExtract);
       if (hasMoreLink == null) {
-        hasMoreLink = new HashMap<String, Boolean>();
+        hasMoreLink = new HashMap<>();
       }
       hasMoreLink.put(lang, needsMoreLink);
       if (hasMoreLinkDots == null) {
-        hasMoreLinkDots = new HashMap<String, Boolean>();
+        hasMoreLinkDots = new HashMap<>();
       }
       hasMoreLinkDots.put(lang, needsMoreLinkDots);
     }
@@ -317,7 +317,7 @@ public class Article extends Api {
   @Deprecated
   public String getDocName() {
     for (Iterator<String> iterator = articleObjMap.keySet().iterator(); iterator.hasNext();) {
-      String key = (String) iterator.next();
+      String key = iterator.next();
       return articleObjMap.get(key).getName();
     }
     return "";

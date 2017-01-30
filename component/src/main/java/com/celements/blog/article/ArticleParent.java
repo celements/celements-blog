@@ -26,7 +26,7 @@ public class ArticleParent implements IDocParentProviderRole {
 
   @Override
   public List<DocumentReference> getDocumentParentsList(DocumentReference docRef) {
-    ArrayList<DocumentReference> docParents = new ArrayList<DocumentReference>();
+    ArrayList<DocumentReference> docParents = new ArrayList<>();
     try {
       DocumentReference nextParent = blogService.getBlogConfigDocRef(
           docRef.getLastSpaceReference());

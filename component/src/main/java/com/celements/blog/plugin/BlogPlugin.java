@@ -162,7 +162,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
 
   private Set<SubscriptionMode> getSubsModes(boolean withSubscribed, boolean withUnsubscribed,
       boolean withUndecided) {
-    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>();
+    Set<SubscriptionMode> subsModes = new HashSet<>();
     if (withSubscribed) {
       subsModes.add(SubscriptionMode.SUBSCRIBED);
     }
@@ -177,7 +177,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
 
   private Set<DateMode> getDateModes(boolean archiveOnly, boolean futurOnly, boolean withArchive,
       boolean withFutur) {
-    Set<DateMode> dateModes = new HashSet<DateMode>();
+    Set<DateMode> dateModes = new HashSet<>();
     dateModes.add(DateMode.PUBLISHED);
     if (withArchive) {
       dateModes.add(DateMode.ARCHIVED);
@@ -197,7 +197,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
   @SuppressWarnings("unchecked")
   public String subscribeNewsletter(boolean inactiveWithoutMail, XWikiContext context)
       throws XWikiException {
-    Map<String, String> request = new HashMap<String, String>();
+    Map<String, String> request = new HashMap<>();
     Map<String, String[]> req = context.getRequest().getParameterMap();
     for (String key : req.keySet()) {
       if ((req.get(key) != null) && (req.get(key).length > 0)) {
@@ -210,8 +210,8 @@ public class BlogPlugin extends XWikiDefaultPlugin {
   public Map<String, String> batchImportReceivers(boolean inactive, String importData,
       String newsletterFullName, XWikiContext context) {
     LOGGER.info("Starting batch newsletter receiver import.");
-    Map<String, String> results = new TreeMap<String, String>();
-    Map<String, String> data = new HashMap<String, String>();
+    Map<String, String> results = new TreeMap<>();
+    Map<String, String> data = new HashMap<>();
     data.put("subsBlog", newsletterFullName);
     for (String emailCandidate : splitImportDataToEmailCandidates(importData)) {
       if (containsEmailAddress(emailCandidate)) {
@@ -359,8 +359,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
   }
 
   List<Attachment> getAllAttachmentsList() {
-    return ((INewsletterAttachmentServiceRole) Utils.getComponent(
-        INewsletterAttachmentServiceRole.class)).getAttachmentList(true);
+    return Utils.getComponent(INewsletterAttachmentServiceRole.class).getAttachmentList(true);
   }
 
   String getActivationKey(BaseObject obj, String docName) {
@@ -478,7 +477,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
   /**
    * Get the previous or next article in the blog. Does not take into account subscribed blogs or
    * archived articles.
-   * 
+   *
    * @param article
    * @param next
    *          true gets the next, false the previous article

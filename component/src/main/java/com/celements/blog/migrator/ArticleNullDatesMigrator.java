@@ -44,6 +44,7 @@ public class ArticleNullDatesMigrator extends AbstractCelementsHibernateMigrator
    * getVersion is using days since 1.1.2010 until the day of committing this migration 19.09.2014
    * -> 1722 http://www.wolframalpha.com/input/?i=days+since+01.01.2010
    */
+  @Override
   public XWikiDBVersion getVersion() {
     return new XWikiDBVersion(1722);
   }

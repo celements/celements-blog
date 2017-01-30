@@ -61,7 +61,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testBatchImportReceivers_Exception() throws XWikiException {
-    Map<String, String> result = new TreeMap<String, String>();
+    Map<String, String> result = new TreeMap<>();
     result.put("myname@email.com", "invalid");
     String importData = "\r\n,My Name <myName@email.com>,,,,";
     String nl = "My.Newsletter";
@@ -83,7 +83,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testBatchImportReceivers_activeAdd() throws XWikiException {
-    Map<String, String> result = new TreeMap<String, String>();
+    Map<String, String> result = new TreeMap<>();
     result.put("myname@email.com", "active");
     String importData = "\r\n,My Name <myName@email.com>,,,,";
     String nl = "My.Newsletter";
@@ -121,7 +121,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testBatchImportReceivers_activeAddInactive() throws XWikiException {
-    Map<String, String> result = new TreeMap<String, String>();
+    Map<String, String> result = new TreeMap<>();
     result.put("myname@email.com", "inactive");
     String importData = "\r\n,My Name <myName@email.com>,,,,";
     String nl = "My.Newsletter";
@@ -143,7 +143,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(nl), same(context))).andReturn(true);
     expect(xwiki.getDocument(eq(nl), same(context))).andReturn(nlDoc);
     expect(nlDoc.getFullName()).andReturn(nl).anyTimes();
-    List<Object> list = new ArrayList<Object>();
+    List<Object> list = new ArrayList<>();
     list.add("NewsletterReceivers.abc");
     expect(xwiki.search((String) anyObject(), same(context))).andReturn(list);
     BaseObject obj = new BaseObject();
@@ -161,7 +161,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testBatchImportReceivers_inactiveAddActive() throws XWikiException {
-    Map<String, String> result = new TreeMap<String, String>();
+    Map<String, String> result = new TreeMap<>();
     result.put("myname@email.com", "inactive");
     String importData = "\r\n,My Name <myName@email.com>,,,,";
     String nl = "My.Newsletter";
@@ -183,7 +183,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase {
     expect(xwiki.exists(eq(nl), same(context))).andReturn(true);
     expect(xwiki.getDocument(eq(nl), same(context))).andReturn(nlDoc);
     expect(nlDoc.getFullName()).andReturn(nl).anyTimes();
-    List<Object> list = new ArrayList<Object>();
+    List<Object> list = new ArrayList<>();
     list.add("NewsletterReceivers.abc");
     expect(xwiki.search((String) anyObject(), same(context))).andReturn(list);
     BaseObject obj = new BaseObject();
@@ -200,7 +200,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase {
 
   @Test
   public void testBatchImportReceivers_inactiveAdd() throws XWikiException {
-    Map<String, String> result = new TreeMap<String, String>();
+    Map<String, String> result = new TreeMap<>();
     result.put("myname@email.com", "inactive");
     result.put("myName2@email", "invalid");
     result.put("myName @email.com", "invalid");
@@ -325,7 +325,7 @@ public class BlogPluginTest extends AbstractBridgedComponentTestCase {
   }
 
   private Vector<BaseObject> getArticleObjVect(int i) {
-    Vector<BaseObject> objVec = new Vector<BaseObject>();
+    Vector<BaseObject> objVec = new Vector<>();
     BaseObject obj = new BaseObject();
     obj.setName("Space.Article" + i);
     obj.setStringValue("lang", "de");

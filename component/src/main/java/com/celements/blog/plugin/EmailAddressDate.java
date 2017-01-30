@@ -18,6 +18,7 @@ public class EmailAddressDate implements Comparable<EmailAddressDate> {
     this.language = language;
   }
 
+  @Override
   public int compareTo(EmailAddressDate emailAdrDate) {
     if (emailAdrDate.getChangeDate().compareTo(changeDate) != 0) {
       return emailAdrDate.getChangeDate().compareTo(changeDate);
