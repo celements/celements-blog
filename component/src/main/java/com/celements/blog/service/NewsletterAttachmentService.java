@@ -103,7 +103,7 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
       embedList = (List<Attachment>) contextVal;
     }
     if ((embedList == null) && create) {
-      embedList = new ArrayList<Attachment>();
+      embedList = new ArrayList<>();
     }
     return embedList;
   }
