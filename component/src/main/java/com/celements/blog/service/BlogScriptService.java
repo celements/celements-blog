@@ -135,8 +135,8 @@ public class BlogScriptService implements ScriptService {
   public ArticleLoadParameter getArchiveArticleLoadParameter() {
     ArticleLoadParameter param = new ArticleLoadParameter();
     param.setDateModes(new HashSet<>(Arrays.asList(DateMode.ARCHIVED)));
-    param.setSubscriptionModes(new HashSet<>(Arrays.asList(
-        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNDECIDED)));
+    param.setSubscriptionModes(new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED,
+        SubscriptionMode.UNDECIDED)));
     return param;
   }
 

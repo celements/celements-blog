@@ -16,15 +16,11 @@ import com.celements.blog.plugin.BlogClasses;
 public class ArticleLoadParameter {
 
   public enum SubscriptionMode {
-    SUBSCRIBED,
-    UNSUBSCRIBED,
-    UNDECIDED;
+    SUBSCRIBED, UNSUBSCRIBED, UNDECIDED;
   }
 
   public enum DateMode {
-    PUBLISHED,
-    ARCHIVED,
-    FUTURE;
+    PUBLISHED, ARCHIVED, FUTURE;
   }
 
   // TODO test default

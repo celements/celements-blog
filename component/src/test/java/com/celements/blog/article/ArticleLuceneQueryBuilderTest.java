@@ -529,8 +529,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_subscribed() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.SUBSCRIBED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = true;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertEquals(getSubsQuery(false), ret.getQueryString());
@@ -538,8 +537,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_subscribed_noEditRights() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.SUBSCRIBED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertEquals(getSubsQuery(false), ret.getQueryString());
@@ -547,8 +545,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_unsubscribed() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.UNSUBSCRIBED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = true;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertEquals(getUnsubsQuery(false), ret.getQueryString());
@@ -556,8 +553,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_unsubscribed_noEditRights() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.UNSUBSCRIBED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertNull(ret);
@@ -565,8 +561,8 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_subscribed_unsubscribed() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED,
+        SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = true;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertEquals(getSubsUnsubsQuery(false), ret.getQueryString());
@@ -574,8 +570,8 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_subscribed_unsubscribed_noEditRights() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED,
+        SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertEquals(getSubsQuery(false), ret.getQueryString());
@@ -583,8 +579,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_undecided() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.UNDECIDED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED));
     boolean hasEditRights = true;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertEquals(getSubsUnsubsQuery(true), ret.getQueryString());
@@ -592,8 +587,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_undecided_noEditRights() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.UNDECIDED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED));
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertNull(ret);
@@ -601,8 +595,8 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_undecided_unsubscribed() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.UNDECIDED, SubscriptionMode.UNSUBSCRIBED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED,
+        SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = true;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertEquals(getSubsQuery(true), ret.getQueryString());
@@ -610,8 +604,8 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_undecided_unsubscribed_noEditRights() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.UNDECIDED, SubscriptionMode.UNSUBSCRIBED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED,
+        SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertNull(ret);
@@ -619,8 +613,8 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_undecided_subscribed() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.UNDECIDED, SubscriptionMode.SUBSCRIBED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED,
+        SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = true;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertEquals(getUnsubsQuery(true), ret.getQueryString());
@@ -628,8 +622,8 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetArticleSubsRestrictions_undecided_subscribed_noEditRights() {
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.UNDECIDED, SubscriptionMode.SUBSCRIBED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED,
+        SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
     assertEquals(getSubsQuery(false), ret.getQueryString());
