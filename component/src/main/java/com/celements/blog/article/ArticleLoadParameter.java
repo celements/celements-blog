@@ -32,7 +32,7 @@ public class ArticleLoadParameter {
   private DocumentReference blogDocRef;
   private boolean withBlogArticles = true;
   private List<DocumentReference> subscribedToBlogs = Collections.emptyList();
-  private Set<DateMode> dateModes = Collections.unmodifiableSet(new HashSet<DateMode>(Arrays.asList(
+  private Set<DateMode> dateModes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
       DateMode.PUBLISHED)));
   private Set<SubscriptionMode> subsModes = Collections.emptySet();
   private String language = null;

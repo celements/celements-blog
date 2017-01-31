@@ -126,8 +126,8 @@ public class BlogScriptService implements ScriptService {
 
   public ArticleLoadParameter getDefaultArticleLoadParameter() {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE)));
-    param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
+    param.setDateModes(new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE)));
+    param.setSubscriptionModes(new HashSet<>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNDECIDED)));
     return param;
   }
@@ -142,9 +142,9 @@ public class BlogScriptService implements ScriptService {
 
   public ArticleLoadParameter getAllArticleLoadParameter() {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE,
+    param.setDateModes(new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE,
         DateMode.ARCHIVED)));
-    param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
+    param.setSubscriptionModes(new HashSet<>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED, SubscriptionMode.UNDECIDED)));
     return param;
   }
@@ -157,9 +157,9 @@ public class BlogScriptService implements ScriptService {
 
   public ArticleLoadParameter getUndecidedArticleLoadParameter() {
     ArticleLoadParameter param = new ArticleLoadParameter();
-    param.setDateModes(new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE,
+    param.setDateModes(new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE,
         DateMode.ARCHIVED)));
-    param.setSubscriptionModes(new HashSet<SubscriptionMode>(Arrays.asList(
+    param.setSubscriptionModes(new HashSet<>(Arrays.asList(
         SubscriptionMode.UNDECIDED)));
     param.setWithBlogArticles(false);
     return param;
