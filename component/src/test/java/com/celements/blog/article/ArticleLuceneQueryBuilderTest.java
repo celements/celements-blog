@@ -420,7 +420,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetDateRestrictions_published_archived() {
-    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED,
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED,
         DateMode.ARCHIVED));
     Date date = new Date();
     boolean hasEditRights = true;
@@ -431,7 +431,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetDateRestrictions_published_archived_noEditRights() {
-    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED,
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED,
         DateMode.ARCHIVED));
     Date date = new Date();
     boolean hasEditRights = false;
@@ -442,7 +442,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetDateRestrictions_published_future() {
-    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE));
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = true;
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
@@ -452,7 +452,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetDateRestrictions_published_future_noEditRights() {
-    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE));
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
@@ -461,7 +461,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetDateRestrictions_archived_future() {
-    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.ARCHIVED, DateMode.FUTURE));
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.ARCHIVED, DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = true;
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
@@ -471,7 +471,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetDateRestrictions_archived_future_noEditRights() {
-    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.ARCHIVED, DateMode.FUTURE));
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.ARCHIVED, DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
@@ -480,7 +480,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetDateRestrictions_all() {
-    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.ARCHIVED,
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, DateMode.ARCHIVED,
         DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = true;
@@ -490,7 +490,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetDateRestrictions_all_noEditRights() {
-    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.ARCHIVED,
+    Set<DateMode> modes = new HashSet<DateMode>(Arrays.asList(DateMode.PUBLISHED, DateMode.ARCHIVED,
         DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = false;
@@ -638,7 +638,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   @Test
   public void testGetArticleSubsRestrictions_all() {
     DocumentReference blogConfDocRef = new DocumentReference("wiki", "space", "blog");
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
+    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED, SubscriptionMode.UNDECIDED));
     boolean hasEditRights = true;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef,
@@ -649,7 +649,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   @Test
   public void testGetArticleSubsRestrictions_all_noEditRights() {
     DocumentReference blogConfDocRef = new DocumentReference("wiki", "space", "blog");
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
+    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>(Arrays.asList(
         SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED, SubscriptionMode.UNDECIDED));
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef,

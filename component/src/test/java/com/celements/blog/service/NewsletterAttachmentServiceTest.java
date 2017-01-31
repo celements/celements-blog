@@ -56,7 +56,7 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
   @Test
   public void testGetEmbedAttList_emptyList() {
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-    List<Attachment> list = new ArrayList<>();
+    List<Attachment> list = new ArrayList<Attachment>();
     vcontext.put("nlEmbedAttList", list);
     assertNull(service.getAttachmentList(true));
   }
@@ -64,7 +64,7 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
   @Test
   public void testGetEmbedAttList_nonAttachmentList() {
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-    List<String> list = new ArrayList<>();
+    List<String> list = new ArrayList<String>();
     list.add("test");
     vcontext.put("nlEmbedAttList", list);
     assertNull(service.getAttachmentList(true));
@@ -73,7 +73,7 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
   @Test
   public void testGetEmbedAttList_validList() {
     VelocityContext vcontext = (VelocityContext) getContext().get("vcontext");
-    List<Attachment> list = new ArrayList<>();
+    List<Attachment> list = new ArrayList<Attachment>();
     Attachment att = new Attachment(null, new XWikiAttachment(), getContext());
     list.add(att);
     vcontext.put("nlEmbedAttList", list);

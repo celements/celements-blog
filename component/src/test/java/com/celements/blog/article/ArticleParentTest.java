@@ -37,7 +37,7 @@ public class ArticleParentTest extends AbstractBridgedComponentTestCase {
         "ArticleChild");
     DocumentReference parentDocRef = new DocumentReference(context.getDatabase(), "content",
         "BlogParent");
-    ArrayList<DocumentReference> expectedDocParents = new ArrayList<>();
+    ArrayList<DocumentReference> expectedDocParents = new ArrayList<DocumentReference>();
     expectedDocParents.add(parentDocRef);
     expect(blogServiceMock.getBlogConfigDocRef(eq(docRef.getLastSpaceReference()))).andReturn(
         parentDocRef).once();
@@ -52,7 +52,7 @@ public class ArticleParentTest extends AbstractBridgedComponentTestCase {
   public void getDocumentParentsList_empty() throws Exception {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "MyBlog",
         "Article1");
-    ArrayList<DocumentReference> expectedDocParents = new ArrayList<>();
+    ArrayList<DocumentReference> expectedDocParents = new ArrayList<DocumentReference>();
     expect(blogServiceMock.getBlogConfigDocRef(eq(docRef.getLastSpaceReference()))).andReturn(
         null).anyTimes();
     replayDefault();

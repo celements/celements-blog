@@ -51,8 +51,8 @@ public class NewsletterReceiversToLowerCaseMigrator extends AbstractCelementsHib
       throws XWikiException {
     DocumentReference recObjRef = new DocumentReference(context.getDatabase(), "Celements",
         "NewsletterReceiverClass");
-    Map<String, String> lowerMap = new HashMap<>();
-    Map<String, String> upperMap = new LinkedHashMap<>();
+    Map<String, String> lowerMap = new HashMap<String, String>();
+    Map<String, String> upperMap = new LinkedHashMap<String, String>();
     buildMaps(lowerMap, upperMap, context);
     mLogger.info(context.getDatabase() + ": found " + upperMap.size() + " / " + (upperMap.size()
         + lowerMap.size()) + " with upper case letters.");
