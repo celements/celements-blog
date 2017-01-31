@@ -420,8 +420,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetDateRestrictions_published_archived() {
-    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED,
-        DateMode.ARCHIVED));
+    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.ARCHIVED));
     Date date = new Date();
     boolean hasEditRights = true;
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
@@ -431,8 +430,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
   @Test
   public void testGetDateRestrictions_published_archived_noEditRights() {
-    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED,
-        DateMode.ARCHIVED));
+    Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.ARCHIVED));
     Date date = new Date();
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
@@ -632,8 +630,8 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   @Test
   public void testGetArticleSubsRestrictions_all() {
     DocumentReference blogConfDocRef = new DocumentReference("wiki", "space", "blog");
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED, SubscriptionMode.UNDECIDED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED,
+        SubscriptionMode.UNSUBSCRIBED, SubscriptionMode.UNDECIDED));
     boolean hasEditRights = true;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef,
         hasEditRights);
@@ -643,8 +641,8 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   @Test
   public void testGetArticleSubsRestrictions_all_noEditRights() {
     DocumentReference blogConfDocRef = new DocumentReference("wiki", "space", "blog");
-    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(
-        SubscriptionMode.SUBSCRIBED, SubscriptionMode.UNSUBSCRIBED, SubscriptionMode.UNDECIDED));
+    Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED,
+        SubscriptionMode.UNSUBSCRIBED, SubscriptionMode.UNDECIDED));
     boolean hasEditRights = false;
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef,
         hasEditRights);
