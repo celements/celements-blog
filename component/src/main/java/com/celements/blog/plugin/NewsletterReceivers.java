@@ -354,9 +354,9 @@ public class NewsletterReceivers {
       XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
       String textContent = messageTool.get("cel_newsletter_text_only_message", Arrays.asList(
           doc.getExternalURL("view", context)));
-      textContent += getUnsubscribeFooter(userMailPair[1], doc, context);
+      textContent += getUnsubscribeFooter(userMailPair[1], doc);
       int singleResult = sendMail(from, replyTo, userMailPair[1], subject, baseURL, htmlContent,
-          textContent, context);
+          textContent);
       result = new String[] { userMailPair[1], Integer.toString(singleResult) };
     } else {
       LOGGER.warn("Tried to send " + doc + " to user " + userMailPair[0] + " which"
@@ -428,7 +428,7 @@ public class NewsletterReceivers {
     return unsubscribeFooter;
   }
 
-  private String getUnsubscribeLink(String blogSpace, String emailAddresse) throws XWikiException {
+  String getUnsubscribeLink(String blogSpace, String emailAddresse) throws XWikiException {
     String unsubscribeLink = "";
     XWikiDocument blogDocument = BlogUtils.getInstance().getBlogPageByBlogSpace(blogSpace,
         getContext());
@@ -455,6 +455,7 @@ public class NewsletterReceivers {
     XWikiMessageTool msgTool = getWebUtilsService().getMessageTool(renderLang);
     DocumentReference headerRef = getWebUtilsService().resolveDocumentReference(
         "LocalMacros.NewsletterHTMLheader");
+    if (getContext().getWiki().exists(headerRef, getContext())) {
       LOGGER.debug("Additional header found.");
       LOGGER.debug("doc=" + doc + ", context.language=" + getContext().getLanguage(), doc,
           getContext());
@@ -466,7 +467,9 @@ public class NewsletterReceivers {
     } else {
       LOGGER.debug("No additional header. Doc does not exist: " + headerRef);
     }
+
     LOGGER.debug("rendering content in " + renderLang);
+
     getContext().setLanguage(renderLang);
     renderCommand.setDefaultPageType("RichText");
     vcontext.put("msg", msgTool);
@@ -502,7 +505,7 @@ public class NewsletterReceivers {
   }
 
   private int sendMail(String from, String replyTo, String to, String subject, String baseURL,
-      String htmlContent, String textContent, XWikiContext context) throws XWikiException {
+      String htmlContent, String textContent) throws XWikiException {
     try {
       if ((to != null) && (to.trim().length() == 0)) {
         to = null;
