@@ -54,7 +54,7 @@ public class NewsletterReceiversToLowerCaseMigratorTest extends AbstractBridgedC
 
   @Test
   public void testMigrate_oneCorrectResult() throws XWikiException {
-    List<Object> resultList = new ArrayList<>();
+    List<Object> resultList = new ArrayList<Object>();
     resultList.add(new Object[] { "abc@def.com", "ISubscribed.This", 5, "Regspc.Docname" });
     expect(wiki.getHibernateStore()).andReturn(store).anyTimes();
     DocumentReference classRef = new DocumentReference(getContext().getDatabase(), "Celements",
@@ -72,7 +72,7 @@ public class NewsletterReceiversToLowerCaseMigratorTest extends AbstractBridgedC
 
   @Test
   public void testMigrate_oneCorrectOneIncorrectResult() throws XWikiException {
-    List<Object> resultList = new ArrayList<>();
+    List<Object> resultList = new ArrayList<Object>();
     resultList.add(new Object[] { "abc@def.com", "ISubscribed.This", 5, "Regspc.Docname" });
     resultList.add(new Object[] { "ABC@cdef.com", "ISubscribed.Thas", 0, "Regspc.Doc2" });
     DocumentReference ref = new DocumentReference(getContext().getDatabase(), "Regspc", "Doc2");
@@ -104,7 +104,7 @@ public class NewsletterReceiversToLowerCaseMigratorTest extends AbstractBridgedC
 
   @Test
   public void testMigrate_sameCorrectAndIncorrectResult() throws XWikiException {
-    List<Object> resultList = new ArrayList<>();
+    List<Object> resultList = new ArrayList<Object>();
     resultList.add(new Object[] { "abc@def.com", "ISubscribed.This", 0, "Regspc.Docname" });
     resultList.add(new Object[] { "ABC@def.com", "ISubscribed.This", 0, "Regspc.Doc2" });
     DocumentReference upperRef = new DocumentReference(getContext().getDatabase(), "Regspc",
@@ -149,7 +149,7 @@ public class NewsletterReceiversToLowerCaseMigratorTest extends AbstractBridgedC
 
   @Test
   public void testMigrate_sameCorrectAndIncorrectResult_inactiveUpper() throws XWikiException {
-    List<Object> resultList = new ArrayList<>();
+    List<Object> resultList = new ArrayList<Object>();
     resultList.add(new Object[] { "abc@def.com", "ISubscribed.This", 0, "Regspc.Docname" });
     resultList.add(new Object[] { "ABC@def.com", "ISubscribed.This", 0, "Regspc.Doc2" });
     DocumentReference upperRef = new DocumentReference(getContext().getDatabase(), "Regspc",
@@ -198,7 +198,7 @@ public class NewsletterReceiversToLowerCaseMigratorTest extends AbstractBridgedC
   public void testMigrate_twoIncorrect() throws XWikiException {
     DocumentReference objRef = new DocumentReference(getContext().getDatabase(), "Celements",
         "NewsletterReceiverClass");
-    List<Object> resultList = new ArrayList<>();
+    List<Object> resultList = new ArrayList<Object>();
     resultList.add(new Object[] { "ABC@DEF.com", "ISubscribed.This", 0, "Regspc.Docname" });
     resultList.add(new Object[] { "ABC@def.com", "ISubscribed.This", 0, "Regspc.Doc2" });
     DocumentReference lowerRef = new DocumentReference(getContext().getDatabase(), "Regspc",
@@ -245,7 +245,7 @@ public class NewsletterReceiversToLowerCaseMigratorTest extends AbstractBridgedC
   public void testMigrate_twoCorrectOnSameDocOneIncorrect() throws XWikiException {
     DocumentReference objRef = new DocumentReference(getContext().getDatabase(), "Celements",
         "NewsletterReceiverClass");
-    List<Object> resultList = new ArrayList<>();
+    List<Object> resultList = new ArrayList<Object>();
     resultList.add(new Object[] { "abc@def.com", "ISubscribed.This", 0, "Regspc.Doc1" });
     resultList.add(new Object[] { "abc@def.com", "ISubscribed.That", 1, "Regspc.Doc1" });
     resultList.add(new Object[] { "ABC@def.com", "ISubscribed.That", 0, "Regspc.Doc2" });
@@ -299,9 +299,9 @@ public class NewsletterReceiversToLowerCaseMigratorTest extends AbstractBridgedC
 
   @Test
   public void testBuildMaps() throws XWikiException {
-    Map<String, String> lower = new HashMap<>();
-    Map<String, String> upper = new HashMap<>();
-    List<Object> resultList = new ArrayList<>();
+    Map<String, String> lower = new HashMap<String, String>();
+    Map<String, String> upper = new HashMap<String, String>();
+    List<Object> resultList = new ArrayList<Object>();
     resultList.add(new Object[] { "abc@def.com", "ISubscribed.This", 5, "Regspc.Docname" });
     resultList.add(new Object[] { "abc@def.com", "ISubscribed.That", 1, "Regspc.Docname" });
     resultList.add(new Object[] { "ABC@def.com", "ISubscribed.This", 7, "Regspc.Docname" });
@@ -335,7 +335,7 @@ public class NewsletterReceiversToLowerCaseMigratorTest extends AbstractBridgedC
 
   @Test
   public void testGetAllReceiversWithCapitals_noClass() throws XWikiException {
-    List<Object> resultList = new ArrayList<>();
+    List<Object> resultList = new ArrayList<Object>();
     resultList.add(new Object[] { "abc@def.com", "ISubscribed.This", 5, "Regspc.Docname" });
     expect(wiki.getHibernateStore()).andReturn(store).anyTimes();
     DocumentReference classRef = new DocumentReference(getContext().getDatabase(), "Celements",
@@ -348,7 +348,7 @@ public class NewsletterReceiversToLowerCaseMigratorTest extends AbstractBridgedC
 
   @Test
   public void testGetAllReceiversWithCapitals_noInternalMapping() throws XWikiException {
-    List<Object> resultList = new ArrayList<>();
+    List<Object> resultList = new ArrayList<Object>();
     resultList.add(new Object[] { "abc@def.com", "ISubscribed.This", 5, "Regspc.Docname" });
     expect(wiki.getHibernateStore()).andReturn(store).anyTimes();
     DocumentReference classRef = new DocumentReference(getContext().getDatabase(), "Celements",
@@ -363,7 +363,7 @@ public class NewsletterReceiversToLowerCaseMigratorTest extends AbstractBridgedC
 
   @Test
   public void testGetAllReceiversWithCapitals() throws XWikiException {
-    List<Object> resultList = new ArrayList<>();
+    List<Object> resultList = new ArrayList<Object>();
     resultList.add(new Object[] { "abc@def.com", "ISubscribed.This", 5, "Regspc.Docname" });
     expect(wiki.getHibernateStore()).andReturn(store).anyTimes();
     DocumentReference classRef = new DocumentReference(getContext().getDatabase(), "Celements",

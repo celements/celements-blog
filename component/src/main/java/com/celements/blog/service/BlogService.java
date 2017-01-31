@@ -155,7 +155,7 @@ public class BlogService implements IBlogServiceRole {
   @Override
   public List<DocumentReference> getSubribedToBlogs(DocumentReference blogConfDocRef)
       throws QueryException, XWikiException {
-    List<DocumentReference> ret = new ArrayList<>();
+    List<DocumentReference> ret = new ArrayList<DocumentReference>();
     BaseObject confObj = getBlogConfigObject(blogConfDocRef);
     if (confObj != null) {
       String spaceNames = confObj.getStringValue(BlogClasses.PROPERTY_BLOG_CONFIG_SUBSCRIBE_TO);
@@ -176,7 +176,7 @@ public class BlogService implements IBlogServiceRole {
   @Override
   public List<SpaceReference> getSubribedToBlogsSpaceRefs(DocumentReference blogConfDocRef)
       throws QueryException, XWikiException {
-    List<SpaceReference> ret = new ArrayList<>();
+    List<SpaceReference> ret = new ArrayList<SpaceReference>();
     for (DocumentReference docRef : getSubribedToBlogs(blogConfDocRef)) {
       ret.add(getBlogSpaceRef(docRef));
     }

@@ -258,17 +258,18 @@ public class BlogPluginApi extends Api {
   }
 
   public String getImageURL(String imgFullname, boolean embedImage) {
-    return Utils.getComponent(INewsletterAttachmentServiceRole.class).getImageURL(imgFullname,
-        embedImage);
+    return ((INewsletterAttachmentServiceRole) Utils.getComponent(
+        INewsletterAttachmentServiceRole.class)).getImageURL(imgFullname, embedImage);
   }
 
   void addAttachment(String attFullname) {
-    Utils.getComponent(INewsletterAttachmentServiceRole.class).addAttachment(attFullname);
+    ((INewsletterAttachmentServiceRole) Utils.getComponent(
+        INewsletterAttachmentServiceRole.class)).addAttachment(attFullname);
   }
 
   List<Attachment> getAttachmentList(boolean includeImages) {
-    return Utils.getComponent(INewsletterAttachmentServiceRole.class).getAttachmentList(
-        includeImages);
+    return ((INewsletterAttachmentServiceRole) Utils.getComponent(
+        INewsletterAttachmentServiceRole.class)).getAttachmentList(includeImages);
   }
 
 }

@@ -162,7 +162,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
 
   private Set<SubscriptionMode> getSubsModes(boolean withSubscribed, boolean withUnsubscribed,
       boolean withUndecided) {
-    Set<SubscriptionMode> subsModes = new HashSet<>();
+    Set<SubscriptionMode> subsModes = new HashSet<SubscriptionMode>();
     if (withSubscribed) {
       subsModes.add(SubscriptionMode.SUBSCRIBED);
     }
@@ -177,7 +177,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
 
   private Set<DateMode> getDateModes(boolean archiveOnly, boolean futurOnly, boolean withArchive,
       boolean withFutur) {
-    Set<DateMode> dateModes = new HashSet<>();
+    Set<DateMode> dateModes = new HashSet<DateMode>();
     dateModes.add(DateMode.PUBLISHED);
     if (withArchive) {
       dateModes.add(DateMode.ARCHIVED);
@@ -197,7 +197,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
   @SuppressWarnings("unchecked")
   public String subscribeNewsletter(boolean inactiveWithoutMail, XWikiContext context)
       throws XWikiException {
-    Map<String, String> request = new HashMap<>();
+    Map<String, String> request = new HashMap<String, String>();
     Map<String, String[]> req = context.getRequest().getParameterMap();
     for (String key : req.keySet()) {
       if ((req.get(key) != null) && (req.get(key).length > 0)) {
@@ -359,7 +359,8 @@ public class BlogPlugin extends XWikiDefaultPlugin {
   }
 
   List<Attachment> getAllAttachmentsList() {
-    return Utils.getComponent(INewsletterAttachmentServiceRole.class).getAttachmentList(true);
+    return ((INewsletterAttachmentServiceRole) Utils.getComponent(
+        INewsletterAttachmentServiceRole.class)).getAttachmentList(true);
   }
 
   String getActivationKey(BaseObject obj, String docName) {
@@ -477,7 +478,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
   /**
    * Get the previous or next article in the blog. Does not take into account subscribed blogs or
    * archived articles.
-   *
+   * 
    * @param article
    * @param next
    *          true gets the next, false the previous article

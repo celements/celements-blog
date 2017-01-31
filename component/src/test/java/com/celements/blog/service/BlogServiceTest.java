@@ -54,7 +54,7 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
     blogService.blogCache = blogCacheMock;
     articleEngineMock = createMockAndAddToDefault(IArticleEngineRole.class);
 
-    DefaultComponentDescriptor<IArticleEngineRole> descriptor = new DefaultComponentDescriptor<>();
+    DefaultComponentDescriptor<IArticleEngineRole> descriptor = new DefaultComponentDescriptor<IArticleEngineRole>();
     descriptor.setRole(IArticleEngineRole.class);
     descriptor.setRoleHint(testEngineHint);
     Utils.getComponentManager().registerComponent(descriptor, articleEngineMock);
@@ -62,7 +62,7 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
 
   @After
   public void breakDown_BlogServiceTest() {
-    DefaultComponentDescriptor<IArticleEngineRole> descriptor = new DefaultComponentDescriptor<>();
+    DefaultComponentDescriptor<IArticleEngineRole> descriptor = new DefaultComponentDescriptor<IArticleEngineRole>();
     descriptor.setRole(IArticleEngineRole.class);
     Utils.getComponentManager().unregisterComponent(IArticleEngineRole.class, testEngineHint);
   }

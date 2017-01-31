@@ -59,7 +59,7 @@ public class NewsletterReceiversRemoveDoublesMigrator extends AbstractCelementsH
     String xwql = "from doc.object(Celements.NewsletterReceiverClass) as obj";
     try {
       List<String> receivers = queryManager.createQuery(xwql, Query.XWQL).execute();
-      Map<String, Object[]> receiversMap = new HashMap<>();
+      Map<String, Object[]> receiversMap = new HashMap<String, Object[]>();
       if (receivers != null) {
         for (String docName : receivers) {
           if (docName != null) {
@@ -102,7 +102,7 @@ public class NewsletterReceiversRemoveDoublesMigrator extends AbstractCelementsH
   }
 
   IWebUtilsService getWebUtils() {
-    return Utils.getComponent(IWebUtilsService.class);
+    return (IWebUtilsService) Utils.getComponent(IWebUtilsService.class);
   }
 
   @Override
