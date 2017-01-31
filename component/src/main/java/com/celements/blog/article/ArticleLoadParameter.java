@@ -16,15 +16,11 @@ import com.celements.blog.plugin.BlogClasses;
 public class ArticleLoadParameter {
 
   public enum SubscriptionMode {
-    SUBSCRIBED,
-    UNSUBSCRIBED,
-    UNDECIDED;
+    SUBSCRIBED, UNSUBSCRIBED, UNDECIDED;
   }
 
   public enum DateMode {
-    PUBLISHED,
-    ARCHIVED,
-    FUTURE;
+    PUBLISHED, ARCHIVED, FUTURE;
   }
 
   // TODO test default
@@ -32,7 +28,7 @@ public class ArticleLoadParameter {
   private DocumentReference blogDocRef;
   private boolean withBlogArticles = true;
   private List<DocumentReference> subscribedToBlogs = Collections.emptyList();
-  private Set<DateMode> dateModes = Collections.unmodifiableSet(new HashSet<DateMode>(Arrays.asList(
+  private Set<DateMode> dateModes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
       DateMode.PUBLISHED)));
   private Set<SubscriptionMode> subsModes = Collections.emptySet();
   private String language = null;

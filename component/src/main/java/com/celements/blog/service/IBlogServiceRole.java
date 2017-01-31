@@ -85,7 +85,7 @@ public interface IBlogServiceRole {
 
   /**
    * gets articles as list for given {@link ArticleLoadParameter}
-   * 
+   *
    * @param blogConfDocRef
    *          may not be null
    * @param param
