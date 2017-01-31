@@ -354,8 +354,7 @@ public class NewsletterReceivers {
       XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
       String textContent = messageTool.get("cel_newsletter_text_only_message", Arrays.asList(
           doc.getExternalURL("view", context)));
-      textContent += getUnsubscribeFooter(userMailPair[1], doc);
-
+      textContent += getUnsubscribeFooter(userMailPair[1], doc, context);
       int singleResult = sendMail(from, replyTo, userMailPair[1], subject, baseURL, htmlContent,
           textContent, context);
       result = new String[] { userMailPair[1], Integer.toString(singleResult) };
@@ -429,7 +428,7 @@ public class NewsletterReceivers {
     return unsubscribeFooter;
   }
 
-  String getUnsubscribeLink(String blogSpace, String emailAddresse) throws XWikiException {
+  private String getUnsubscribeLink(String blogSpace, String emailAddresse) throws XWikiException {
     String unsubscribeLink = "";
     XWikiDocument blogDocument = BlogUtils.getInstance().getBlogPageByBlogSpace(blogSpace,
         getContext());
@@ -456,7 +455,6 @@ public class NewsletterReceivers {
     XWikiMessageTool msgTool = getWebUtilsService().getMessageTool(renderLang);
     DocumentReference headerRef = getWebUtilsService().resolveDocumentReference(
         "LocalMacros.NewsletterHTMLheader");
-    if (getContext().getWiki().exists(headerRef, getContext())) {
       LOGGER.debug("Additional header found.");
       LOGGER.debug("doc=" + doc + ", context.language=" + getContext().getLanguage(), doc,
           getContext());

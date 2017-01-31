@@ -33,7 +33,7 @@ public class ArticleDatesListenerTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetEvents() {
     replayDefault();
-    HashSet<Class<? extends Event>> eventClasses = new HashSet<Class<? extends Event>>();
+    HashSet<Class<? extends Event>> eventClasses = new HashSet<>();
     for (Event theEvent : listener.getEvents()) {
       eventClasses.add(theEvent.getClass());
     }

@@ -47,7 +47,7 @@ public class ArticleEngineHQL implements IArticleEngineRole {
     try {
       SpaceReference spaceRef = blogService.getBlogSpaceRef(param.getBlogDocRef());
       String blogArticleSpace = spaceRef != null ? spaceRef.getName() : "";
-      List<String> subscribedBlogs = new ArrayList<String>();
+      List<String> subscribedBlogs = new ArrayList<>();
       for (DocumentReference subsDocRef : param.getSubscribedToBlogs()) {
         SpaceReference subsSpaceRef = blogService.getBlogSpaceRef(subsDocRef);
         if (subsSpaceRef != null) {
@@ -114,7 +114,7 @@ public class ArticleEngineHQL implements IArticleEngineRole {
     } else {
       Document origBlogDoc = spaceBlogDoc.newDocument(getContext());
       for (Iterator<Article> artIter = articles.iterator(); artIter.hasNext();) {
-        Article article = (Article) artIter.next();
+        Article article = artIter.next();
         try {
           XWikiDocument articleDoc = getContext().getWiki().getDocument(
               article.getDocumentReference(), getContext());
@@ -200,9 +200,9 @@ public class ArticleEngineHQL implements IArticleEngineRole {
   void filterTimespan(List<Article> articles, String language, boolean withArchive,
       boolean archiveOnly, boolean withFutur, boolean futurOnly) {
     Date now = new Date();
-    List<Article> deleteArticles = new ArrayList<Article>();
+    List<Article> deleteArticles = new ArrayList<>();
     for (Iterator<Article> artIter = articles.iterator(); artIter.hasNext();) {
-      Article article = (Article) artIter.next();
+      Article article = artIter.next();
       Date archivedate = article.getArchiveDate(language);
       Date publishdate = article.getPublishDate(language);
       if (((archivedate != null) && archivedate.before(now)) && ((!withArchive && !archiveOnly)

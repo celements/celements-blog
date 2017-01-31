@@ -210,8 +210,8 @@ public class BlogPlugin extends XWikiDefaultPlugin {
   public Map<String, String> batchImportReceivers(boolean inactive, String importData,
       String newsletterFullName, XWikiContext context) {
     LOGGER.info("Starting batch newsletter receiver import.");
-    Map<String, String> results = new TreeMap<String, String>();
-    Map<String, String> data = new HashMap<String, String>();
+    Map<String, String> results = new TreeMap<>();
+    Map<String, String> data = new HashMap<>();
     data.put("subsBlog", newsletterFullName);
     for (String emailCandidate : splitImportDataToEmailCandidates(importData)) {
       if (containsEmailAddress(emailCandidate)) {

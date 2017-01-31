@@ -105,10 +105,12 @@ public class NewsletterReceiversRemoveDoublesMigrator extends AbstractCelementsH
     return (IWebUtilsService) Utils.getComponent(IWebUtilsService.class);
   }
 
+  @Override
   public String getDescription() {
     return "Delete all NewsletterReceivers duplicates, created by double clicking.";
   }
 
+  @Override
   public String getName() {
     return "NewsletterReceiversRemoveDoubles";
   }
@@ -117,6 +119,7 @@ public class NewsletterReceiversRemoveDoublesMigrator extends AbstractCelementsH
    * getVersion is using days since 1.1.2010 until the day of committing this migration 28.06.2013
    * -> 1274 use: http://www.wolframalpha.com
    */
+  @Override
   public XWikiDBVersion getVersion() {
     return new XWikiDBVersion(1275);
   }

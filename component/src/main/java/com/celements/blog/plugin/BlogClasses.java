@@ -77,6 +77,7 @@ public class BlogClasses extends AbstractClassCollection {
   public BlogClasses() {
   }
 
+  @Override
   public String getConfigName() {
     return "blog";
   }

@@ -381,21 +381,21 @@ public class NewsletterReceiversToLowerCaseMigratorTest extends AbstractBridgedC
 
   @Test
   public void testGetDocSpace() {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("1", "Doc.Name;3");
     assertEquals("Doc", mig.getDocSpace(map, "1"));
   }
 
   @Test
   public void testGetDocName() {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("1", "Doc.Name;3");
     assertEquals("Name", mig.getDocName(map, "1"));
   }
 
   @Test
   public void testGetObjNr() {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("1", "Doc.Name;3");
     assertEquals(new Integer(3), mig.getObjNr(map, "1"));
   }

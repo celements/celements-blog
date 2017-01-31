@@ -80,7 +80,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
-    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<>();
     list.add(obj);
     expect(xwiki.getSpacePreference(eq("default_language"), eq("space"), eq(""), same(
         context))).andReturn("").anyTimes();
@@ -102,7 +102,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     frbObj.setStringValue("title", "");
     frbObj.setStringValue("lang", "fr");
     com.xpn.xwiki.api.Object frObj = new com.xpn.xwiki.api.Object(frbObj, context);
-    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<>();
     list.add(obj);
     list.add(frObj);
     expect(xwiki.getSpacePreference(eq("default_language"), eq("space"), eq(""), same(
@@ -121,7 +121,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
-    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<>();
     list.add(obj);
     article = new Article(list, "space", context);
     assertEquals("Article Title", article.getTitle("de"));
@@ -136,7 +136,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
         "Article1");
     bObj.setDocumentReference(expectedDocRef);
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
-    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<>();
     list.add(obj);
     article = new Article(list, "space", context);
     assertEquals(expectedDocRef, article.getDocumentReference());
@@ -151,7 +151,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
         "Article1");
     bObj.setDocumentReference(expectedDocRef);
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
-    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<>();
     list.add(null);
     list.add(obj);
     article = new Article(list, "space", context);
@@ -168,7 +168,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     frbObj.setStringValue("title", "");
     frbObj.setStringValue("lang", "fr");
     com.xpn.xwiki.api.Object frObj = new com.xpn.xwiki.api.Object(frbObj, context);
-    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<>();
     list.add(obj);
     list.add(frObj);
     expect(xwiki.getSpacePreference(eq("default_language"), eq("space"), eq(""), same(
@@ -184,7 +184,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     BaseObject bObj = new BaseObject();
     bObj.setStringValue("field", "value");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
-    List<com.xpn.xwiki.api.Object> list = new ArrayList<com.xpn.xwiki.api.Object>();
+    List<com.xpn.xwiki.api.Object> list = new ArrayList<>();
     list.add(obj);
     article = new Article(list, "space", context);
     assertEquals("value", article.getStringProperty(obj, "field"));
@@ -195,7 +195,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
       EmptyArticleException {
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
-    Vector<BaseObject> articleObjs = new Vector<BaseObject>();
+    Vector<BaseObject> articleObjs = new Vector<>();
     BaseObject articleDe = new BaseObject();
     articleDe.setLargeStringValue("extract", "deutscher extract");
     articleDe.setLargeStringValue("content", "deutscher extract");
@@ -228,7 +228,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
       EmptyArticleException {
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
-    Vector<BaseObject> articleObjs = new Vector<BaseObject>();
+    Vector<BaseObject> articleObjs = new Vector<>();
     BaseObject articleDe = new BaseObject();
     articleDe.setLargeStringValue("extract", "deutscher extract");
     articleDe.setLargeStringValue("content", "deutscher content");
@@ -262,7 +262,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   public void testHasMoreLink_in_default_lang() throws XWikiException, EmptyArticleException {
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
-    Vector<BaseObject> articleObjs = new Vector<BaseObject>();
+    Vector<BaseObject> articleObjs = new Vector<>();
     BaseObject articleDe = new BaseObject();
     articleDe.setLargeStringValue("extract", "deutscher extract");
     articleDe.setLargeStringValue("content", "deutscher content");
@@ -289,7 +289,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
       EmptyArticleException {
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
-    Vector<BaseObject> articleObjs = new Vector<BaseObject>();
+    Vector<BaseObject> articleObjs = new Vector<>();
     BaseObject articleDe = new BaseObject();
     articleDe.setLargeStringValue("content", "deutscher content");
     articleDe.setStringValue("lang", "de");
@@ -315,7 +315,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
       EmptyArticleException {
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
-    Vector<BaseObject> articleObjs = new Vector<BaseObject>();
+    Vector<BaseObject> articleObjs = new Vector<>();
     BaseObject articleDe = new BaseObject();
     articleDe.setLargeStringValue("content", getLoremIpsum());
     articleDe.setStringValue("lang", "de");
@@ -343,7 +343,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     // expect(articleDoc.getSpace()).andReturn("News");
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
-    Vector<BaseObject> articleObjs = new Vector<BaseObject>();
+    Vector<BaseObject> articleObjs = new Vector<>();
     BaseObject articleDe = new BaseObject();
     articleDe.setLargeStringValue("content", "deutscher content");
     articleDe.setStringValue("lang", "de");
@@ -372,7 +372,7 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
       EmptyArticleException {
     Document articleApiDoc = new Document(articleDoc, context);
     expect(articleDoc.newDocument(same(context))).andReturn(articleApiDoc);
-    Vector<BaseObject> articleObjs = new Vector<BaseObject>();
+    Vector<BaseObject> articleObjs = new Vector<>();
     BaseObject articleDe = new BaseObject();
     articleDe.setLargeStringValue("content", getLoremIpsum());
     articleDe.setStringValue("lang", "de");

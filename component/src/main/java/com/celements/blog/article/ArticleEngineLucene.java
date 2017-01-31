@@ -42,7 +42,7 @@ public class ArticleEngineLucene implements IArticleEngineRole {
   @Override
   public List<Article> getArticles(ArticleLoadParameter param) throws ArticleLoadException {
     try {
-      List<Article> articles = new ArrayList<Article>();
+      List<Article> articles = new ArrayList<>();
       LuceneQuery query = queryBuilder.build(param);
       if (query != null) {
         LuceneSearchResult result = searchService.searchWithoutChecks(query, param.getSortFields(),

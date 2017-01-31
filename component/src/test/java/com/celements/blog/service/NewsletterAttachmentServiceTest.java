@@ -18,7 +18,6 @@ import com.celements.common.test.AbstractBridgedComponentTestCase;
 import com.celements.filebase.IAttachmentServiceRole;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -141,7 +140,7 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
     expect(xwiki.getDocument(eq(docRef), same(getContext()))).andReturn(doc).once();
     String imgTag = "<img class=\"abc\" src=\"/download/Test/Img/file.jpg?bla=123\" />";
     String content = "Test text with " + imgTag + " image included";
-    Set<String> tags = new HashSet<String>();
+    Set<String> tags = new HashSet<>();
     tags.add(imgTag);
     replayDefault();
     String result = service.embedImagesInContent(content, tags);
@@ -162,7 +161,7 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
     String imgTag = "<img class=\"abc\" src=\"www.test.com/download/Test/Img/file.jpg?"
         + "bla=123\" />";
     String content = "Test text with " + imgTag + " image included";
-    Set<String> tags = new HashSet<String>();
+    Set<String> tags = new HashSet<>();
     tags.add(imgTag);
     replayDefault();
     String result = service.embedImagesInContent(content, tags);
@@ -184,7 +183,7 @@ public class NewsletterAttachmentServiceTest extends AbstractBridgedComponentTes
     String imgTag = "<img class=\"abc\" src=\"http://www.test.com/download/Test/Img/"
         + "file.jpg?bla=123\" />";
     String content = "Test text with " + imgTag + " image included";
-    Set<String> tags = new HashSet<String>();
+    Set<String> tags = new HashSet<>();
     tags.add(imgTag);
     replayDefault();
     String result = service.embedImagesInContent(content, tags);

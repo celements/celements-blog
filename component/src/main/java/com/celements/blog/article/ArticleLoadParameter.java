@@ -11,7 +11,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.blog.plugin.BlogClasses;
 
-// TODO javadoc for fields (also note if one isn't regarded by an engine, e.g. offset, 
+// TODO javadoc for fields (also note if one isn't regarded by an engine, e.g. offset,
 // limit, sortFields not regarded in ArticleEngineHQL)
 public class ArticleLoadParameter {
 
@@ -98,7 +98,7 @@ public class ArticleLoadParameter {
   }
 
   public ArticleLoadParameter setDateModes(List<String> modeStrs) {
-    Set<DateMode> modes = new HashSet<DateMode>();
+    Set<DateMode> modes = new HashSet<>();
     for (String modeStr : modeStrs) {
       modes.add(DateMode.valueOf(modeStr.toUpperCase()));
     }
@@ -115,7 +115,7 @@ public class ArticleLoadParameter {
   }
 
   public ArticleLoadParameter setSubscriptionModes(List<String> modeStrs) {
-    Set<SubscriptionMode> modes = new HashSet<SubscriptionMode>();
+    Set<SubscriptionMode> modes = new HashSet<>();
     for (String modeStr : modeStrs) {
       modes.add(SubscriptionMode.valueOf(modeStr.toUpperCase()));
     }

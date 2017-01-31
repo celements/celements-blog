@@ -33,10 +33,12 @@ public class AddBlogDateValidationMigrator extends AbstractCelementsHibernateMig
   @Requirement
   private IWebUtilsService webUtilsService;
 
+  @Override
   public String getName() {
     return "AddBlogDateValidationMigrator";
   }
 
+  @Override
   public String getDescription() {
     return "Add a RegExp to the Datefields and change DateFormat";
   }
@@ -45,6 +47,7 @@ public class AddBlogDateValidationMigrator extends AbstractCelementsHibernateMig
    * getVersion is using days since 1.1.2010 until the day of committing this migration 28.08.2014
    * -> 1713 http://www.convertunits.com/dates/from/Jan+1,+2010/to/Sep+10,+2014
    */
+  @Override
   public XWikiDBVersion getVersion() {
     return new XWikiDBVersion(1713);
   }

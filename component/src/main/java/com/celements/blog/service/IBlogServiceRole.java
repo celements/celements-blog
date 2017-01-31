@@ -34,7 +34,7 @@ public interface IBlogServiceRole {
 
   /**
    * gets the blog ref for the given space reference
-   * 
+   *
    * @param spaceRef
    * @return
    * @throws QueryException
@@ -45,7 +45,7 @@ public interface IBlogServiceRole {
 
   /**
    * gets the space reference for the given blog ref
-   * 
+   *
    * @param blogConfDocRef
    * @return
    * @throws XWikiException
@@ -54,7 +54,7 @@ public interface IBlogServiceRole {
 
   /**
    * checks whether blog ref is subscribable
-   * 
+   *
    * @param blogConfDocRef
    * @return
    * @throws XWikiException
@@ -63,7 +63,7 @@ public interface IBlogServiceRole {
 
   /**
    * gets all subscribed blog refs for the given blog ref
-   * 
+   *
    * @param blogConfDocRef
    * @return
    * @throws QueryException
@@ -74,7 +74,7 @@ public interface IBlogServiceRole {
 
   /**
    * gets all subscribed blog space refs for the given blog ref
-   * 
+   *
    * @param blogConfDocRef
    * @return
    * @throws QueryException

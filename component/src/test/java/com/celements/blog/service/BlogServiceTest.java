@@ -373,7 +373,7 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetArticles_nullparam() throws Exception {
     DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
-    Capture<ArticleLoadParameter> paramCapture = new Capture<ArticleLoadParameter>();
+    Capture<ArticleLoadParameter> paramCapture = new Capture<>();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(new XWikiDocument(
         docRef)).once();
     expect(xwiki.getXWikiPreference(eq("blog_article_engine"), eq("blog.article.engine"), isNull(
