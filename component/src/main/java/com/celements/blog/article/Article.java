@@ -1,33 +1,37 @@
 /*
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
+* See the NOTICE file distributed with this work for additional
+* information regarding copyright ownership.
+*
+* This is free software; you can redistribute it and/or modify it
+* under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation; either version 2.1 of
+* the License, or (at your option) any later version.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this software; if not, write to the Free
+* Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+* 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+*/
 package com.celements.blog.article;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -35,11 +39,15 @@ import com.celements.blog.plugin.BlogClasses;
 import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.util.ModelUtils;
+import com.celements.web.plugin.cmd.ConvertToPlainTextException;
+import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.api.Property;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -47,7 +55,11 @@ import com.xpn.xwiki.web.Utils;
 
 public class Article extends Api {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(Article.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(Article.class);
+
+  public static int MIN_SOCIAL_MEDIA_IMAGE_SIZE = 100;
+  public static int MIN_SOCIAL_MEDIA_AREA_SIZE = MIN_SOCIAL_MEDIA_IMAGE_SIZE
+      * MIN_SOCIAL_MEDIA_IMAGE_SIZE;
 
   private Map<String, com.xpn.xwiki.api.Object> articleObjMap;
   private Boolean isSubscribed;
@@ -55,6 +67,7 @@ public class Article extends Api {
   private Map<String, Boolean> hasMoreLink;
   private Map<String, Boolean> hasMoreLinkDots;
   private String defaultLang;
+  private DocumentReference articleDocRef;
 
   IBlogServiceRole injected_blogService;
 
@@ -72,19 +85,42 @@ public class Article extends Api {
 
   public Article(Document articleDoc, XWikiContext context) throws XWikiException,
       EmptyArticleException {
-    this(articleDoc.getObjects("XWiki.ArticleClass"), articleDoc.getSpace(), context);
+    this(articleDoc.getObjects("XWiki.ArticleClass"), articleDoc.getDocumentReference(), context);
   }
 
   public Article(List<com.xpn.xwiki.api.Object> objList, String space, XWikiContext context)
       throws XWikiException, EmptyArticleException {
+    this(objList, getDocRefForObjList(objList, space), context);
+  }
+
+  public Article(List<com.xpn.xwiki.api.Object> objList, DocumentReference docRef,
+      XWikiContext context) throws XWikiException, EmptyArticleException {
     super(context);
-    for (Iterator<com.xpn.xwiki.api.Object> iterator = objList.iterator(); iterator.hasNext();) {
-      com.xpn.xwiki.api.Object artObj = iterator.next();
-      init(artObj, space);
+    articleDocRef = docRef;
+    for (Object artObj : objList) {
+      init(artObj, docRef.getLastSpaceReference().getName());
     }
     if (articleObjMap == null) {
       throw new EmptyArticleException();
     }
+  }
+
+  private static DocumentReference getDocRefForObjList(List<com.xpn.xwiki.api.Object> objList,
+      String space) {
+    for (Object artObj : objList) {
+      if (artObj != null) {
+        String fn = artObj.getName();
+        if (!fn.startsWith(space + ".")) {
+          fn = fn.replaceAll("^.*?(\\..*)$", space + "$1");
+        }
+        return getModelUtils().resolveRef(fn, DocumentReference.class);
+      }
+    }
+    return null;
+  }
+
+  private static ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
   public void init(com.xpn.xwiki.api.Object obj, String space) {
@@ -108,8 +144,8 @@ public class Article extends Api {
     // TODO why loading doc&objects here when already loaded articleObjMap could be used?
     try {
       doc = context.getWiki().getDocument(getDocName(), context);
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException xwe) {
+      LOGGER.error("Exception loading document", xwe);
     }
     if (doc != null) {
       String blogConfFN = Utils.getComponent(
@@ -316,8 +352,7 @@ public class Article extends Api {
    */
   @Deprecated
   public String getDocName() {
-    for (Iterator<String> iterator = articleObjMap.keySet().iterator(); iterator.hasNext();) {
-      String key = iterator.next();
+    for (String key : articleObjMap.keySet()) {
       return articleObjMap.get(key).getName();
     }
     return "";
@@ -443,6 +478,92 @@ public class Article extends Api {
   @Override
   public String toString() {
     return "Article [docRef=" + getDocumentReference() + "]";
+  }
+
+  public String getExtractPlainText(String lang, boolean isViewtypeFull, int maxNumChars) {
+    String articleExtract = getExtract(lang, isViewtypeFull, maxNumChars);
+    try {
+      return new PlainTextCommand().convertHtmlToPlainText(articleExtract);
+    } catch (ConvertToPlainTextException ctpte) {
+      LOGGER.error("Failed to convert article extract to plain text for article {}", articleDocRef,
+          ctpte);
+    }
+    return articleExtract;
+  }
+
+  public List<String> getArticleImagesBySizeAsc(String lang) {
+    List<String> articleImages = extractImagesList(getFullArticle(lang));
+    if (articleImages.isEmpty()) {
+      articleImages = extractImagesList(getExtract(lang, false, getMaxNumChars()));
+    }
+    return articleImages;
+  }
+
+  List<String> extractImagesList(String content) {
+    String regex = "<img .*?src=['\"](.*?)['\"].*?/>";
+    Map<Long, List<String>> articleImages = new TreeMap<>();
+    Pattern p = Pattern.compile(regex);
+    Matcher m = p.matcher(content);
+    while (m.find()) {
+      String imgUrl = m.group(1);
+      Long key = getImgUrlSizeKey(imgUrl);
+      if (!articleImages.containsKey(key)) {
+        articleImages.put(key, new ArrayList<String>());
+      }
+      articleImages.get(key).add(getImgUrlExternal(imgUrl));
+    }
+    List<String> sortedImages = new ArrayList<>();
+    for (Long imgArea : articleImages.keySet()) {
+      // Image size not extractable is in key == '-1' Don't include too small images.
+      if ((imgArea == -1) || (imgArea >= (MIN_SOCIAL_MEDIA_AREA_SIZE))) {
+        Collections.reverse(articleImages.get(imgArea));
+        sortedImages.addAll(articleImages.get(imgArea));
+      }
+    }
+    return sortedImages;
+  }
+
+  String getImgUrlExternal(String imgUrl) {
+    if (!imgUrl.startsWith("http://") && !imgUrl.startsWith("https://")) {
+
+      // TODO
+      // -> links anschauen und versuchen sauber space / doc zu extracten sowie querybehalten um zu
+      // retainen
+
+    }
+    return imgUrl;
+  }
+
+  Long getImgUrlSizeKey(String imgUrl) {
+    int w = parseImgUrlDimension(imgUrl, "celwidth");
+    int h = parseImgUrlDimension(imgUrl, "celheight");
+    Long area = new Long(h * w);
+    if (area < 0) {
+      area = area * area;
+    } else if ((h == -1) && (w == -1)) {
+      area = -1l;
+    }
+    return area;
+  }
+
+  int parseImgUrlDimension(String imgUrl, String dimension) {
+    String str = imgUrl.replaceAll("^.*" + dimension + "=(\\d+)(&.*)?$", "$1");
+    try {
+      return Integer.parseInt(str);
+    } catch (NumberFormatException nfe) {
+      LOGGER.debug("Exception while parsing Integer from [{}]", str, nfe);
+    }
+    return -1;
+  }
+
+  public String getExternalUrl() {
+    String fullName = getModelUtils().serializeRefLocal(articleDocRef);
+    try {
+      return context.getWiki().getExternalURL(fullName, "view", "ref=socialmedia", context);
+    } catch (XWikiException xwe) {
+      LOGGER.error("Exception while trying to get externalURL for doc {}", articleDocRef, xwe);
+    }
+    return context.getWiki().getURL(articleDocRef, "view", context);
   }
 
 }
