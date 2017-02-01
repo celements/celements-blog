@@ -35,8 +35,8 @@
     <!-- Add here all your dependencies -->
     <dependency>
       <groupId>com.celements</groupId>
-      <artifactId>celements-core</artifactId>
-      <version>1.147</version>
+    <artifactId>celements-core</artifactId>
+    <version>1.163-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
