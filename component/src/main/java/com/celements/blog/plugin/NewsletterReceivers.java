@@ -60,7 +60,6 @@ public class NewsletterReceivers {
   private static Logger LOGGER = LoggerFactory.getLogger(NewsletterReceivers.class);
   private UserNameForUserDataCommand userNameForUserDataCmd = new UserNameForUserDataCommand();
   private RenderCommand renderCommand = new RenderCommand();
-
   private List<String> allAddresses = new ArrayList<>();
   private List<String[]> groups = new ArrayList<>();
   private List<String[]> groupUsers = new ArrayList<>();
@@ -235,23 +234,19 @@ public class NewsletterReceivers {
     String replyTo = request.get("reply_to");
     String subject = request.get("subject");
     String testSend = request.get("testSend");
-
     boolean isTest = false;
     if ((testSend != null) && testSend.equals("1")) {
       isTest = true;
     }
-
     XWiki wiki = context.getWiki();
     List<String[]> result = new ArrayList<>();
     int successfullySent = 0;
-
     LOGGER.debug("articleName = " + articleName);
     LOGGER.debug("article exists = " + wiki.exists(articleName, context));
     if ((articleName != null) && (!"".equals(articleName.trim())) && (wiki.exists(articleName,
         context))) {
       XWikiDocument doc = wiki.getDocument(articleName, context);
       String baseURL = doc.getExternalURL("view", context);
-
       List<String[]> allUserMailPairs = null;
       LOGGER.debug("is test send: " + isTest);
       if (isTest) {
@@ -271,7 +266,6 @@ public class NewsletterReceivers {
       } else {
         allUserMailPairs = getNewsletterReceiversList();
       }
-
       String origUser = context.getUser();
       String origLanguage = context.getLanguage();
       VelocityContext vcontext = (VelocityContext) context.get("vcontext");
@@ -292,10 +286,8 @@ public class NewsletterReceivers {
       vcontext.put("admin_language", origAdminLanguage);
       vcontext.put("msg", origMsgTool);
       vcontext.put("adminMsg", origAdminMsgTool);
-
       setNewsletterSentObject(doc, from, replyTo, subject, successfullySent, isTest, context);
     }
-
     return result;
   }
 
@@ -343,7 +335,6 @@ public class NewsletterReceivers {
     XWikiMessageTool msgTool = getWebUtilsService().getMessageTool(language);
     vcontext.put("msg", msgTool);
     vcontext.put("adminMsg", msgTool);
-
     if (context.getWiki().checkAccess("view", doc, context)) {
       String senderContextLang = context.getLanguage();
       context.setLanguage(language);
@@ -438,8 +429,8 @@ public class NewsletterReceivers {
         unsubscribeLink = blogDocument.getExternalURL("view",
             "xpage=celements_ajax&ajax_mode=BlogAjax&doaction=unsubscribe&emailadresse="
                 + URLEncoder.encode(emailAddresse, StandardCharsets.UTF_8.name()), getContext());
-      } catch (UnsupportedEncodingException e) {
-        LOGGER.error("UTF-8 unsupported.");
+      } catch (UnsupportedEncodingException uee) {
+        LOGGER.error("UTF-8 is not supported.", uee);
       }
     }
     return unsubscribeLink;
@@ -467,9 +458,7 @@ public class NewsletterReceivers {
     } else {
       LOGGER.debug("No additional header. Doc does not exist: " + headerRef);
     }
-
     LOGGER.debug("rendering content in " + renderLang);
-
     getContext().setLanguage(renderLang);
     renderCommand.setDefaultPageType("RichText");
     vcontext.put("msg", msgTool);
@@ -512,7 +501,6 @@ public class NewsletterReceivers {
       }
       Map<String, String> otherHeader = new HashMap<>();
       otherHeader.put("Content-Location", baseURL);
-
       LOGGER.info("NewsletterReceivers: sendMail from [" + from + "], replyTo [" + replyTo
           + "], to [" + to + "], subject [" + subject + "].");
       CelSendMail sender = new CelSendMail();
@@ -536,15 +524,12 @@ public class NewsletterReceivers {
     if (configObj == null) {
       configObj = doc.newObject("Classes.NewsletterConfigClass", context);
     }
-
     configObj.set("from_address", from, context);
     configObj.set("reply_to_address", replyTo, context);
     configObj.set("subject", subject, context);
-
     if ((nrOfSent > 0) && !isTest) {
       setNewsletterHistory(configObj, nrOfSent, context);
     }
-
     context.getWiki().saveDocument(doc, context);
   }
 

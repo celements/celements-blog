@@ -46,7 +46,7 @@ public class NewsletterReceiversTest extends AbstractComponentTest {
     comp = new NewsletterReceivers();
   }
 
-  public void unsubscribeLink(String email) throws Exception {
+  private void unsubscribeLink(String email) throws Exception {
     String spaceName = "TestSpace";
     String docName = "BlogArticle";
     String urlParams = "xpage=celements_ajax&ajax_mode=BlogAjax&doaction=unsubscribe&emailadresse=";
