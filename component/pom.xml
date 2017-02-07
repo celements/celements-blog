@@ -20,8 +20,7 @@
   * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   *
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celements</artifactId>
@@ -29,7 +28,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-blog</artifactId>
-  <version>1.46-SNAPSHOT</version>
+  <version>1.46</version>
   <description>Celements Blog</description>
   <dependencies>
     <!-- Add here all your dependencies -->
@@ -56,6 +55,6 @@
     <connection>scm:git:git@github.com:celements/celements-blog.git</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-blog.git</developerConnection>
     <url>https://github.com/celements/celements-blog</url>
-    <tag>HEAD</tag>
+    <tag>celements-blog-1.46</tag>
   </scm>
 </project>
