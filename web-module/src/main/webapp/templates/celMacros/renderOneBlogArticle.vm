@@ -97,21 +97,31 @@
   #set($devNull = $attributes.put('name', 'og:image'))
   #set($devNull = $attributes.put('property', 'og:image'))
   #foreach($imgUrl in $article.getArticleImagesBySizeAsc($language))
-    $services.metatag.addMetaTagToCollector($attributes, $imgUrl)
+    #if("$!imgUrl" != '')
+      $services.metatag.addMetaTagToCollector($attributes, $imgUrl)
+    #end
   #end
   #set($attributes = $xwiki.getHashMap())
   #set($devNull = $attributes.put('name', 'og:url'))
   #set($devNull = $attributes.put('property', 'og:url'))
-  $services.metatag.addMetaTagToCollector($attributes, $article.getExternalUrl())
+  #set($extUrl = $article.getExternalUrl())
+  #if("$!extUrl" != '')
+    $services.metatag.addMetaTagToCollector($attributes, $extUrl)
+  #end
   #set($attributes = $xwiki.getHashMap())
   #set($devNull = $attributes.put('name', 'og:title'))
   #set($devNull = $attributes.put('property', 'og:title'))
-  $services.metatag.addMetaTagToCollector($attributes, $displayTitle)
+  #if("$!displayTitle" != '')
+    $services.metatag.addMetaTagToCollector($attributes, $displayTitle)
+  #end
   #set($attributes = $xwiki.getHashMap())
   #set($devNull = $attributes.put('name', 'og:description'))
   #set($devNull = $attributes.put('property', 'og:description'))
   #set($maxNumChars = 300) ## For Facebook posts 300, for Facebook comments 110
-  $services.metatag.addMetaTagToCollector($attributes, $article.getExtractPlainText($language, $viewtypefull, $maxNumChars))
+  #set($plainExtr = $article.getExtractPlainText($language, $viewtypefull, $maxNumChars))
+  #if("$!plainExtr" != '')
+    $services.metatag.addMetaTagToCollector($attributes, $plainExtr)
+  #end
   $services.metatag.displayCollectedMetaTags()
 #else
   <!-- not enough rights on $services.model.serialize($article.getDocumentReference()) -->
