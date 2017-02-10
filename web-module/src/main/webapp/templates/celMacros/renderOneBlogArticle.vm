@@ -92,27 +92,27 @@
   ##     und Twitter articles darstellen - also ob die zusaetzlichen Felder ueberhaupt verwenden.
   #set($devNull = $attributes.put('name', 'og:type'))
   #set($devNull = $attributes.put('property', 'og:type'))
-  $services.metatag.addMetaTag($attributes, 'website')
+  $services.metatag.addMetaTagToCollector($attributes, 'website')
   #set($attributes = $xwiki.getHashMap())
   #set($devNull = $attributes.put('name', 'og:image'))
   #set($devNull = $attributes.put('property', 'og:image'))
   #foreach($imgUrl in $article.getArticleImagesBySizeAsc($language))
-    $services.metatag.addMetaTag($attributes, $imgUrl)
+    $services.metatag.addMetaTagToCollector($attributes, $imgUrl)
   #end
   #set($attributes = $xwiki.getHashMap())
   #set($devNull = $attributes.put('name', 'og:url'))
   #set($devNull = $attributes.put('property', 'og:url'))
-  $services.metatag.addMetaTag($attributes, $article.getExternalUrl())
+  $services.metatag.addMetaTagToCollector($attributes, $article.getExternalUrl())
   #set($attributes = $xwiki.getHashMap())
   #set($devNull = $attributes.put('name', 'og:title'))
   #set($devNull = $attributes.put('property', 'og:title'))
-  $services.metatag.addMetaTag($attributes, $displayTitle)
+  $services.metatag.addMetaTagToCollector($attributes, $displayTitle)
   #set($attributes = $xwiki.getHashMap())
   #set($devNull = $attributes.put('name', 'og:description'))
   #set($devNull = $attributes.put('property', 'og:description'))
   #set($maxNumChars = 300) ## For Facebook posts 300, for Facebook comments 110
-  $services.metatag.addMetaTag($attributes, $article.getExtractPlainText($language, $viewtypefull, $maxNumChars))
-  $services.metatag.displayAllMetaTags()
+  $services.metatag.addMetaTagToCollector($attributes, $article.getExtractPlainText($language, $viewtypefull, $maxNumChars))
+  $services.metatag.displayCollectedMetaTags()
 #else
   <!-- not enough rights on $services.model.serialize($article.getDocumentReference()) -->
 #end
