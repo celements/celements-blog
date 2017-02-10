@@ -119,10 +119,6 @@ public class Article extends Api {
     return null;
   }
 
-  private static ModelUtils getModelUtils() {
-    return Utils.getComponent(ModelUtils.class);
-  }
-
   public void init(com.xpn.xwiki.api.Object obj, String space) {
     if (articleObjMap == null) {
       articleObjMap = new HashMap<>();
@@ -525,11 +521,13 @@ public class Article extends Api {
 
   String getImgUrlExternal(String imgUrl) {
     if (!imgUrl.startsWith("http://") && !imgUrl.startsWith("https://")) {
-
-      // TODO
-      // -> links anschauen und versuchen sauber space / doc zu extracten sowie querybehalten um zu
-      // retainen
-
+      String action = imgUrl.replaceAll("^.*?/(.*?)/.*$", "$1");
+      String space = imgUrl.replaceAll("^(.*?/){2}(.*?)/.*$", "$2");
+      String docname = imgUrl.replaceAll("^(.*?/){3}(.*?)/.*$", "$2");
+      String filename = imgUrl.replaceAll("^(.*?/){4}(.*?)(|\\?.*)$", "$2");
+      String query = imgUrl.replaceAll("^.*\\?(.*)$", "$1");
+      imgUrl = getContext().getURLFactory().createAttachmentURL(filename, space, docname, action,
+          query, getContext().getDatabase(), getContext()).toString();
     }
     return imgUrl;
   }
@@ -564,6 +562,10 @@ public class Article extends Api {
       LOGGER.error("Exception while trying to get externalURL for doc {}", articleDocRef, xwe);
     }
     return context.getWiki().getURL(articleDocRef, "view", context);
+  }
+
+  private static ModelUtils getModelUtils() {
+    return Utils.getComponent(ModelUtils.class);
   }
 
 }

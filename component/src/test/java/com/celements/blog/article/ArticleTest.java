@@ -19,9 +19,11 @@
  */
 package com.celements.blog.article;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -34,16 +36,19 @@ import com.celements.blog.plugin.BlogClasses;
 import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.service.BlogService;
 import com.celements.blog.service.IBlogServiceRole;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
+import com.celements.model.access.IModelAccessFacade;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class ArticleTest extends AbstractBridgedComponentTestCase {
+public class ArticleTest extends AbstractComponentTest {
 
+  private IModelAccessFacade modelAccess;
   private XWikiContext context;
   private XWikiDocument articleDoc;
   private Article article;
@@ -52,6 +57,8 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
 
   @Before
   public void setUp_ArticleTest() throws Exception {
+    modelAccess = registerComponentMock(IModelAccessFacade.class);
+    getContext().setURLFactory(registerComponentMock(XWikiURLFactory.class));
     context = getContext();
     xwiki = createMock(XWiki.class);
     context.setWiki(xwiki);
@@ -77,6 +84,9 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTitleDetailed() throws XWikiException, EmptyArticleException {
     BaseObject bObj = new BaseObject();
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "testspc",
+        "docname");
+    bObj.setDocumentReference(docRef);
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
@@ -95,6 +105,9 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTitleDetailed_noTranslation() throws XWikiException, EmptyArticleException {
     BaseObject bObj = new BaseObject();
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "testspc",
+        "docname");
+    bObj.setDocumentReference(docRef);
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
@@ -118,6 +131,9 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   @Test
   public void getTitle() throws Exception {
     BaseObject bObj = new BaseObject();
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "testspc",
+        "docname");
+    bObj.setDocumentReference(docRef);
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
@@ -161,6 +177,9 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   @Test
   public void getTitle_noTranslation() throws XWikiException, EmptyArticleException {
     BaseObject bObj = new BaseObject();
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "testspc",
+        "docname");
+    bObj.setDocumentReference(docRef);
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
@@ -182,6 +201,9 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   @Test
   public void getStringProperty() throws XWikiException, EmptyArticleException {
     BaseObject bObj = new BaseObject();
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "testspc",
+        "docname");
+    bObj.setDocumentReference(docRef);
     bObj.setStringValue("field", "value");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
     List<com.xpn.xwiki.api.Object> list = new ArrayList<>();
@@ -439,6 +461,116 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
     int maxNumChars = article.getMaxNumChars();
     assertEquals(1000, maxNumChars);
     verifyAll();
+  }
+
+  @Test
+  public void testGetImgUrlSizeKey_nosize() {
+    String url = "https://www.test.url/download/images/imgurl/test.jpg";
+    assertEquals(-1l, (long) article.getImgUrlSizeKey(url));
+  }
+
+  @Test
+  public void testGetImgUrlSizeKey_onlyWidth_smallerMin() {
+    String url = "https://www.test.url/download/images/imgurl/test.jpg?test=bla&celwidth=3&celheight=";
+    assertEquals(3 * 3l, (long) article.getImgUrlSizeKey(url));
+  }
+
+  @Test
+  public void testGetImgUrlSizeKey_onlyWidth() {
+    String url = "https://www.test.url/download/images/imgurl/test.jpg?celwidth=1000";
+    assertEquals(1000 * 1000l, (long) article.getImgUrlSizeKey(url));
+  }
+
+  @Test
+  public void testGetImgUrlSizeKey_onlyHeight_smallerMin() {
+    String url = "https://www.test.url/download/images/imgurl/test.jpg?celheight=3&celwidth&";
+    assertEquals(3 * 3l, (long) article.getImgUrlSizeKey(url));
+  }
+
+  @Test
+  public void testGetImgUrlSizeKey_onlyHeight() {
+    String url = "https://www.test.url/download/images/imgurl/test.jpg?celheight=1000&celwidth";
+    assertEquals(1000 * 1000l, (long) article.getImgUrlSizeKey(url));
+  }
+
+  @Test
+  public void testGetImgUrlSizeKey_both_productSmallerMin() {
+    String url = "https://www.test.url/download/images/imgurl/test.jpg?celwidth=2&celheight=500&"
+        + "test=999999";
+    assertEquals(2 * 500l, (long) article.getImgUrlSizeKey(url));
+  }
+
+  @Test
+  public void testGetImgUrlSizeKey_both() {
+    String url = "https://www.test.url/download/images/imgurl/test.jpg?celwidth=1000&celheight=800";
+    assertEquals(1000 * 800l, (long) article.getImgUrlSizeKey(url));
+  }
+
+  @Test
+  public void testGetImgUrlExternal_http() {
+    String url = "http://www.test.url/download/images/imgurl/test.jpg?celwidth=1000&celheight=800";
+    replayDefault();
+    assertEquals(url, article.getImgUrlExternal(url));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetImgUrlExternal_https() {
+    String url = "https://www.test.url/download/images/imgurl/test.jpg?celwidth=1000&celheight=800";
+    replayDefault();
+    assertEquals(url, article.getImgUrlExternal(url));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetImgUrlExternal_downloadAction() throws Exception {
+    String domain = "https://www.test.url";
+    String space = "ArtSpc";
+    String docname = "Doc";
+    String filename = "test.jpg";
+    String action = "download";
+    String querystring = "celwidth=1000&celheight=800";
+    String url = "/" + action + "/" + space + "/" + docname + "/" + filename + "?" + querystring;
+    expect(getContext().getURLFactory().createAttachmentURL(eq(filename), eq(space), eq(docname),
+        eq(action), eq(querystring), eq(getContext().getDatabase()), same(getContext()))).andReturn(
+            new URL(domain + url));
+    replayDefault();
+    assertEquals(domain + url, article.getImgUrlExternal("test.url" + url));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetImgUrlExternal_skinAction() throws Exception {
+    String domain = "https://www.test.url";
+    String space = "ArtSpc";
+    String docname = "Doc";
+    String filename = "test.jpg";
+    String action = "skin";
+    String querystring = "celwidth=1000&celheight=800&cropX=30";
+    String url = "/" + action + "/" + space + "/" + docname + "/" + filename + "?" + querystring;
+    expect(getContext().getURLFactory().createAttachmentURL(eq(filename), eq(space), eq(docname),
+        eq(action), eq(querystring), eq(getContext().getDatabase()), same(getContext()))).andReturn(
+            new URL(domain + url));
+    replayDefault();
+    assertEquals(domain + url, article.getImgUrlExternal("www.test.url" + url));
+    verifyDefault();
+  }
+
+  @Test
+  public void testGetImgUrlExternal_fileAction() throws Exception {
+    String domain = "https://www.test.url";
+    String space = "ArtSpc";
+    String docname = "Doc";
+    String filename = "test.jpg";
+    String action = "file";
+    String querystring = "celwidth=1000&celheight=800";
+    String url = "/" + action + "/" + space + "/" + docname + "/" + filename + "?" + querystring;
+    expect(getContext().getURLFactory().createAttachmentURL(eq(filename), eq(space), eq(docname),
+        eq(action), eq(querystring), eq(getContext().getDatabase()), same(getContext()))).andReturn(
+            new URL(domain + url));
+    replayDefault();
+    assertEquals(domain + url, article.getImgUrlExternal(url));
+    verifyDefault();
   }
 
   // Helper
