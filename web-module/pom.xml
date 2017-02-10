@@ -52,11 +52,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
-    <!-- Add here all your dependencies -->    
+    <!-- Add here all your dependencies -->
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-blog</artifactId>
-      <version>1.46</version>
+      <version>1.47-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>
