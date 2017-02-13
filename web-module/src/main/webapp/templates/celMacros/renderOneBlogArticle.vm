@@ -86,43 +86,6 @@
 #parse('celMacros/blogArticleSubscribeBar.vm')
     #end
     </div> <!-- article_abstract -->
-  #set($attributes = $xwiki.getHashMap())
-  ##TODO type=article waere eigentlich besser geeignet, hat aber einige Felder mehr zur Verfuegung.
-  ##     Es ist aber fraglich ob sich das Erfassen der zusaetzlichen Felder lohnt und wie Facebook
-  ##     und Twitter articles darstellen - also ob die zusaetzlichen Felder ueberhaupt verwenden.
-  #set($devNull = $attributes.put('name', 'og:type'))
-  #set($devNull = $attributes.put('property', 'og:type'))
-  $services.metatag.addMetaTagToCollector($attributes, 'website')
-  #set($attributes = $xwiki.getHashMap())
-  #set($devNull = $attributes.put('name', 'og:image'))
-  #set($devNull = $attributes.put('property', 'og:image'))
-  #foreach($imgUrl in $article.getArticleImagesBySizeAsc($language))
-    #if("$!imgUrl" != '')
-      $services.metatag.addMetaTagToCollector($attributes, $imgUrl)
-    #end
-  #end
-  #set($attributes = $xwiki.getHashMap())
-  #set($devNull = $attributes.put('name', 'og:url'))
-  #set($devNull = $attributes.put('property', 'og:url'))
-  #set($extUrl = $article.getExternalUrl())
-  #if("$!extUrl" != '')
-    $services.metatag.addMetaTagToCollector($attributes, $extUrl)
-  #end
-  #set($attributes = $xwiki.getHashMap())
-  #set($devNull = $attributes.put('name', 'og:title'))
-  #set($devNull = $attributes.put('property', 'og:title'))
-  #if("$!displayTitle" != '')
-    $services.metatag.addMetaTagToCollector($attributes, $displayTitle)
-  #end
-  #set($attributes = $xwiki.getHashMap())
-  #set($devNull = $attributes.put('name', 'og:description'))
-  #set($devNull = $attributes.put('property', 'og:description'))
-  #set($maxNumChars = 300) ## For Facebook posts 300, for Facebook comments 110
-  #set($plainExtr = $article.getExtractPlainText($language, $viewtypefull, $maxNumChars))
-  #if("$!plainExtr" != '')
-    $services.metatag.addMetaTagToCollector($attributes, $plainExtr)
-  #end
-  $services.metatag.displayCollectedMetaTags()
 #else
   <!-- not enough rights on $services.model.serialize($article.getDocumentReference()) -->
 #end
