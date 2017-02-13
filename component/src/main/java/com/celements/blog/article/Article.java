@@ -19,9 +19,6 @@
 */
 package com.celements.blog.article;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -482,13 +479,11 @@ public class Article extends Api {
   public String getExtractPlainTextEncoded(String lang, boolean isViewtypeFull, int maxNumChars) {
     String articleExtract = getExtract(lang, isViewtypeFull, maxNumChars);
     try {
-      return URLEncoder.encode(new PlainTextCommand().convertHtmlToPlainText(articleExtract),
-          StandardCharsets.UTF_8.name());
+      String plainExtract = new PlainTextCommand().convertHtmlToPlainText(articleExtract);
+      return plainExtract.replaceAll("\"", "&quot;");
     } catch (ConvertToPlainTextException ctpte) {
       LOGGER.error("Failed to convert article extract to plain text for article {}", articleDocRef,
           ctpte);
-    } catch (UnsupportedEncodingException uee) {
-      LOGGER.error("UTF-8 not available as encoding", uee);
     }
     return articleExtract;
   }
@@ -499,18 +494,6 @@ public class Article extends Api {
       articleImages = extractImagesList(getExtract(lang, false, getMaxNumChars()));
     }
     return articleImages;
-  }
-
-  public List<String> getArticleImagesEncodedBySizeAsc(String lang) {
-    List<String> imgUrls = new ArrayList<>();
-    for (String url : getArticleImagesBySizeAsc(lang)) {
-      try {
-        imgUrls.add(URLEncoder.encode(url, StandardCharsets.UTF_8.name()));
-      } catch (UnsupportedEncodingException uee) {
-        LOGGER.error("UTF-8 not available as encoding", uee);
-      }
-    }
-    return imgUrls;
   }
 
   List<String> extractImagesList(String content) {
@@ -580,16 +563,6 @@ public class Article extends Api {
       LOGGER.error("Exception while trying to get externalURL for doc {}", articleDocRef, xwe);
     }
     return context.getWiki().getURL(articleDocRef, "view", context);
-  }
-
-  public String getExternalEncodedUrl() {
-    String url = getExternalUrl();
-    try {
-      return URLEncoder.encode(url, StandardCharsets.UTF_8.name());
-    } catch (UnsupportedEncodingException uee) {
-      LOGGER.error("UTF-8 not available as encoding", uee);
-    }
-    return url;
   }
 
   private static ModelUtils getModelUtils() {
