@@ -80,7 +80,7 @@ $xwiki.includeForm('celements2web:Macros.getArticleContext', false)
   #set($devNull = $attributes.put('name', 'og:description'))
   #set($devNull = $attributes.put('property', 'og:description'))
   #set($maxNumChars = 300) ## For Facebook posts 300, for Facebook comments 110
-  #set($viewTypeFull = true) ## allways full, since it's on the detail page
+  #set($viewTypeFull = false) ## max num chars only works with false
   #set($plainExtr = $article.getExtractPlainTextEncoded($language, $viewTypeFull, $maxNumChars))
   $services.metatag.addMetaTagToCollector($attributes, $plainExtr)
   $services.metatag.displayCollectedMetaTags()
