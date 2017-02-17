@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -28,13 +28,13 @@ import com.xpn.xwiki.XWikiException;
 @Component("celblog")
 public class BlogScriptService implements ScriptService {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(BlogScriptService.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(BlogScriptService.class);
 
   @Requirement
-  IBlogServiceRole blogService;
+  private IBlogServiceRole blogService;
 
   @Requirement
-  Execution execution;
+  private Execution execution;
 
   private XWikiContext getContext() {
     return (XWikiContext) execution.getContext().getProperty("xwikicontext");
@@ -187,9 +187,22 @@ public class BlogScriptService implements ScriptService {
       article = new Article(getContext().getWiki().getDocument(articleDocRef, getContext()),
           getContext());
     } catch (EmptyArticleException exc) {
-      LOGGER.info(exc);
+      LOGGER.info("Empty article {}", articleDocRef, exc);
     }
     return article;
+  }
+
+  public void addArticleSocialMediaTagsToCollector(DocumentReference articleDocRef,
+      String language) {
+    Article article = null;
+    try {
+      article = getArticle(articleDocRef);
+    } catch (XWikiException xwe) {
+      LOGGER.error("Exception getting article for doc ref {}", articleDocRef, xwe);
+    }
+    if (article != null) {
+      article.addArticleSocialMediaTagsToCollector(language);
+    }
   }
 
 }

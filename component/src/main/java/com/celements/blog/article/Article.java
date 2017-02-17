@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -39,10 +40,15 @@ import com.celements.blog.plugin.BlogClasses;
 import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.metatag.MetaTag;
+import com.celements.metatag.MetaTagServiceRole;
+import com.celements.metatag.enums.opengraph.EOpenGraph;
+import com.celements.metatag.enums.twitter.ETwitter;
 import com.celements.model.util.ModelUtils;
 import com.celements.web.plugin.cmd.ConvertToPlainTextException;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -56,6 +62,11 @@ import com.xpn.xwiki.web.Utils;
 public class Article extends Api {
 
   private static Logger LOGGER = LoggerFactory.getLogger(Article.class);
+
+  // TODO config for card type "summary" or "summary_large_image"
+  public static final String BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME = "blog.article.socialmediatags.active";
+  public static final String BLOG_ARTICLE_TWITTER_SITE = "blog.twitter.account";
+  public static final String BLOG_ARTICLE_TWITTER_CARD_TYPE = "blog.twitter.card.type";
 
   public static int MIN_SOCIAL_MEDIA_IMAGE_SIZE = 100;
   public static int MIN_SOCIAL_MEDIA_AREA_SIZE = MIN_SOCIAL_MEDIA_IMAGE_SIZE
@@ -565,8 +576,58 @@ public class Article extends Api {
     return context.getWiki().getURL(articleDocRef, "view", context);
   }
 
+  /**
+   * Adds social media meta tags to the collector, respecting the configuration. If the tags are
+   * activate the calculated OpenGraph tags are added. Furthermore if a Twitter account is
+   * configured (e.g. @example), the Twitter tags are added. The Twitter card type is configurable,
+   * defaulting to "summary"
+   *
+   * @param language
+   */
+  public void addArticleSocialMediaTagsToCollector(String language) {
+    if (1 == getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, 0)) {
+      String externalUrl = getExternalUrl();
+      List<String> images = getArticleImagesBySizeAsc(language);
+      // TODO In open graph there is a type=article. However that type would require additional
+      // fields to be available as e.g. author. We also would have to check if and how social
+      // media e.g. facebook displays articles
+      getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_TYPE, "website"));
+      for (String imageUrl : images) {
+        getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE,
+            imageUrl));
+        getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrl));
+      }
+      getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
+      String title = getTitle(language);
+      getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_TITLE,
+          title.replaceAll("\"", "&quot;")));
+      // maxNumChars: e.g. for Facebook posts 300, for Facebook comments 110
+      // viewTypeFull: maxNumChars has no influence if viewTypeFull == true
+      String plainExtract = getExtractPlainTextEncoded(language, false, 450);
+      getMetaTagService().addMetaTagToCollector(new MetaTag(
+          EOpenGraph.OPENGRAPH_OPTIONAL_DESCRIPTION, plainExtract));
+      String twitterSite = getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_SITE);
+      if (!Strings.isNullOrEmpty(twitterSite)) {
+        getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_CARD,
+            getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_CARD_TYPE, "summary")));
+        getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_SITE, twitterSite));
+        for (String imageUrl : images) {
+          getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrl));
+        }
+      }
+    }
+  }
+
   private static ModelUtils getModelUtils() {
     return Utils.getComponent(ModelUtils.class);
+  }
+
+  private static ConfigurationSource getConfigurationSource() {
+    return Utils.getComponent(ConfigurationSource.class);
+  }
+
+  private static MetaTagServiceRole getMetaTagService() {
+    return Utils.getComponent(MetaTagServiceRole.class);
   }
 
 }
