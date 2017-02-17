@@ -587,17 +587,12 @@ public class Article extends Api {
     if (1 == getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, 0)) {
       String externalUrl = getExternalUrl();
       List<String> images = getArticleImagesBySizeAsc(language);
-      // TODO In open graph there is a type=article. However that type would require additional
-      // fields to be available as e.g. author. We also would have to check if and how social
-      // media e.g. facebook displays articles
       getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_TYPE, "website"));
       for (String imageUrl : images) {
         getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE,
             imageUrl));
-        // getMetaTagService().addMetaTagToCollector(new
-        // MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, );
-        // getMetaTagService().addMetaTagToCollector(new
-        // MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, );
+        getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, );
+        getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, );
       }
       getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
       String title = getTitle(language);
