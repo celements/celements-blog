@@ -510,7 +510,7 @@ public class ArticleTest extends AbstractComponentTest {
   public void testGetImgUrlExternal_http() {
     String url = "http://www.test.url/download/images/imgurl/test.jpg?celwidth=1000&celheight=800";
     replayDefault();
-    assertEquals(url, article.getImgUrlExternal(url));
+    assertEquals(url, article.getImgUrlExternal(url).getUrl());
     verifyDefault();
   }
 
@@ -518,7 +518,7 @@ public class ArticleTest extends AbstractComponentTest {
   public void testGetImgUrlExternal_https() {
     String url = "https://www.test.url/download/images/imgurl/test.jpg?celwidth=1000&celheight=800";
     replayDefault();
-    assertEquals(url, article.getImgUrlExternal(url));
+    assertEquals(url, article.getImgUrlExternal(url).getUrl());
     verifyDefault();
   }
 
@@ -535,7 +535,7 @@ public class ArticleTest extends AbstractComponentTest {
         eq(action), eq(querystring), eq(getContext().getDatabase()), same(getContext()))).andReturn(
             new URL(domain + url));
     replayDefault();
-    assertEquals(domain + url, article.getImgUrlExternal("test.url" + url));
+    assertEquals(domain + url, article.getImgUrlExternal("test.url" + url).getUrl());
     verifyDefault();
   }
 
@@ -552,7 +552,7 @@ public class ArticleTest extends AbstractComponentTest {
         eq(action), eq(querystring), eq(getContext().getDatabase()), same(getContext()))).andReturn(
             new URL(domain + url));
     replayDefault();
-    assertEquals(domain + url, article.getImgUrlExternal("www.test.url" + url));
+    assertEquals(domain + url, article.getImgUrlExternal("www.test.url" + url).getUrl());
     verifyDefault();
   }
 
@@ -569,7 +569,7 @@ public class ArticleTest extends AbstractComponentTest {
         eq(action), eq(querystring), eq(getContext().getDatabase()), same(getContext()))).andReturn(
             new URL(domain + url));
     replayDefault();
-    assertEquals(domain + url, article.getImgUrlExternal(url));
+    assertEquals(domain + url, article.getImgUrlExternal(url).getUrl());
     verifyDefault();
   }
 
