@@ -63,12 +63,11 @@ public class Article extends Api {
 
   private static Logger LOGGER = LoggerFactory.getLogger(Article.class);
 
-  // TODO config for card type "summary" or "summary_large_image"
   public static final String BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME = "blog.article.socialmediatags.active";
   public static final String BLOG_ARTICLE_TWITTER_SITE = "blog.twitter.account";
   public static final String BLOG_ARTICLE_TWITTER_CARD_TYPE = "blog.twitter.card.type";
 
-  public static int MIN_SOCIAL_MEDIA_IMAGE_SIZE = 100;
+  public static int MIN_SOCIAL_MEDIA_IMAGE_SIZE = 200;
   public static int MIN_SOCIAL_MEDIA_AREA_SIZE = MIN_SOCIAL_MEDIA_IMAGE_SIZE
       * MIN_SOCIAL_MEDIA_IMAGE_SIZE;
 
@@ -595,7 +594,10 @@ public class Article extends Api {
       for (String imageUrl : images) {
         getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE,
             imageUrl));
-        getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrl));
+        // getMetaTagService().addMetaTagToCollector(new
+        // MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, );
+        // getMetaTagService().addMetaTagToCollector(new
+        // MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, );
       }
       getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
       String title = getTitle(language);
@@ -611,9 +613,14 @@ public class Article extends Api {
         getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_CARD,
             getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_CARD_TYPE, "summary")));
         getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_SITE, twitterSite));
+        String imageUrls = "";
         for (String imageUrl : images) {
-          getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrl));
+          if (imageUrls.length() > 0) {
+            imageUrls += ",";
+          }
+          imageUrls += imageUrl;
         }
+        getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrls));
       }
     }
   }
