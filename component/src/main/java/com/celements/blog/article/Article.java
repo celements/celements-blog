@@ -498,28 +498,28 @@ public class Article extends Api {
     return articleExtract;
   }
 
-  public List<String> getArticleImagesBySizeAsc(String lang) {
-    List<String> articleImages = extractImagesList(getFullArticle(lang));
+  public List<ImageUrlDim> getArticleImagesBySizeAsc(String lang) {
+    List<ImageUrlDim> articleImages = extractImagesList(getFullArticle(lang));
     if (articleImages.isEmpty()) {
       articleImages = extractImagesList(getExtract(lang, false, getMaxNumChars()));
     }
     return articleImages;
   }
 
-  List<String> extractImagesList(String content) {
+  List<ImageUrlDim> extractImagesList(String content) {
     String regex = "<img .*?src=['\"](.*?)['\"].*?/>";
-    Map<Long, List<String>> articleImages = new TreeMap<>();
+    Map<Long, List<ImageUrlDim>> articleImages = new TreeMap<>();
     Pattern p = Pattern.compile(regex);
     Matcher m = p.matcher(content);
     while (m.find()) {
       String imgUrl = m.group(1);
       Long key = getImgUrlSizeKey(imgUrl);
       if (!articleImages.containsKey(key)) {
-        articleImages.put(key, new ArrayList<String>());
+        articleImages.put(key, new ArrayList<ImageUrlDim>());
       }
       articleImages.get(key).add(getImgUrlExternal(imgUrl));
     }
-    List<String> sortedImages = new ArrayList<>();
+    List<ImageUrlDim> sortedImages = new ArrayList<>();
     for (Long imgArea : articleImages.keySet()) {
       // Image size not extractable is in key == '-1' Don't include too small images.
       if ((imgArea == -1) || (imgArea >= (MIN_SOCIAL_MEDIA_AREA_SIZE))) {
@@ -530,7 +530,7 @@ public class Article extends Api {
     return sortedImages;
   }
 
-  String getImgUrlExternal(String imgUrl) {
+  ImageUrlDim getImgUrlExternal(String imgUrl) {
     if (!imgUrl.startsWith("http://") && !imgUrl.startsWith("https://")) {
       String action = imgUrl.replaceAll("^.*?/(.*?)/.*$", "$1");
       String space = imgUrl.replaceAll("^(.*?/){2}(.*?)/.*$", "$2");
@@ -540,7 +540,8 @@ public class Article extends Api {
       imgUrl = getContext().getURLFactory().createAttachmentURL(filename, space, docname, action,
           query, getContext().getDatabase(), getContext()).toString();
     }
-    return imgUrl;
+    return new ImageUrlDim(imgUrl, parseImgUrlDimension(imgUrl, "celwidth"), parseImgUrlDimension(
+        imgUrl, "celheight"));
   }
 
   Long getImgUrlSizeKey(String imgUrl) {
@@ -586,13 +587,15 @@ public class Article extends Api {
   public void addArticleSocialMediaTagsToCollector(String language) {
     if (1 == getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, 0)) {
       String externalUrl = getExternalUrl();
-      List<String> images = getArticleImagesBySizeAsc(language);
+      List<ImageUrlDim> images = getArticleImagesBySizeAsc(language);
       getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_TYPE, "website"));
-      for (String imageUrl : images) {
+      for (ImageUrlDim image : images) {
         getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE,
-            imageUrl));
-        getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, );
-        getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, );
+            image.getUrl()));
+        getMetaTagService().addMetaTagToCollector(new MetaTag(
+            EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, image.getWidth()));
+        getMetaTagService().addMetaTagToCollector(new MetaTag(
+            EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, image.getHeight()));
       }
       getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
       String title = getTitle(language);
@@ -609,11 +612,11 @@ public class Article extends Api {
             getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_CARD_TYPE, "summary")));
         getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_SITE, twitterSite));
         String imageUrls = "";
-        for (String imageUrl : images) {
+        for (ImageUrlDim image : images) {
           if (imageUrls.length() > 0) {
             imageUrls += ",";
           }
-          imageUrls += imageUrl;
+          imageUrls += image.getUrl();
         }
         getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrls));
       }
@@ -630,6 +633,36 @@ public class Article extends Api {
 
   private static MetaTagServiceRole getMetaTagService() {
     return Utils.getComponent(MetaTagServiceRole.class);
+  }
+
+  class ImageUrlDim {
+
+    private String url;
+    private String width = "";
+    private String height = "";
+
+    public ImageUrlDim(String url, int width, int height) {
+      this.url = url;
+      if (width > 0) {
+        this.width = Integer.toString(width);
+      }
+      if (height > 0) {
+        this.height = Integer.toString(height);
+      }
+    }
+
+    public String getUrl() {
+      return url;
+    }
+
+    public String getWidth() {
+      return width;
+    }
+
+    public String getHeight() {
+      return height;
+    }
+
   }
 
 }
