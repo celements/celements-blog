@@ -28,7 +28,7 @@ import com.xpn.xwiki.XWikiException;
 @Component("celblog")
 public class BlogScriptService implements ScriptService {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(BlogScriptService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BlogScriptService.class);
 
   @Requirement
   private IBlogServiceRole blogService;

@@ -61,7 +61,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class Article extends Api {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(Article.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Article.class);
 
   public static final String BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME = "blog.article.socialmediatags.active";
   public static final String BLOG_ARTICLE_TWITTER_SITE = "blog.twitter.account";
