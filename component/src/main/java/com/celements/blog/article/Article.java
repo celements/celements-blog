@@ -45,6 +45,7 @@ import com.celements.metatag.MetaTagServiceRole;
 import com.celements.metatag.enums.opengraph.EOpenGraph;
 import com.celements.metatag.enums.twitter.ETwitter;
 import com.celements.model.util.ModelUtils;
+import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.web.plugin.cmd.ConvertToPlainTextException;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.service.IWebUtilsService;
@@ -598,9 +599,8 @@ public class Article extends Api {
             EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, image.getHeight()));
       }
       getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
-      String title = getTitle(language);
       getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_TITLE,
-          title.replaceAll("\"", "&quot;")));
+          getTitleWithMenuNameFallback(language).replaceAll("\"", "&quot;")));
       // maxNumChars: e.g. for Facebook posts 300, for Facebook comments 110
       // viewTypeFull: maxNumChars has no influence if viewTypeFull == true
       String plainExtract = getExtractPlainTextEncoded(language, false, 450);
@@ -621,6 +621,16 @@ public class Article extends Api {
         getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrls));
       }
     }
+  }
+
+  String getTitleWithMenuNameFallback(String language) {
+    String title = getTitle(language);
+    if (Strings.isNullOrEmpty(title)) {
+      MultilingualMenuNameCommand menuNameCmd = new MultilingualMenuNameCommand();
+      title = menuNameCmd.getMultilingualMenuName(getModelUtils().serializeRefLocal(articleDocRef),
+          language, context);
+    }
+    return title;
   }
 
   private static ModelUtils getModelUtils() {
