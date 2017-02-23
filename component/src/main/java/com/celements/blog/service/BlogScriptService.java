@@ -192,17 +192,4 @@ public class BlogScriptService implements ScriptService {
     return article;
   }
 
-  public void addArticleSocialMediaTagsToCollector(DocumentReference articleDocRef,
-      String language) {
-    Article article = null;
-    try {
-      article = getArticle(articleDocRef);
-    } catch (XWikiException xwe) {
-      LOGGER.error("Exception getting article for doc ref {}", articleDocRef, xwe);
-    }
-    if (article != null) {
-      article.addArticleSocialMediaTagsToCollector(language);
-    }
-  }
-
 }

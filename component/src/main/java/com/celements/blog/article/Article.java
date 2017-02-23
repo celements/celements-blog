@@ -29,6 +29,8 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +43,6 @@ import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.classes.IClassCollectionRole;
 import com.celements.metatag.MetaTag;
-import com.celements.metatag.MetaTagServiceRole;
 import com.celements.metatag.enums.opengraph.EOpenGraph;
 import com.celements.metatag.enums.twitter.ETwitter;
 import com.celements.model.util.ModelUtils;
@@ -122,6 +123,8 @@ public class Article extends Api {
       if (artObj != null) {
         String fn = artObj.getName();
         if (!fn.startsWith(space + ".")) {
+          LOGGER.warn("getDocRefForObjList: article fullname [{}] found, but expected space to be "
+              + "[{}]", fn, space);
           fn = fn.replaceAll("^.*?(\\..*)$", space + "$1");
         }
         return getModelUtils().resolveRef(fn, DocumentReference.class);
@@ -578,39 +581,36 @@ public class Article extends Api {
   }
 
   /**
-   * Adds social media meta tags to the collector, respecting the configuration. If the tags are
-   * activate the calculated OpenGraph tags are added. Furthermore if a Twitter account is
-   * configured (e.g. @example), the Twitter tags are added. The Twitter card type is configurable,
-   * defaulting to "summary"
+   * Returns social media meta tags, respecting the configuration. If the tags are activate the
+   * calculated OpenGraph tags are added. Furthermore if a Twitter account is configured
+   * (e.g. @example), the Twitter tags are added. The Twitter card type is configurable, defaulting
+   * to "summary"
    *
    * @param language
    */
-  public void addArticleSocialMediaTagsToCollector(String language) {
+  public List<MetaTag> getArticleSocialMediaTags(@NotNull String language) {
+    List<MetaTag> metaTags = new ArrayList<>();
     if (1 == getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, 0)) {
       String externalUrl = getExternalUrl();
       List<ImageUrlDim> images = getArticleImagesBySizeAsc(language);
-      getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_TYPE, "website"));
+      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TYPE, "website"));
       for (ImageUrlDim image : images) {
-        getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE,
-            image.getUrl()));
-        getMetaTagService().addMetaTagToCollector(new MetaTag(
-            EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, image.getWidth()));
-        getMetaTagService().addMetaTagToCollector(new MetaTag(
-            EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, image.getHeight()));
+        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE, image.getUrl()));
+        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, image.getWidth()));
+        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, image.getHeight()));
       }
-      getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
-      getMetaTagService().addMetaTagToCollector(new MetaTag(EOpenGraph.OPENGRAPH_TITLE,
-          getTitleWithMenuNameFallback(language).replaceAll("\"", "&quot;")));
+      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
+      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TITLE, getTitleWithMenuNameFallback(
+          language).replaceAll("\"", "&quot;")));
       // maxNumChars: e.g. for Facebook posts 300, for Facebook comments 110
       // viewTypeFull: maxNumChars has no influence if viewTypeFull == true
       String plainExtract = getExtractPlainTextEncoded(language, false, 450);
-      getMetaTagService().addMetaTagToCollector(new MetaTag(
-          EOpenGraph.OPENGRAPH_OPTIONAL_DESCRIPTION, plainExtract));
+      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_DESCRIPTION, plainExtract));
       String twitterSite = getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_SITE);
       if (!Strings.isNullOrEmpty(twitterSite)) {
-        getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_CARD,
-            getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_CARD_TYPE, "summary")));
-        getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_SITE, twitterSite));
+        metaTags.add(new MetaTag(ETwitter.TWITTER_CARD, getConfigurationSource().getProperty(
+            BLOG_ARTICLE_TWITTER_CARD_TYPE, "summary")));
+        metaTags.add(new MetaTag(ETwitter.TWITTER_SITE, twitterSite));
         String imageUrls = "";
         for (ImageUrlDim image : images) {
           if (imageUrls.length() > 0) {
@@ -618,9 +618,10 @@ public class Article extends Api {
           }
           imageUrls += image.getUrl();
         }
-        getMetaTagService().addMetaTagToCollector(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrls));
+        metaTags.add(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrls));
       }
     }
+    return metaTags;
   }
 
   String getTitleWithMenuNameFallback(String language) {
@@ -639,10 +640,6 @@ public class Article extends Api {
 
   private static ConfigurationSource getConfigurationSource() {
     return Utils.getComponent(ConfigurationSource.class);
-  }
-
-  private static MetaTagServiceRole getMetaTagService() {
-    return Utils.getComponent(MetaTagServiceRole.class);
   }
 
   class ImageUrlDim {
