@@ -50,6 +50,7 @@ import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.web.plugin.cmd.ConvertToPlainTextException;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -591,35 +592,41 @@ public class Article extends Api {
   public List<MetaTag> getArticleSocialMediaTags(@NotNull String language) {
     List<MetaTag> metaTags = new ArrayList<>();
     if (1 == getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, 0)) {
-      String externalUrl = getExternalUrl();
       List<ImageUrlDim> images = getArticleImagesBySizeAsc(language);
-      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TYPE, "website"));
-      for (ImageUrlDim image : images) {
-        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE, image.getUrl()));
-        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, image.getWidth()));
-        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, image.getHeight()));
-      }
-      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
-      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TITLE, getTitleWithMenuNameFallback(
-          language).replaceAll("\"", "&quot;")));
-      // maxNumChars: e.g. for Facebook posts 300, for Facebook comments 110
-      // viewTypeFull: maxNumChars has no influence if viewTypeFull == true
-      String plainExtract = getExtractPlainTextEncoded(language, false, 450);
-      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_DESCRIPTION, plainExtract));
-      String twitterSite = getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_SITE);
-      if (!Strings.isNullOrEmpty(twitterSite)) {
-        metaTags.add(new MetaTag(ETwitter.TWITTER_CARD, getConfigurationSource().getProperty(
-            BLOG_ARTICLE_TWITTER_CARD_TYPE, "summary")));
-        metaTags.add(new MetaTag(ETwitter.TWITTER_SITE, twitterSite));
-        String imageUrls = "";
-        for (ImageUrlDim image : images) {
-          if (imageUrls.length() > 0) {
-            imageUrls += ",";
-          }
-          imageUrls += image.getUrl();
-        }
-        metaTags.add(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrls));
-      }
+      metaTags.addAll(addOpenGraphTags(images, language));
+      metaTags.addAll(addTwitterTags(images));
+    }
+    return metaTags;
+  }
+
+  List<MetaTag> addOpenGraphTags(List<ImageUrlDim> images, String language) {
+    List<MetaTag> metaTags = new ArrayList<>();
+    String externalUrl = getExternalUrl();
+    metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TYPE, "website"));
+    for (ImageUrlDim image : images) {
+      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE, image.getUrl()));
+      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, image.getWidth()));
+      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, image.getHeight()));
+    }
+    metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
+    metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TITLE, getTitleWithMenuNameFallback(
+        language).replaceAll("\"", "&quot;")));
+    // maxNumChars: e.g. for Facebook posts 300, for Facebook comments 110
+    // viewTypeFull: maxNumChars has no influence if viewTypeFull == true
+    String plainExtract = getExtractPlainTextEncoded(language, false, 450);
+    metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_DESCRIPTION, plainExtract));
+    return metaTags;
+  }
+
+  List<MetaTag> addTwitterTags(List<ImageUrlDim> images) {
+    List<MetaTag> metaTags = new ArrayList<>();
+    String twitterSite = getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_SITE);
+    if (!Strings.isNullOrEmpty(twitterSite)) {
+      metaTags.add(new MetaTag(ETwitter.TWITTER_CARD, getConfigurationSource().getProperty(
+          BLOG_ARTICLE_TWITTER_CARD_TYPE, "summary")));
+      metaTags.add(new MetaTag(ETwitter.TWITTER_SITE, twitterSite));
+      String imageUrls = Joiner.on(",").join(images);
+      metaTags.add(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrls));
     }
     return metaTags;
   }
@@ -670,6 +677,10 @@ public class Article extends Api {
       return height;
     }
 
+    @Override
+    public String toString() {
+      return getUrl();
+    }
   }
 
 }
