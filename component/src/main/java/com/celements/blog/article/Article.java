@@ -491,7 +491,7 @@ public class Article extends Api {
     return "Article [docRef=" + getDocumentReference() + "]";
   }
 
-  public String getExtractPlainTextEncoded(String lang, boolean isViewtypeFull, int maxNumChars) {
+  String getExtractPlainTextEncoded(String lang, boolean isViewtypeFull, int maxNumChars) {
     String articleExtract = getExtract(lang, isViewtypeFull, maxNumChars);
     try {
       String plainExtract = new PlainTextCommand().convertHtmlToPlainText(articleExtract);
@@ -503,7 +503,7 @@ public class Article extends Api {
     return articleExtract;
   }
 
-  public List<ImageUrlDim> getArticleImagesBySizeAsc(String lang) {
+  List<ImageUrlDim> getArticleImagesBySizeAsc(String lang) {
     List<ImageUrlDim> articleImages = extractImagesList(getFullArticle(lang));
     if (articleImages.isEmpty()) {
       articleImages = extractImagesList(getExtract(lang, false, getMaxNumChars()));
@@ -524,6 +524,11 @@ public class Article extends Api {
       }
       articleImages.get(key).add(getImgUrlExternal(imgUrl));
     }
+    List<ImageUrlDim> sortedImages = filterImagesByMissingOrSmallSize(articleImages);
+    return sortedImages;
+  }
+
+  List<ImageUrlDim> filterImagesByMissingOrSmallSize(Map<Long, List<ImageUrlDim>> articleImages) {
     List<ImageUrlDim> sortedImages = new ArrayList<>();
     for (Long imgArea : articleImages.keySet()) {
       // Image size not extractable is in key == '-1' Don't include too small images.
