@@ -13,8 +13,6 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.metatag.MetaTagProviderRole;
 import com.celements.pagetype.PageTypeReference;
-import com.celements.pagetype.classes.PageTypeClass;
-import com.celements.pagetype.classes.PageTypeClassDefinition;
 import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
@@ -23,20 +21,12 @@ public class HeaderSocialMediaMetaTagsTest extends AbstractComponentTest {
 
   private HeaderSocialMediaMetaTags headerTags;
   private IPageTypeResolverRole ptResolverMock;
-  private PageTypeClassDefinition ptClass;
 
   @Before
   public void prepareTest() throws Exception {
     ptResolverMock = registerComponentMock(IPageTypeResolverRole.class);
-    ptClass = Utils.getComponent(PageTypeClassDefinition.class, PageTypeClass.CLASS_DEF_HINT);
     headerTags = (HeaderSocialMediaMetaTags) Utils.getComponent(MetaTagProviderRole.class,
         HeaderSocialMediaMetaTags.COMPONENT_NAME);
-  }
-
-  @Test
-  public void testGetHeaderMetaTags() {
-    fail("Not yet implemented");
-
   }
 
   @Test
