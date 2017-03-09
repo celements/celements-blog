@@ -1,4 +1,4 @@
-xwiki.log
+xwiki.lo*
 .project
 .settings
 .classpath
