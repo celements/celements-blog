@@ -20,14 +20,10 @@
 package com.celements.blog.article;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.validation.constraints.NotNull;
 
@@ -47,6 +43,8 @@ import com.celements.metatag.enums.opengraph.EOpenGraph;
 import com.celements.metatag.enums.twitter.ETwitter;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
+import com.celements.photo.container.ImageUrlDim;
+import com.celements.photo.utilities.ImageUrlExtractor;
 import com.celements.web.plugin.cmd.ConvertToPlainTextException;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.service.IWebUtilsService;
@@ -69,10 +67,6 @@ public class Article extends Api {
   public static final String BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME = "blog.article.socialmediatags.active";
   public static final String BLOG_ARTICLE_TWITTER_SITE = "blog.twitter.account";
   public static final String BLOG_ARTICLE_TWITTER_CARD_TYPE = "blog.twitter.card.type";
-
-  public static int MIN_SOCIAL_MEDIA_IMAGE_SIZE = 200;
-  public static int MIN_SOCIAL_MEDIA_AREA_SIZE = MIN_SOCIAL_MEDIA_IMAGE_SIZE
-      * MIN_SOCIAL_MEDIA_IMAGE_SIZE;
 
   private Map<String, com.xpn.xwiki.api.Object> articleObjMap;
   private Boolean isSubscribed;
@@ -504,76 +498,12 @@ public class Article extends Api {
   }
 
   List<ImageUrlDim> getArticleImagesBySizeAsc(String lang) {
-    List<ImageUrlDim> articleImages = extractImagesList(getFullArticle(lang));
+    ImageUrlExtractor urlManip = new ImageUrlExtractor();
+    List<ImageUrlDim> articleImages = urlManip.extractImagesList(getFullArticle(lang));
     if (articleImages.isEmpty()) {
-      articleImages = extractImagesList(getExtract(lang, false, getMaxNumChars()));
+      articleImages = urlManip.extractImagesList(getExtract(lang, false, getMaxNumChars()));
     }
     return articleImages;
-  }
-
-  List<ImageUrlDim> extractImagesList(String content) {
-    String regex = "<img .*?src=['\"](.*?)['\"].*?/>";
-    Map<Long, List<ImageUrlDim>> articleImages = new TreeMap<>();
-    Pattern p = Pattern.compile(regex);
-    Matcher m = p.matcher(content);
-    while (m.find()) {
-      String imgUrl = m.group(1);
-      Long key = getImgUrlSizeKey(imgUrl);
-      if (!articleImages.containsKey(key)) {
-        articleImages.put(key, new ArrayList<ImageUrlDim>());
-      }
-      articleImages.get(key).add(getImgUrlExternal(imgUrl));
-    }
-    List<ImageUrlDim> sortedImages = filterImagesByMissingOrSmallSize(articleImages);
-    return sortedImages;
-  }
-
-  List<ImageUrlDim> filterImagesByMissingOrSmallSize(Map<Long, List<ImageUrlDim>> articleImages) {
-    List<ImageUrlDim> sortedImages = new ArrayList<>();
-    for (Long imgArea : articleImages.keySet()) {
-      // Image size not extractable is in key == '-1' Don't include too small images.
-      if ((imgArea == -1) || (imgArea >= (MIN_SOCIAL_MEDIA_AREA_SIZE))) {
-        Collections.reverse(articleImages.get(imgArea));
-        sortedImages.addAll(articleImages.get(imgArea));
-      }
-    }
-    return sortedImages;
-  }
-
-  ImageUrlDim getImgUrlExternal(String imgUrl) {
-    if (!imgUrl.startsWith("http://") && !imgUrl.startsWith("https://")) {
-      String action = imgUrl.replaceAll("^.*?/(.*?)/.*$", "$1");
-      String space = imgUrl.replaceAll("^(.*?/){2}(.*?)/.*$", "$2");
-      String docname = imgUrl.replaceAll("^(.*?/){3}(.*?)/.*$", "$2");
-      String filename = imgUrl.replaceAll("^(.*?/){4}(.*?)(|\\?.*)$", "$2");
-      String query = imgUrl.replaceAll("^.*\\?(.*)$", "$1");
-      imgUrl = getContext().getURLFactory().createAttachmentURL(filename, space, docname, action,
-          query, getContext().getDatabase(), getContext()).toString();
-    }
-    return new ImageUrlDim(imgUrl, parseImgUrlDimension(imgUrl, "celwidth"), parseImgUrlDimension(
-        imgUrl, "celheight"));
-  }
-
-  Long getImgUrlSizeKey(String imgUrl) {
-    int w = parseImgUrlDimension(imgUrl, "celwidth");
-    int h = parseImgUrlDimension(imgUrl, "celheight");
-    Long area = new Long(h * w);
-    if (area < 0) {
-      area = area * area;
-    } else if ((h == -1) && (w == -1)) {
-      area = -1l;
-    }
-    return area;
-  }
-
-  int parseImgUrlDimension(String imgUrl, String dimension) {
-    String str = imgUrl.replaceAll("^.*" + dimension + "=(\\d+)(&.*)?$", "$1");
-    try {
-      return Integer.parseInt(str);
-    } catch (NumberFormatException nfe) {
-      LOGGER.debug("Exception while parsing Integer from [{}]", str, nfe);
-    }
-    return -1;
   }
 
   public String getExternalUrl() {
@@ -652,40 +582,6 @@ public class Article extends Api {
 
   private static ConfigurationSource getConfigurationSource() {
     return Utils.getComponent(ConfigurationSource.class);
-  }
-
-  class ImageUrlDim {
-
-    private String url;
-    private String width = "";
-    private String height = "";
-
-    public ImageUrlDim(String url, int width, int height) {
-      this.url = url;
-      if (width > 0) {
-        this.width = Integer.toString(width);
-      }
-      if (height > 0) {
-        this.height = Integer.toString(height);
-      }
-    }
-
-    public String getUrl() {
-      return url;
-    }
-
-    public String getWidth() {
-      return width;
-    }
-
-    public String getHeight() {
-      return height;
-    }
-
-    @Override
-    public String toString() {
-      return getUrl();
-    }
   }
 
 }
