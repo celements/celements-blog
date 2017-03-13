@@ -33,14 +33,11 @@ public class HeaderSocialMediaMetaTags implements MetaTagProviderRole {
   @Override
   public List<MetaTag> getHeaderMetaTags() {
     if (isBlogArticle()) {
-      Article article = null;
       try {
-        article = new Article(modelContext.getDoc(), modelContext.getXWikiContext());
+        Article article = new Article(modelContext.getDoc(), modelContext.getXWikiContext());
+        return article.getArticleSocialMediaTags(modelContext.getXWikiContext().getLanguage());
       } catch (XWikiException | EmptyArticleException excp) {
         LOGGER.error("Exception getting article for doc [{}]", modelContext.getDoc(), excp);
-      }
-      if (article != null) {
-        return article.getArticleSocialMediaTags(modelContext.getXWikiContext().getLanguage());
       }
     }
     return Collections.emptyList();
