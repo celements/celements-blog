@@ -50,6 +50,7 @@ import com.celements.web.plugin.cmd.ConvertToPlainTextException;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -104,7 +105,7 @@ public class Article extends Api {
   public Article(@NotNull List<com.xpn.xwiki.api.Object> objList, @NotNull DocumentReference docRef,
       @NotNull XWikiContext context) throws XWikiException, EmptyArticleException {
     super(context);
-    articleDocRef = docRef;
+    articleDocRef = Preconditions.checkNotNull(docRef);
     for (Object artObj : objList) {
       init(artObj, docRef.getLastSpaceReference().getName());
     }
@@ -126,7 +127,7 @@ public class Article extends Api {
         return getModelUtils().resolveRef(fn, DocumentReference.class);
       }
     }
-    return null;
+    throw new IllegalArgumentException("Unable to get DocumentReference for article objects");
   }
 
   public void init(@Nullable com.xpn.xwiki.api.Object obj, @NotNull String space) {
