@@ -526,7 +526,7 @@ public class Article extends Api {
    */
   public List<MetaTag> getArticleSocialMediaTags(@NotNull String language) {
     List<MetaTag> metaTags = new ArrayList<>();
-    if (1 == getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, 0)) {
+    if (getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, false)) {
       List<ImageUrlDim> images = getArticleImagesBySizeAsc(language);
       metaTags.addAll(addOpenGraphTags(images, language));
       metaTags.addAll(addTwitterTags(images));
@@ -557,8 +557,14 @@ public class Article extends Api {
     List<MetaTag> metaTags = new ArrayList<>();
     String twitterSite = getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_SITE);
     if (!Strings.isNullOrEmpty(twitterSite)) {
-      metaTags.add(new MetaTag(ETwitter.TWITTER_CARD, getConfigurationSource().getProperty(
-          BLOG_ARTICLE_TWITTER_CARD_TYPE, "summary")));
+      // FIXME solved by CELDEV-443
+      // String cardType = getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_CARD_TYPE,
+      // "summary");
+      String cardType = getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_CARD_TYPE);
+      if (Strings.isNullOrEmpty(cardType)) {
+        cardType = "summary";
+      }
+      metaTags.add(new MetaTag(ETwitter.TWITTER_CARD, cardType));
       metaTags.add(new MetaTag(ETwitter.TWITTER_SITE, twitterSite));
       String imageUrls = Joiner.on(",").join(images);
       metaTags.add(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrls));
