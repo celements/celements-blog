@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.apache.velocity.VelocityContext;
@@ -81,27 +82,27 @@ public class Article extends Api {
   /**
    * For Test Use only!!!
    */
-  Article(XWikiContext context) {
+  Article(@NotNull XWikiContext context) {
     super(context);
   }
 
-  public Article(XWikiDocument articleDoc, XWikiContext context) throws XWikiException,
-      EmptyArticleException {
+  public Article(@NotNull XWikiDocument articleDoc, @NotNull XWikiContext context)
+      throws XWikiException, EmptyArticleException {
     this(articleDoc.newDocument(context), context);
   }
 
-  public Article(Document articleDoc, XWikiContext context) throws XWikiException,
+  public Article(@NotNull Document articleDoc, @NotNull XWikiContext context) throws XWikiException,
       EmptyArticleException {
     this(articleDoc.getObjects("XWiki.ArticleClass"), articleDoc.getDocumentReference(), context);
   }
 
-  public Article(List<com.xpn.xwiki.api.Object> objList, String space, XWikiContext context)
-      throws XWikiException, EmptyArticleException {
+  public Article(@NotNull List<com.xpn.xwiki.api.Object> objList, @NotNull String space,
+      @NotNull XWikiContext context) throws XWikiException, EmptyArticleException {
     this(objList, getDocRefForObjList(objList, space), context);
   }
 
-  public Article(List<com.xpn.xwiki.api.Object> objList, DocumentReference docRef,
-      XWikiContext context) throws XWikiException, EmptyArticleException {
+  public Article(@NotNull List<com.xpn.xwiki.api.Object> objList, @NotNull DocumentReference docRef,
+      @NotNull XWikiContext context) throws XWikiException, EmptyArticleException {
     super(context);
     articleDocRef = docRef;
     for (Object artObj : objList) {
@@ -112,8 +113,8 @@ public class Article extends Api {
     }
   }
 
-  private static DocumentReference getDocRefForObjList(List<com.xpn.xwiki.api.Object> objList,
-      String space) {
+  private static DocumentReference getDocRefForObjList(
+      @NotNull List<com.xpn.xwiki.api.Object> objList, @NotNull String space) {
     for (Object artObj : objList) {
       if (artObj != null) {
         String fn = artObj.getName();
@@ -128,7 +129,7 @@ public class Article extends Api {
     return null;
   }
 
-  public void init(com.xpn.xwiki.api.Object obj, String space) {
+  public void init(@Nullable com.xpn.xwiki.api.Object obj, @NotNull String space) {
     if (articleObjMap == null) {
       articleObjMap = new HashMap<>();
       defaultLang = context.getWiki().getSpacePreference("default_language", space, "", context);
@@ -144,7 +145,7 @@ public class Article extends Api {
     }
   }
 
-  private void setSubscribed(DocumentReference blogConfDocRef) {
+  private void setSubscribed(@Nullable DocumentReference blogConfDocRef) {
     XWikiDocument doc = null;
     // TODO why loading doc&objects here when already loaded articleObjMap could be used?
     try {
@@ -173,22 +174,22 @@ public class Article extends Api {
     }
   }
 
-  public Date getPublishDate() {
+  public @Nullable Date getPublishDate() {
     Date date = getDateProperty(getObj(defaultLang), "publishdate");
     return date;
   }
 
-  public Date getPublishDate(String lang) {
+  public @Nullable Date getPublishDate(@Nullable String lang) {
     Date date = getDateProperty(getObj(lang), "publishdate");
     return date;
   }
 
-  public Date getArchiveDate() {
+  public @Nullable Date getArchiveDate() {
     Date date = getDateProperty(getObj(defaultLang), "archivedate");
     return date;
   }
 
-  public Date getArchiveDate(String lang) {
+  public @Nullable Date getArchiveDate(@Nullable String lang) {
     Date date = getDateProperty(getObj(lang), "archivedate");
     return date;
   }
@@ -200,11 +201,11 @@ public class Article extends Api {
    * @param lang
    * @return
    */
-  public String getTitleLang(String lang) {
+  public @NotNull String getTitleLang(@Nullable String lang) {
     return getTitleDetailed(lang)[0];
   }
 
-  public String getTitle(String lang) {
+  public @NotNull String getTitle(@Nullable String lang) {
     return getTitleDetailed(lang)[1];
   }
 
@@ -242,19 +243,21 @@ public class Article extends Api {
    * @param lang
    * @return
    */
-  public String getExtractLang(String lang, boolean isViewtypeFull) {
+  public @NotNull String getExtractLang(@NotNull String lang, @Nullable boolean isViewtypeFull) {
     return getExtractDetailed(lang, isViewtypeFull, getMaxNumChars())[0];
   }
 
-  public String getExtract(String lang, boolean isViewtypeFull) {
+  public @NotNull String getExtract(@NotNull String lang, @Nullable boolean isViewtypeFull) {
     return getExtractDetailed(lang, isViewtypeFull, getMaxNumChars())[1];
   }
 
-  public String getExtract(String lang, boolean isViewtypeFull, int maxNumChars) {
+  public @NotNull String getExtract(@NotNull String lang, @Nullable boolean isViewtypeFull,
+      @Nullable int maxNumChars) {
     return getExtractDetailed(lang, isViewtypeFull, maxNumChars)[1];
   }
 
-  public String[] getExtractDetailed(String lang, boolean isViewtypeFull, int maxNumChars) {
+  public @NotNull String[] getExtractDetailed(@NotNull String lang,
+      @Nullable boolean isViewtypeFull, @Nullable int maxNumChars) {
     String effectiveLang = lang;
     LOGGER.info("getExtract('" + lang + "', " + isViewtypeFull + "')");
     if ((extract == null) || !extract.containsKey(lang)) {
@@ -309,32 +312,32 @@ public class Article extends Api {
     return (string.trim().length() <= 0) && !lang.equals(defaultLang);
   }
 
-  public String getFullArticle(String lang) {
+  public @NotNull String getFullArticle(@Nullable String lang) {
     return getStringProperty(getObj(lang), "content");
   }
 
-  public String getEditor(String lang) {
+  public @NotNull String getEditor(@Nullable String lang) {
     return getStringProperty(getObj(lang), "blogeditor");
   }
 
-  public Boolean isCommentable() {
+  public @Nullable Boolean isCommentable() {
     return getBooleanProperty(getObj(defaultLang), "hasComments");
   }
 
-  public Boolean isCommentable(String lang) {
+  public @Nullable Boolean isCommentable(@Nullable String lang) {
     return getBooleanProperty(getObj(lang), "hasComments");
   }
 
-  public Boolean isSubscribable() {
+  public @Nullable Boolean isSubscribable() {
     return getBooleanProperty(getObj(defaultLang), "isSubscribable");
   }
 
   // Attention! May return null if not set so use -> if(isSubscribable(lang) == true)
-  public Boolean isSubscribable(String lang) {
+  public @Nullable Boolean isSubscribable(@Nullable String lang) {
     return getBooleanProperty(getObj(lang), "isSubscribable");
   }
 
-  public boolean isFromSubscribableBlog(String blogArticleSpace) {
+  public @NotNull boolean isFromSubscribableBlog(@Nullable String blogArticleSpace) {
     boolean result = true;
     if (getDocName().startsWith(blogArticleSpace + ".")) {
       result = false;
@@ -342,7 +345,7 @@ public class Article extends Api {
     return result;
   }
 
-  public DocumentReference getDocumentReference() {
+  public @Nullable DocumentReference getDocumentReference() {
     if (articleObjMap.size() > 0) {
       String firstKey = articleObjMap.keySet().iterator().next();
       com.xpn.xwiki.api.Object articleObj = articleObjMap.get(firstKey);
@@ -363,7 +366,8 @@ public class Article extends Api {
     return "";
   }
 
-  public String getStringProperty(com.xpn.xwiki.api.Object obj, String name) {
+  public @NotNull String getStringProperty(@Nullable com.xpn.xwiki.api.Object obj,
+      @Nullable String name) {
     String result = "";
     if (obj != null) {
       Property prop = obj.getProperty(name);
@@ -374,7 +378,8 @@ public class Article extends Api {
     return result;
   }
 
-  public Date getDateProperty(com.xpn.xwiki.api.Object obj, String name) {
+  public @Nullable Date getDateProperty(@Nullable com.xpn.xwiki.api.Object obj,
+      @Nullable String name) {
     Date result = null;
     if (obj != null) {
       Property prop = obj.getProperty(name);
@@ -386,7 +391,8 @@ public class Article extends Api {
   }
 
   // not set = null, false = 0, true = 1
-  public Boolean getBooleanProperty(com.xpn.xwiki.api.Object obj, String name) {
+  public @Nullable Boolean getBooleanProperty(@Nullable com.xpn.xwiki.api.Object obj,
+      @Nullable String name) {
     Boolean result = null;
     if (obj != null) {
       Property prop = obj.getProperty(name);
@@ -404,7 +410,7 @@ public class Article extends Api {
     return result;
   }
 
-  public com.xpn.xwiki.api.Object getObj(String lang) {
+  public @Nullable com.xpn.xwiki.api.Object getObj(@Nullable String lang) {
     com.xpn.xwiki.api.Object obj = null;
     if (articleObjMap.containsKey(lang)) {
       LOGGER.info("'" + getDocName() + "' - Getting object for lang '" + lang + "'");
@@ -439,21 +445,21 @@ public class Article extends Api {
     return isSubscribed(blogConfDocRef);
   }
 
-  public Boolean isSubscribed(DocumentReference blogConfDocRef) {
+  public @Nullable Boolean isSubscribed(@Nullable DocumentReference blogConfDocRef) {
     if (isSubscribed == null) {
       setSubscribed(blogConfDocRef);
     }
     return isSubscribed;
   }
 
-  public boolean hasMoreLink(String lang, boolean isViewtypeFull) {
+  public @NotNull boolean hasMoreLink(@Nullable String lang, @NotNull boolean isViewtypeFull) {
     if ((hasMoreLink == null) || !hasMoreLink.containsKey(lang)) {
       getExtract(lang, isViewtypeFull);
     }
     return hasMoreLink.get(lang);
   }
 
-  public boolean hasMoreLinkDots(String lang, boolean isViewtypeFull) {
+  public @NotNull boolean hasMoreLinkDots(@Nullable String lang, @NotNull boolean isViewtypeFull) {
     if (hasMoreLink(lang, isViewtypeFull)) {
       getExtract(lang, isViewtypeFull);
     }
@@ -481,7 +487,7 @@ public class Article extends Api {
   }
 
   @Override
-  public String toString() {
+  public @NotNull String toString() {
     return "Article [docRef=" + getDocumentReference() + "]";
   }
 
@@ -506,7 +512,7 @@ public class Article extends Api {
     return articleImages;
   }
 
-  public String getExternalUrl() {
+  public @NotNull String getExternalUrl() {
     String fullName = getModelUtils().serializeRefLocal(articleDocRef);
     try {
       return context.getWiki().getExternalURL(fullName, "view", "ref=socialmedia", context);
@@ -524,7 +530,7 @@ public class Article extends Api {
    *
    * @param language
    */
-  public List<MetaTag> getArticleSocialMediaTags(@NotNull String language) {
+  public @NotNull List<MetaTag> getArticleSocialMediaTags(@NotNull String language) {
     List<MetaTag> metaTags = new ArrayList<>();
     if (getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, false)) {
       List<ImageUrlDim> images = getArticleImagesBySizeAsc(language);
