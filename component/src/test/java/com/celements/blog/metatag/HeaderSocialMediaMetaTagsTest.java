@@ -4,27 +4,25 @@ import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.metatag.MetaTagProviderRole;
-import com.celements.pagetype.PageTypeReference;
-import com.celements.pagetype.service.IPageTypeResolverRole;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class HeaderSocialMediaMetaTagsTest extends AbstractComponentTest {
 
   private HeaderSocialMediaMetaTags headerTags;
-  private IPageTypeResolverRole ptResolverMock;
+  private IBlogServiceRole blogServiceMock;
 
   @Before
   public void prepareTest() throws Exception {
-    ptResolverMock = registerComponentMock(IPageTypeResolverRole.class);
+    blogServiceMock = registerComponentMock(IBlogServiceRole.class);
     headerTags = (HeaderSocialMediaMetaTags) Utils.getComponent(MetaTagProviderRole.class,
         HeaderSocialMediaMetaTags.COMPONENT_NAME);
   }
@@ -39,27 +37,32 @@ public class HeaderSocialMediaMetaTagsTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space", "Doc");
     XWikiDocument doc = new XWikiDocument(docRef);
     getContext().setDoc(doc);
-    expect(ptResolverMock.getPageTypeRefForDoc(same(doc))).andReturn(new PageTypeReference(
-        "Article", "provider", Arrays.asList("cat")));
+    expect(blogServiceMock.getBlogConfigDocRef(same(
+        doc.getDocumentReference().getLastSpaceReference()))).andReturn(docRef);
     replayDefault();
     assertTrue(headerTags.isBlogArticle());
     verifyDefault();
   }
 
   @Test
-  public void testIsBlogArticle_false_noPt() {
-    getContext().setDoc(new XWikiDocument(new DocumentReference(getContext().getDatabase(), "Space",
-        "Doc")));
-    assertFalse(headerTags.isBlogArticle());
-  }
-
-  @Test
-  public void testIsBlogArticle_false_withPt() {
+  public void testIsBlogArticle_false() throws Exception {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space", "Doc");
     XWikiDocument doc = new XWikiDocument(docRef);
     getContext().setDoc(doc);
-    expect(ptResolverMock.getPageTypeRefForDoc(same(doc))).andReturn(new PageTypeReference(
-        "RichText", "provider", Arrays.asList("cat")));
+    expect(blogServiceMock.getBlogConfigDocRef(same(
+        doc.getDocumentReference().getLastSpaceReference()))).andReturn((DocumentReference) null);
+    replayDefault();
+    assertFalse(headerTags.isBlogArticle());
+    verifyDefault();
+  }
+
+  @Test
+  public void testIsBlogArticle_false_withException() throws Exception {
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space", "Doc");
+    XWikiDocument doc = new XWikiDocument(docRef);
+    getContext().setDoc(doc);
+    expect(blogServiceMock.getBlogConfigDocRef(same(
+        doc.getDocumentReference().getLastSpaceReference()))).andThrow(new XWikiException());
     replayDefault();
     assertFalse(headerTags.isBlogArticle());
     verifyDefault();

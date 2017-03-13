@@ -3,20 +3,26 @@ package com.celements.blog.metatag;
 import java.util.Collections;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.query.QueryException;
 
 import com.celements.blog.article.Article;
 import com.celements.blog.plugin.EmptyArticleException;
+import com.celements.blog.service.IBlogServiceRole;
 import com.celements.metatag.MetaTag;
 import com.celements.metatag.MetaTagProviderRole;
 import com.celements.model.context.ModelContext;
-import com.celements.pagetype.PageTypeReference;
-import com.celements.pagetype.service.IPageTypeResolverRole;
 import com.xpn.xwiki.XWikiException;
 
+import groovy.lang.Immutable;
+
+@Immutable
 @Component(HeaderSocialMediaMetaTags.COMPONENT_NAME)
 public class HeaderSocialMediaMetaTags implements MetaTagProviderRole {
 
@@ -25,13 +31,13 @@ public class HeaderSocialMediaMetaTags implements MetaTagProviderRole {
   private static final Logger LOGGER = LoggerFactory.getLogger(HeaderSocialMediaMetaTags.class);
 
   @Requirement
-  private IPageTypeResolverRole ptResolver;
-
-  @Requirement
   private ModelContext modelContext;
 
+  @Requirement
+  private IBlogServiceRole blogService;
+
   @Override
-  public List<MetaTag> getHeaderMetaTags() {
+  public @NotNull List<MetaTag> getHeaderMetaTags() {
     if (isBlogArticle()) {
       try {
         Article article = new Article(modelContext.getDoc(), modelContext.getXWikiContext());
@@ -44,12 +50,17 @@ public class HeaderSocialMediaMetaTags implements MetaTagProviderRole {
   }
 
   @Override
-  public List<MetaTag> getBodyMetaTags() {
+  public @NotNull List<MetaTag> getBodyMetaTags() {
     return Collections.emptyList();
   }
 
   boolean isBlogArticle() {
-    PageTypeReference ptRef = ptResolver.getPageTypeRefForDoc(modelContext.getDoc());
-    return (ptRef != null) && "Article".equals(ptRef.getConfigName());
+    SpaceReference spaceRef = modelContext.getDoc().getDocumentReference().getLastSpaceReference();
+    try {
+      return null != blogService.getBlogConfigDocRef(spaceRef);
+    } catch (QueryException | XWikiException excp) {
+      LOGGER.warn("Exception determining blog config for space {}", spaceRef, excp);
+    }
+    return false;
   }
 }
