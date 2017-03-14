@@ -45,11 +45,13 @@ import com.celements.metatag.enums.twitter.ETwitter;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
 import com.celements.photo.container.ImageUrlDim;
+import com.celements.photo.utilities.DefaultImageUrlExtractor;
 import com.celements.photo.utilities.ImageUrlExtractor;
 import com.celements.web.plugin.cmd.ConvertToPlainTextException;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
@@ -505,7 +507,7 @@ public class Article extends Api {
   }
 
   List<ImageUrlDim> getArticleImagesBySizeAsc(String lang) {
-    ImageUrlExtractor urlManip = new ImageUrlExtractor();
+    ImageUrlExtractor urlManip = new DefaultImageUrlExtractor();
     List<ImageUrlDim> articleImages = urlManip.extractImagesList(getFullArticle(lang));
     if (articleImages.isEmpty()) {
       articleImages = urlManip.extractImagesList(getExtract(lang, false, getMaxNumChars()));
@@ -547,8 +549,14 @@ public class Article extends Api {
     metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TYPE, "website"));
     for (ImageUrlDim image : images) {
       metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE, image.getUrl()));
-      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, image.getWidth()));
-      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, image.getHeight()));
+      Optional<String> width = image.getWidth();
+      if (width.isPresent()) {
+        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, width.get()));
+      }
+      Optional<String> height = image.getHeight();
+      if (height.isPresent()) {
+        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, height.get()));
+      }
     }
     metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
     metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TITLE, getTitleWithMenuNameFallback(
