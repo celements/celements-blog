@@ -3,6 +3,7 @@ package com.celements.blog.metatag;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.concurrent.Immutable;
 import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
@@ -19,8 +20,6 @@ import com.celements.metatag.MetaTag;
 import com.celements.metatag.MetaTagProviderRole;
 import com.celements.model.context.ModelContext;
 import com.xpn.xwiki.XWikiException;
-
-import groovy.lang.Immutable;
 
 @Immutable
 @Component(HeaderSocialMediaMetaTags.COMPONENT_NAME)
