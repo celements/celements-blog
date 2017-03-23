@@ -44,14 +44,12 @@ import com.celements.metatag.enums.opengraph.EOpenGraph;
 import com.celements.metatag.enums.twitter.ETwitter;
 import com.celements.model.util.ModelUtils;
 import com.celements.navigation.cmd.MultilingualMenuNameCommand;
-import com.celements.photo.container.ImageUrlDim;
-import com.celements.photo.utilities.DefaultImageUrlExtractor;
+import com.celements.photo.container.ImageUrl;
 import com.celements.photo.utilities.ImageUrlExtractor;
 import com.celements.web.plugin.cmd.ConvertToPlainTextException;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.service.IWebUtilsService;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.xpn.xwiki.XWikiContext;
@@ -506,11 +504,12 @@ public class Article extends Api {
     return articleExtract;
   }
 
-  List<ImageUrlDim> getArticleImagesBySizeAsc(String lang) {
-    ImageUrlExtractor urlManip = new DefaultImageUrlExtractor();
-    List<ImageUrlDim> articleImages = urlManip.extractImagesList(getFullArticle(lang));
+  List<ImageUrl> getArticleImagesBySizeAsc(String lang) {
+    List<ImageUrl> articleImages = getImageUrlExtractor().extractImagesSocialMediaUrlList(
+        getFullArticle(lang));
     if (articleImages.isEmpty()) {
-      articleImages = urlManip.extractImagesList(getExtract(lang, false, getMaxNumChars()));
+      articleImages = getImageUrlExtractor().extractImagesSocialMediaUrlList(getExtract(lang, false,
+          getMaxNumChars()));
     }
     return articleImages;
   }
@@ -536,26 +535,26 @@ public class Article extends Api {
   public @NotNull List<MetaTag> getArticleSocialMediaTags(@NotNull String language) {
     List<MetaTag> metaTags = new ArrayList<>();
     if (getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, false)) {
-      List<ImageUrlDim> images = getArticleImagesBySizeAsc(language);
+      List<ImageUrl> images = getArticleImagesBySizeAsc(language);
       metaTags.addAll(addOpenGraphTags(images, language));
       metaTags.addAll(addTwitterTags(images));
     }
     return metaTags;
   }
 
-  List<MetaTag> addOpenGraphTags(List<ImageUrlDim> images, String language) {
+  List<MetaTag> addOpenGraphTags(List<ImageUrl> images, String language) {
     List<MetaTag> metaTags = new ArrayList<>();
     String externalUrl = getExternalUrl();
     metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TYPE, "website"));
-    for (ImageUrlDim image : images) {
+    for (ImageUrl image : images) {
       metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE, image.getUrl()));
-      Optional<String> width = image.getWidth();
-      if (width.isPresent()) {
-        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH, width.get()));
+      if (image.getWidth().isPresent()) {
+        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH,
+            image.getWidth().get().toString()));
       }
-      Optional<String> height = image.getHeight();
-      if (height.isPresent()) {
-        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT, height.get()));
+      if (image.getHeight().isPresent()) {
+        metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_HEIGHT,
+            image.getHeight().get().toString()));
       }
     }
     metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
@@ -568,7 +567,7 @@ public class Article extends Api {
     return metaTags;
   }
 
-  List<MetaTag> addTwitterTags(List<ImageUrlDim> images) {
+  List<MetaTag> addTwitterTags(List<ImageUrl> images) {
     List<MetaTag> metaTags = new ArrayList<>();
     String twitterSite = getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_SITE);
     if (!Strings.isNullOrEmpty(twitterSite)) {
@@ -595,6 +594,10 @@ public class Article extends Api {
           language, context);
     }
     return title;
+  }
+
+  private ImageUrlExtractor getImageUrlExtractor() {
+    return Utils.getComponent(ImageUrlExtractor.class);
   }
 
   private static ModelUtils getModelUtils() {
