@@ -536,13 +536,13 @@ public class Article extends Api {
     List<MetaTag> metaTags = new ArrayList<>();
     if (getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, false)) {
       List<ImageUrl> images = getArticleImagesBySizeAsc(language);
-      metaTags.addAll(addOpenGraphTags(images, language));
-      metaTags.addAll(addTwitterTags(images));
+      metaTags.addAll(getOpenGraphTags(images, language));
+      metaTags.addAll(getTwitterTags(images));
     }
     return metaTags;
   }
 
-  List<MetaTag> addOpenGraphTags(List<ImageUrl> images, String language) {
+  List<MetaTag> getOpenGraphTags(List<ImageUrl> images, String language) {
     List<MetaTag> metaTags = new ArrayList<>();
     String externalUrl = getExternalUrl();
     metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TYPE, "website"));
@@ -567,7 +567,7 @@ public class Article extends Api {
     return metaTags;
   }
 
-  List<MetaTag> addTwitterTags(List<ImageUrl> images) {
+  List<MetaTag> getTwitterTags(List<ImageUrl> images) {
     List<MetaTag> metaTags = new ArrayList<>();
     String twitterSite = getConfigurationSource().getProperty(BLOG_ARTICLE_TWITTER_SITE);
     if (!Strings.isNullOrEmpty(twitterSite)) {
