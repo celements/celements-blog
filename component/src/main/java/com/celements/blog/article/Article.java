@@ -66,9 +66,9 @@ public class Article extends Api {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Article.class);
 
-  public static final String BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME = "blog.article.socialmediatags.active";
-  public static final String BLOG_ARTICLE_TWITTER_SITE = "blog.twitter.account";
-  public static final String BLOG_ARTICLE_TWITTER_CARD_TYPE = "blog.twitter.card.type";
+  private final String BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME = "blog.article.socialmediatags.active";
+  private final String BLOG_ARTICLE_TWITTER_SITE = "blog.twitter.account";
+  private final String BLOG_ARTICLE_TWITTER_CARD_TYPE = "blog.twitter.card.type";
 
   private Map<String, com.xpn.xwiki.api.Object> articleObjMap;
   private Boolean isSubscribed;
