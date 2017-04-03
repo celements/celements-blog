@@ -20,6 +20,7 @@ import com.celements.metatag.MetaTag;
 import com.celements.metatag.MetaTagProviderRole;
 import com.celements.model.context.ModelContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Immutable
 @Component(HeaderSocialMediaMetaTags.COMPONENT_NAME)
@@ -54,11 +55,14 @@ public class HeaderSocialMediaMetaTags implements MetaTagProviderRole {
   }
 
   boolean isBlogArticle() {
-    SpaceReference spaceRef = modelContext.getDoc().getDocumentReference().getLastSpaceReference();
-    try {
-      return null != blogService.getBlogConfigDocRef(spaceRef);
-    } catch (QueryException | XWikiException excp) {
-      LOGGER.warn("Exception determining blog config for space {}", spaceRef, excp);
+    XWikiDocument doc = modelContext.getDoc();
+    if (doc != null) {
+      SpaceReference spaceRef = doc.getDocumentReference().getLastSpaceReference();
+      try {
+        return null != blogService.getBlogConfigDocRef(spaceRef);
+      } catch (QueryException | XWikiException excp) {
+        LOGGER.warn("Exception determining blog config for space {}", spaceRef, excp);
+      }
     }
     return false;
   }
