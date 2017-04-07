@@ -534,7 +534,7 @@ public class Article extends Api {
    */
   public @NotNull List<MetaTag> getArticleSocialMediaTags(@NotNull String language) {
     List<MetaTag> metaTags = new ArrayList<>();
-    if (getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, false)) {
+    if (1 == getConfigurationSource().getProperty(BLOG_ARTICLE_SOCIAL_MEDIA_CONF_NAME, 0)) {
       List<ImageUrl> images = getArticleImagesBySizeAsc(language);
       metaTags.addAll(getOpenGraphTags(images, language));
       metaTags.addAll(getTwitterTags(images));
