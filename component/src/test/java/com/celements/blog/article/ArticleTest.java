@@ -19,6 +19,7 @@
  */
 package com.celements.blog.article;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -34,7 +35,7 @@ import com.celements.blog.plugin.BlogClasses;
 import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.service.BlogService;
 import com.celements.blog.service.IBlogServiceRole;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -42,7 +43,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class ArticleTest extends AbstractBridgedComponentTestCase {
+public class ArticleTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWikiDocument articleDoc;
@@ -77,6 +78,9 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTitleDetailed() throws XWikiException, EmptyArticleException {
     BaseObject bObj = new BaseObject();
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "testspc",
+        "docname");
+    bObj.setDocumentReference(docRef);
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
@@ -95,6 +99,9 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetTitleDetailed_noTranslation() throws XWikiException, EmptyArticleException {
     BaseObject bObj = new BaseObject();
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "testspc",
+        "docname");
+    bObj.setDocumentReference(docRef);
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
@@ -118,6 +125,9 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   @Test
   public void getTitle() throws Exception {
     BaseObject bObj = new BaseObject();
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "testspc",
+        "docname");
+    bObj.setDocumentReference(docRef);
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
@@ -161,6 +171,9 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   @Test
   public void getTitle_noTranslation() throws XWikiException, EmptyArticleException {
     BaseObject bObj = new BaseObject();
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "testspc",
+        "docname");
+    bObj.setDocumentReference(docRef);
     bObj.setStringValue("title", "Article Title");
     bObj.setStringValue("lang", "de");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
@@ -182,6 +195,9 @@ public class ArticleTest extends AbstractBridgedComponentTestCase {
   @Test
   public void getStringProperty() throws XWikiException, EmptyArticleException {
     BaseObject bObj = new BaseObject();
+    DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "testspc",
+        "docname");
+    bObj.setDocumentReference(docRef);
     bObj.setStringValue("field", "value");
     com.xpn.xwiki.api.Object obj = new com.xpn.xwiki.api.Object(bObj, context);
     List<com.xpn.xwiki.api.Object> list = new ArrayList<>();

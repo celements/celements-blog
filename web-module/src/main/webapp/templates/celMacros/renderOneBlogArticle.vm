@@ -42,8 +42,8 @@
     $article.getTitle($language)
     #if(("$!viewtype" == 'extract') || ("$!viewtype" == 'title'))</a>#end</div>
     #if("$!viewtype" != 'title')
-      <div class="text $!{article.getExtractLang($language, $viewtypefull)}">
       #set($viewtypefull = ("$!viewtype" == 'full'))
+      <div class="text $!{article.getExtractLang($language, $viewtypefull)}">
       #set($content = $article.getExtract("$language", $viewtypefull))
       #if($article.hasMoreLink("$language", $viewtypefull))
         #if($article.hasMoreLinkDots("$language", $viewtypefull))
@@ -87,5 +87,5 @@
     #end
     </div> <!-- article_abstract -->
 #else
-  <!-- not enough rights on $services.model.serialize($article.getDocumentReference()) --> 
+  <!-- not enough rights on $services.model.serialize($article.getDocumentReference()) -->
 #end

@@ -34,14 +34,20 @@
     <!-- Add here all your dependencies -->
     <dependency>
       <groupId>com.celements</groupId>
-      <artifactId>celements-core</artifactId>
-      <version>1.162</version>
+    <artifactId>celements-core</artifactId>
+    <version>1.164</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-search</artifactId>
       <version>2.17</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.celements</groupId>
+      <artifactId>celements-photo</artifactId>
+      <version>1.53-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

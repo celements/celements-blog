@@ -42,8 +42,10 @@
 $xwiki.includeForm('celements2web:Macros.getArticleContext', false)
 <div class="article_detail$!{additionalArticleClass}" $!contextMenu>
   <div class="article_date">$creationDate</div>
-  <div class="article_title $!{obj.getProperty('lang').getTitle()} h1">$theDoc.display("title", "view", $obj)</div>
-  <div class="text $!{obj.getProperty('lang').getTitle()}">$theDoc.display("content", "rendered", $obj)</div><!-- article_content -->
+  #set($displayTitle = $theDoc.display("title", "view", $obj))
+  <div class="article_title $!{obj.getProperty('lang').getTitle()} h1">$displayTitle</div>
+  #set($displayContent = $theDoc.display("content", "rendered", $obj))
+  <div class="text $!{obj.getProperty('lang').getTitle()}">$displayContent</div><!-- article_content -->
   <div class="clearleft"><!-- required:floating images --></div>
     #if(("$defObj.getProperty('isSubscribable').getValue()" == '1') && ("$!blogSpace" != '') && ("$theDoc.web" != "$!blogSpace"))
       #set($blogArticleSubscriptionObj = '')
