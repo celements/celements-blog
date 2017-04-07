@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -560,8 +561,8 @@ public class Article extends Api {
       }
     }
     metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_URL, externalUrl));
-    metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TITLE, getTitleWithMenuNameFallback(
-        language).replaceAll("\"", "&quot;")));
+    metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TITLE, StringEscapeUtils.escapeHtml(
+        getTitleWithMenuNameFallback(language))));
     // maxNumChars: e.g. for Facebook posts 300, for Facebook comments 110
     // viewTypeFull: maxNumChars has no influence if viewTypeFull == true
     String plainExtract = getExtractPlainTextEncoded(language, false, 450);
@@ -582,7 +583,8 @@ public class Article extends Api {
       }
       metaTags.add(new MetaTag(ETwitter.TWITTER_CARD, cardType));
       metaTags.add(new MetaTag(ETwitter.TWITTER_SITE, twitterSite));
-      String imageUrls = FluentIterable.from(images).transform(toExternalUrl()).join(Joiner.on(','));
+      String imageUrls = FluentIterable.from(images).transform(toExternalUrl()).join(Joiner.on(
+          ','));
       metaTags.add(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrls));
     }
     return metaTags;
