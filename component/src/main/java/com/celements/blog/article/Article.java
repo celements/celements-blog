@@ -49,9 +49,11 @@ import com.celements.photo.utilities.ImageUrlExtractor;
 import com.celements.web.plugin.cmd.ConvertToPlainTextException;
 import com.celements.web.plugin.cmd.PlainTextCommand;
 import com.celements.web.service.IWebUtilsService;
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.FluentIterable;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -547,7 +549,7 @@ public class Article extends Api {
     String externalUrl = getExternalUrl();
     metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_TYPE, "website"));
     for (ImageUrl image : images) {
-      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE, image.getUrl()));
+      metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_IMAGE, image.getExternalUrl()));
       if (image.getWidth().isPresent()) {
         metaTags.add(new MetaTag(EOpenGraph.OPENGRAPH_OPTIONAL_IMAGE_WIDTH,
             image.getWidth().get().toString()));
@@ -580,10 +582,20 @@ public class Article extends Api {
       }
       metaTags.add(new MetaTag(ETwitter.TWITTER_CARD, cardType));
       metaTags.add(new MetaTag(ETwitter.TWITTER_SITE, twitterSite));
-      String imageUrls = Joiner.on(",").join(images);
+      String imageUrls = FluentIterable.from(images).transform(toExternalUrl()).join(Joiner.on(','));
       metaTags.add(new MetaTag(ETwitter.TWITTER_IMAGE, imageUrls));
     }
     return metaTags;
+  }
+
+  Function<ImageUrl, String> toExternalUrl() {
+    return new Function<ImageUrl, String>() {
+
+      @Override
+      public String apply(ImageUrl imgUrl) {
+        return imgUrl.getExternalUrl();
+      }
+    };
   }
 
   String getTitleWithMenuNameFallback(String language) {
