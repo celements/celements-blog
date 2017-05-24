@@ -343,11 +343,7 @@ public class NewsletterReceivers {
       htmlContent += getUnsubscribeFooter(userMailPair[1], doc);
       context.setLanguage(senderContextLang);
       XWikiMessageTool messageTool = getWebUtilsService().getMessageTool(language);
-      String textContent = messageTool.get("cel_newsletter_text_only_message", Arrays.asList(
-          doc.getExternalURL("view", context)));
-      textContent += getUnsubscribeFooter(userMailPair[1], doc);
-      int singleResult = sendMail(from, replyTo, userMailPair[1], subject, baseURL, htmlContent,
-          textContent);
+      int singleResult = sendMail(from, replyTo, userMailPair[1], subject, baseURL, htmlContent);
       result = new String[] { userMailPair[1], Integer.toString(singleResult) };
     } else {
       LOGGER.warn("Tried to send " + doc + " to user " + userMailPair[0] + " which"
@@ -494,7 +490,7 @@ public class NewsletterReceivers {
   }
 
   private int sendMail(String from, String replyTo, String to, String subject, String baseURL,
-      String htmlContent, String textContent) throws XWikiException {
+      String htmlContent) throws XWikiException {
     try {
       if ((to != null) && (to.trim().length() == 0)) {
         to = null;
@@ -509,7 +505,6 @@ public class NewsletterReceivers {
       sender.setTo(to);
       sender.setSubject(subject);
       sender.setHtmlContent(htmlContent, false);
-      sender.setTextContent(textContent);
       sender.setOthers(otherHeader);
       sender.setAttachments(getNewsletterAttachmentService().getAttachmentList(true));
       return sender.sendMail();
