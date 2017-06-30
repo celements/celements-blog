@@ -20,3 +20,4 @@ com.celements.blog.observation.listener.ArticleUpdateListener
 com.celements.blog.observation.listener.ArticleDeleteListener
 com.celements.blog.observation.listener.BlogCacheFlushingListener
 com.celements.blog.cache.BlogCache
+com.celements.blog.search.BlogWebSearchPackage
