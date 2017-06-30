@@ -1,7 +1,5 @@
 package com.celements.blog.search;
 
-import java.util.Set;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
@@ -17,7 +15,6 @@ import com.celements.search.lucene.query.QueryRestrictionGroup;
 import com.celements.search.lucene.query.QueryRestrictionGroup.Type;
 import com.celements.search.web.packages.WebSearchPackage;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Component(BlogWebSearchPackage.NAME)
@@ -50,8 +47,8 @@ public class BlogWebSearchPackage implements WebSearchPackage {
   }
 
   @Override
-  public Set<LuceneDocType> getDocTypes() {
-    return ImmutableSet.of(LuceneDocType.DOC);
+  public LuceneDocType getDocType() {
+    return LuceneDocType.DOC;
   }
 
   @Override
