@@ -57,10 +57,14 @@ public class BlogWebSearchPackage implements WebSearchPackage {
       return searchService.createFieldRestriction(getArticleClassRef(),
           BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE, searchTerm, false);
     } else {
-      QueryRestrictionGroup grp = searchService.createRestrictionGroup(Type.OR);
-      grp.add(searchService.createFieldRestriction(getArticleClassRef(), "title", searchTerm));
-      grp.add(searchService.createFieldRestriction(getArticleClassRef(), "extract", searchTerm));
-      grp.add(searchService.createFieldRestriction(getArticleClassRef(), "content", searchTerm));
+      QueryRestrictionGroup grp = searchService.createRestrictionGroup(Type.AND);
+      grp.add(searchService.createFieldRestriction(getArticleClassRef(),
+          BlogClasses.PROPERTY_ARTICLE_LANG, context.getXWikiContext().getLanguage()));
+      QueryRestrictionGroup orGrp = searchService.createRestrictionGroup(Type.OR);
+      orGrp.add(searchService.createFieldRestriction(getArticleClassRef(), "title", searchTerm));
+      orGrp.add(searchService.createFieldRestriction(getArticleClassRef(), "extract", searchTerm));
+      orGrp.add(searchService.createFieldRestriction(getArticleClassRef(), "content", searchTerm));
+      grp.add(orGrp);
       return grp;
     }
   }
