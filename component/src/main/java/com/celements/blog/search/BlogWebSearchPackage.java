@@ -2,6 +2,7 @@ package com.celements.blog.search;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.ClassReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.blog.plugin.BlogClasses;
@@ -53,28 +54,30 @@ public class BlogWebSearchPackage implements WebSearchPackage {
 
   @Override
   public IQueryRestriction getQueryRestriction(XWikiDocument cfgDoc, String searchTerm) {
+    QueryRestrictionGroup grp = searchService.createRestrictionGroup(Type.AND);
+    grp.add(searchService.createFieldRestriction(getArticleClassDocRef(),
+        BlogClasses.PROPERTY_ARTICLE_LANG, context.getXWikiContext().getLanguage()));
     if (LuceneSearchService.DATE_PATTERN.matcher(searchTerm).matches()) {
-      return searchService.createFieldRestriction(getArticleClassRef(),
-          BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE, searchTerm, false);
+      grp.add(searchService.createFieldRestriction(getArticleClassDocRef(),
+          BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE, searchTerm, false));
     } else {
-      QueryRestrictionGroup grp = searchService.createRestrictionGroup(Type.AND);
-      grp.add(searchService.createFieldRestriction(getArticleClassRef(),
-          BlogClasses.PROPERTY_ARTICLE_LANG, context.getXWikiContext().getLanguage()));
       QueryRestrictionGroup orGrp = searchService.createRestrictionGroup(Type.OR);
-      orGrp.add(searchService.createFieldRestriction(getArticleClassRef(), "title", searchTerm));
-      orGrp.add(searchService.createFieldRestriction(getArticleClassRef(), "extract", searchTerm));
-      orGrp.add(searchService.createFieldRestriction(getArticleClassRef(), "content", searchTerm));
+      orGrp.add(searchService.createFieldRestriction(getArticleClassDocRef(), "title", searchTerm));
+      orGrp.add(searchService.createFieldRestriction(getArticleClassDocRef(), "extract",
+          searchTerm));
+      orGrp.add(searchService.createFieldRestriction(getArticleClassDocRef(), "content",
+          searchTerm));
       grp.add(orGrp);
-      return grp;
     }
+    return grp;
   }
 
   @Override
-  public Optional<DocumentReference> getLinkedClassRef() {
-    return Optional.of(getArticleClassRef());
+  public Optional<ClassReference> getLinkedClassRef() {
+    return Optional.of(new ClassReference(getArticleClassDocRef()));
   }
 
-  private DocumentReference getArticleClassRef() {
+  DocumentReference getArticleClassDocRef() {
     return ((BlogClasses) blogClasses).getArticleClassRef(context.getWikiRef().getName());
   }
 
