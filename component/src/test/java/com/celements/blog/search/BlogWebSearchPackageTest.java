@@ -18,7 +18,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class BlogWebSearchPackageTest extends AbstractComponentTest {
 
-  BlogWebSearchPackage webSearchPackage;
+  private BlogWebSearchPackage webSearchPackage;
 
   @Before
   public void prepareTest() throws Exception {
