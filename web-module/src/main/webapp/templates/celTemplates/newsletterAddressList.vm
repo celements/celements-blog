@@ -16,10 +16,10 @@
 
 #set($namesVisible = "$!request.namesVisible")
 #if("$!namesVisible" == "1")
-  #set($namesVisibleText = "Namen einblenden")
+  #set($namesVisibleText = "Namen ausblenden")
   #set($namesVisibleParam = "0")
 #else
-  #set($namesVisibleText = "Namen ausblenden")
+  #set($namesVisibleText = "Namen einblenden")
   #set($namesVisibleParam = "1")
 #end
 
