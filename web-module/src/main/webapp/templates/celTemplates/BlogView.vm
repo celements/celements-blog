@@ -9,9 +9,9 @@
 #set($sql = "${sql}) order by doc.date desc")
 #set($mostRecentChangedArticle = $xwiki.searchDocuments($sql, 1, 0))
 #if($mostRecentChangedArticle.size() > 0)
-  #set($lastChanged = $xwiki.getDocument($mostRecentChangedArticle.get(0)).getDate()) 
+  #set($lastChanged = $xwiki.getDocument($mostRecentChangedArticle.get(0)).getDate())
 #else
-  #set($lastChanged = $blogDoc) 
+  #set($lastChanged = $blogDoc)
 #end
 #set($reqIfModifiedSince = $request.getDateHeader("If-Modified-Since"))
 #set($If_Modified_Since = ($lastChanged.getTime() == $reqIfModifiedSince))
@@ -51,7 +51,7 @@
   #set($baseurl = "http://${request.serverName}")
   #parse('celMacros/BlogRssCode.vm')
 #else ## normal (XHTML) mode
-  #set($has_comments = "$!blogObj.getProperty('has_comments').getValue()") 
+  #set($has_comments = "$!blogObj.getProperty('has_comments').getValue()")
   #if("$!has_comments" == '1')
     #set($has_comments = true)
   #else
@@ -62,7 +62,7 @@
   #if(!$newSubscribable)
     #set($articleParam = $services.celblog.getUndecidedArticleLoadParameter())
     #set($devNull = $articleParam.setLanguage("$default_language"))
-    $articleParam.setSearchTerm("${request.searchTerm}")
+    $articleParam.setSearchTerm($searchTerm)
     #set($undecidedArticles = $services.celblog.getArticles($blogDocRef, $articleParam).size())
     #if($undecidedArticles > 0)
       #if($undecidedArticles == 1)
@@ -79,7 +79,7 @@
   #if(!$subscribable)
     #set($articleParam = $services.celblog.getAllSubsribedArticleLoadParameter())
     #set($devNull = $articleParam.setLanguage("$default_language"))
-    $articleParam.setSearchTerm("${request.searchTerm}")
+    $articleParam.setSearchTerm($searchTerm)
     #set($subscribableArticles = $services.celblog.getArticles($blogDocRef, $articleParam).size())
     #if($subscribableArticles > 0)
       $adminMsg.get('rls_showAllSubscribable', ["$!blogPageName"])
@@ -87,7 +87,7 @@
     #end
   #end
 #end
-  
+
   #if(("$!blogTitle" != '') && !$supressBlogTitle)
     <h1 class="pageTitle">$blogTitle<!--iE6.0--></h1>
   #end
@@ -96,7 +96,7 @@
     #set($blogCssClasses = "$!{blogCssClasses}cel_paging ")
   #end
   <div id="articles_start:$isarchive:$!{spaceRef.getName()}:"##
-  class="$!{blogCssClasses.trim()}"> 
+  class="$!{blogCssClasses.trim()}">
   <span class="cel_paging_details_json" style="display:none">$!articleParamJSON.getJSON()</span>
   #if(("$!renderArticlesMacro" == '') || !$xwiki.exists($renderArticlesMacro))
     #parse('celMacros/renderBlogArticles.vm')
