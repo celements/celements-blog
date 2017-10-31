@@ -59,9 +59,6 @@
   #end
 
 #if(!$deactivateArticleMsgs && $blogDoc.hasAccessLevel("edit"))
-  #if("$!searchTerm" == '')
-    #set($searchTerm = "${request.searchTerm}")
-  #end
   #if(!$newSubscribable)
     #set($articleParam = $services.celblog.getUndecidedArticleLoadParameter())
     #set($devNull = $articleParam.setLanguage("$default_language"))

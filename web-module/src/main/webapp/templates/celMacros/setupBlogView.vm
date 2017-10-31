@@ -48,7 +48,10 @@ $context.setCacheDuration(0)
 #if(("$!nb" != '') && ($nb > 0))
   #set($devNull = $articleParam.setLimit($nb))
 #end
-#set($devNull = $articleParam.setSearchTerm("$!request.get('searchTerm')"))
+#if("$!searchTerm" == '')
+  #set($searchTerm = "${request.searchTerm}")
+#end
+#set($devNull = $articleParam.setSearchTerm("$!searchTerm"))
 #set($articles = $services.celblog.getArticles($blogDocRef, $articleParam))
 #set($devNull = $articleParam.setLimit(0))
 #set($devNull = $articleParam.setOffset(0))
