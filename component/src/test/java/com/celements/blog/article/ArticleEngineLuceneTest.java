@@ -1,5 +1,6 @@
 package com.celements.blog.article;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -11,8 +12,9 @@ import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.syntax.Syntax;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.LuceneSearchException;
 import com.celements.search.lucene.LuceneSearchResult;
@@ -22,7 +24,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.lucene.LucenePlugin;
 import com.xpn.xwiki.web.Utils;
 
-public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
+public class ArticleEngineLuceneTest extends AbstractComponentTest {
 
   private ArticleEngineLucene engine;
 
@@ -57,6 +59,7 @@ public class ArticleEngineLuceneTest extends AbstractBridgedComponentTestCase {
     LuceneSearchResult resultMock = createMockAndAddToDefault(LuceneSearchResult.class);
     DocumentReference artDocRef = new DocumentReference("wiki", "blogSpace", "article");
     XWikiDocument artDoc = new XWikiDocument(artDocRef);
+    artDoc.setSyntax(Syntax.XWIKI_1_0);
     AttachmentReference attRef = new AttachmentReference("file", artDocRef);
 
     expect(queryBuilderMock.build(same(param))).andReturn(query).once();
