@@ -37,8 +37,8 @@ public class HeaderSocialMediaMetaTagsTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space", "Doc");
     XWikiDocument doc = new XWikiDocument(docRef);
     getContext().setDoc(doc);
-    expect(blogServiceMock.getBlogConfigDocRef(same(
-        doc.getDocumentReference().getLastSpaceReference()))).andReturn(docRef);
+    expect(blogServiceMock.getBlogConfigDocRef(doc.getDocumentReference().getLastSpaceReference()))
+        .andReturn(docRef);
     replayDefault();
     assertTrue(headerTags.isBlogArticle());
     verifyDefault();
@@ -49,8 +49,8 @@ public class HeaderSocialMediaMetaTagsTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space", "Doc");
     XWikiDocument doc = new XWikiDocument(docRef);
     getContext().setDoc(doc);
-    expect(blogServiceMock.getBlogConfigDocRef(same(
-        doc.getDocumentReference().getLastSpaceReference()))).andReturn((DocumentReference) null);
+    expect(blogServiceMock.getBlogConfigDocRef(doc.getDocumentReference().getLastSpaceReference()))
+        .andReturn((DocumentReference) null);
     replayDefault();
     assertFalse(headerTags.isBlogArticle());
     verifyDefault();
@@ -61,8 +61,8 @@ public class HeaderSocialMediaMetaTagsTest extends AbstractComponentTest {
     DocumentReference docRef = new DocumentReference(getContext().getDatabase(), "Space", "Doc");
     XWikiDocument doc = new XWikiDocument(docRef);
     getContext().setDoc(doc);
-    expect(blogServiceMock.getBlogConfigDocRef(same(
-        doc.getDocumentReference().getLastSpaceReference()))).andThrow(new XWikiException());
+    expect(blogServiceMock.getBlogConfigDocRef(doc.getDocumentReference().getLastSpaceReference()))
+        .andThrow(new XWikiException());
     replayDefault();
     assertFalse(headerTags.isBlogArticle());
     verifyDefault();
