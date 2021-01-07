@@ -105,5 +105,6 @@
   #end
   </div> <!-- articles_start -->
 #end ## mode rdf/xhtml
+#set($blogDoc = '')
 
 #end ## If-Modified-Since
