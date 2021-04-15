@@ -1,5 +1,6 @@
 package com.celements.blog.service;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -23,7 +24,7 @@ import com.celements.blog.article.ArticleLoadParameter;
 import com.celements.blog.article.IArticleEngineRole;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.common.cache.IDocumentReferenceCache;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -32,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class BlogServiceTest extends AbstractBridgedComponentTestCase {
+public class BlogServiceTest extends AbstractComponentTest {
 
   private XWiki xwiki;
   private XWikiContext context;
@@ -373,7 +374,7 @@ public class BlogServiceTest extends AbstractBridgedComponentTestCase {
   @Test
   public void testGetArticles_nullparam() throws Exception {
     DocumentReference docRef = new DocumentReference(wikiRef.getName(), "space", "blog");
-    Capture<ArticleLoadParameter> paramCapture = new Capture<>();
+    Capture<ArticleLoadParameter> paramCapture = newCapture();
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(new XWikiDocument(
         docRef)).once();
     expect(xwiki.getXWikiPreference(eq("blog_article_engine"), eq("blog.article.engine"), isNull(
