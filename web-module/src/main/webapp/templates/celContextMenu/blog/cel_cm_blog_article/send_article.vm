@@ -1,0 +1,11 @@
+#if("$!elemId" != '')
+#set($spacename = $!elemId.split("\.").get(0))
+#set($blogDoc = $xwiki.celementsblog.getBlogPageByBlogSpace("$!{spacename}"))
+#set($blogConfig_obj = $!blogDoc.getObject('Celements2.BlogConfigClass'))
+#if("$!blogConfig_obj.getProperty('is_newsletter').getValue()" == '1')
+#set($l = "$xwiki.getURL($elemId, 'view')")
+#set($l = "${l}?xpage=sendnewsletter")
+#set($l = "${l}&xredirect=$doc.getURL()")
+window.location.href=&quot;${l}&quot;##
+#end
+#end

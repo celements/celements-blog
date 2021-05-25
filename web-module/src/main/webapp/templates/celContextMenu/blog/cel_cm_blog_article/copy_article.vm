@@ -1,0 +1,11 @@
+#if("$!elemId" != '')
+#set($blog_template = "$!elemId")
+#set($blog_templateRef = $services.model.resolveDocument($blog_template))
+#set($spacename = "$!blog_templateRef.lastSpaceReference.name")
+#set($new_name = $celementsweb.getNextTitledPageFullName("$!{spacename}", "Article"))
+#set($l = "$xwiki.getURL($new_name, 'inline')")
+#set($l = "${l}?template=${blog_template}")
+#set($l = "${l}&language=$!{services.webUtils.getDefaultLanguage()}")
+#set($cmenu_pageLink = "${l}&xredirect=${doc.getURL('view')}")
+window.location.href=&quot;${cmenu_pageLink}&quot;##
+#end

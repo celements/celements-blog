@@ -1,0 +1,7 @@
+#if("$!elemId" == '')
+#set($cmenu_pageLink = "$doc.getURL('view')")
+#if(($elemParams.size() > 1) && ("$!elemParams.get(1)" != 'true'))
+#set($cmenu_pageLink = "${cmenu_pageLink}?archive=1")
+#end
+window.location.href=&quot;${cmenu_pageLink}&quot;##
+#end

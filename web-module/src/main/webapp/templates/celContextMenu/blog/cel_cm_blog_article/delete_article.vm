@@ -1,0 +1,6 @@
+#if("$!elemId" != '')
+#set($l = "$xwiki.getURL($elemId,'delete')")
+#set($l = "${l}?xredirect=/${doc.getSpace()}/$doc.getName()")
+#set($l = "${l}&confirm=1")
+confirmURL(&quot;$adminMsg.get('cel_ctm_blog_del_confirm', [$!elemId])&quot;, &quot;${l}&quot;)##
+#end

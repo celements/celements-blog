@@ -1,0 +1,10 @@
+#if("$!elemId" == '')
+#set($l = "$doc.getURL('edit')")
+#set($docLanguage = "$!doc.defaultLanguage")
+#if("$!docLanguage" == '')
+#set($docLanguage = "$!language")
+#end
+#set($l = "${l}?language=${docLanguage}")
+#set($cmenu_pageLink = "${l}")
+window.location.href=&quot;${cmenu_pageLink}&quot;##
+#end
