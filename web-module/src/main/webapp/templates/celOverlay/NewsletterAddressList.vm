@@ -1,4 +1,4 @@
 #set($cel_loadAdminMenuBar = false)
 #set($showOverlayLanguageBar = false)
 #set($showCloseOverlayButton = true)
-#set($celementsLoadInOverlay = "celTemplates/newsletterAddressList.vm") ##template on disk
+#set($celementsLoadInOverlay = "celTemplates/newsletterOverlay/newsletterAddressList.vm") ##template on disk
