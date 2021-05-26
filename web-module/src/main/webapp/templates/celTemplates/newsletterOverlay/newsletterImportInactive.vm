@@ -4,12 +4,13 @@ $celementsweb.addExtJSfileOnce(':celJS/stopDblClick.js')
 <br/>
 #set($spaceRef = $doc.documentReference.lastSpaceReference)
 #set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
-#set($blogDocFN = "$!services.model.serialize($blogDocRef, 'local')")
-#if(("$!blogDocFN" != "") && $xwiki.hasAccessLevel("edit", $context.user, $blogDocFN))
+#set($editLevel = $services.rightsAccess.getEAccessLevel("edit"))
+#if(("$!blogDocRef" != "") && $services.rightsAccess.hasAccessLevel($blogDocRef, $editLevel))
   #template("celMacros/newsletterImportResult.vm")
   <form action="" method="post">
     <input type="hidden" name="isSubmit" value="1" />
     <input type="hidden" name="asInactive" value="1" />
+    #set($blogDocFN = "$!services.model.serialize($blogDocRef, 'local')")
     <input type="hidden" name="subsBlog" value="$!blogDocFN" />
     
     Zu importierende E-Mailadressen: Adressen m&uuml;ssen durch ein Komma oder 

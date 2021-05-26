@@ -44,7 +44,8 @@
 <div class="cel_newsletterImport">
 
 <h1>Newsletter Emailadressen
-#if(("$!blogname" != "") && $xwiki.hasAccessLevel("edit", $context.user, $blogname))
+#set($editLevel = $services.rightsAccess.getEAccessLevel("edit"))
+#if(("$!blogDocRef" != "") && $services.rightsAccess.hasAccessLevel($blogDocRef, $editLevel))
   <span style="font-size: 10px;"><a href='$doc.getURL("view","xpage=overlay&conf=NewsletterAddressList&xredirect=${request.xredirect}&orderByDate=$!{orderByDateParam}&namesVisible=$!{namesVisible}")'>$sortText</a>
   </span>
   <span style="font-size: 10px;"><a href='$doc.getURL("view","xpage=overlay&conf=NewsletterAddressList&xredirect=${request.xredirect}&orderByDate=$!{orderByDate}&namesVisible=$!{namesVisibleParam}")'>$namesVisibleText</a>
