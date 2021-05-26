@@ -4,11 +4,9 @@
   #set($artDoc = $doc)
 #end
 #set($artObj = $artDoc.getObject('XWiki.ArticleClass'))
-###set($blogspaceName = "$artDoc.getSpace()")
-##$xwiki.includeForm("celements2web:Macros.getBlogPageByBlogSpace", false)
 #set($blogDocument = $xwiki.celementsblog.getBlogPageByBlogSpace("$artDoc.getSpace()"))
 #set($blogObj = $blogDocument.getObject('Celements2.BlogConfigClass'))
-#if(("$!blogObj" != '') && ($blogObj.getProperty('is_newsletter').getValue() == 1) && $hasAdmin)
+#if(("$!blogObj" != '') && ("$!blogObj.getProperty('is_newsletter').getValue()" == '1') && $hasAdmin)
   #set($configObj = $artDoc.getObject('Classes.NewsletterConfigClass'))
   <div id="newsletter_send_answer">
   <div class="cel_newsletter_info_title">$adminMsg.get('cel_newsletter_send_history_title')</div>
@@ -141,5 +139,10 @@
   </div>
   </div>
 #else
+<!--
+hasAdmin : $hasAdmin
+blogObj : $!blogObj
+is_newsletter: $!blogObj.getProperty('is_newsletter').getValue()
+-->
   $adminMsg.get('cel_newsletter_is_no_newsletter')
 #end
