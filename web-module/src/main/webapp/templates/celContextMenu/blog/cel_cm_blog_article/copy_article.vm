@@ -1,11 +1,11 @@
 #if("$!elemId" != '')
 #set($blog_template = "$!elemId")
-#set($blog_templateRef = $services.model.resolveDocument($blog_template))
-#set($spacename = "$!blog_templateRef.lastSpaceReference.name")
-#set($new_name = $celementsweb.getNextTitledPageFullName("$!{spacename}", "Article"))
-#set($l = "$xwiki.getURL($new_name, 'inline')")
-#set($l = "${l}?template=${blog_template}")
+#set($blog_templateRef = $services.reference.resolve($blog_template))
+#set($spaceRef = $blog_templateRef.lastSpaceReference)
+#set($newArticleRef = $services.nextfreedoc.getNextTitledPageDocRef($spaceRef, "Article"))
+#set($l = "template=${blog_template}")
 #set($l = "${l}&language=$!{services.webUtils.getDefaultLanguage()}")
-#set($cmenu_pageLink = "${l}&xredirect=${doc.getURL('view')}")
+#set($l = "${l}&xredirect=${doc.getURL('view')}")
+#set($cmenu_pageLink = $!services.url.getURL($newArticleRef, 'inline', "$!l"))
 window.location.href=&quot;${cmenu_pageLink}&quot;##
 #end

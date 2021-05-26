@@ -1,12 +1,13 @@
 #if("$!elemId" != '')
-#set($spacename = $!elemId.split("\.").get(0))
-#set($blogDoc = $xwiki.celementsblog.getBlogPageByBlogSpace("$!{spacename}"))
+$set($elemDocRef = $services.reference.resolve($elemId))
+#set($spaceRef = $elemDocRef.lastSpaceReference)
+#set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
+#set($blogDoc = $services.modelAccess.getDocument($blogDocRef))
 #set($blogConfig_obj = $!blogDoc.getObject('Celements2.BlogConfigClass'))
 #if("$!blogConfig_obj.getProperty('is_newsletter').getValue()" == '1')
-#set($l = "$xwiki.getURL($elemId, 'view')")
-#set($l = "${l}?xpage=overlay")
-#set($l = "${l}&conf=NewsletterAddressList")
+#set($l = "xpage=overlay&conf=NewsletterAddressList")
 #set($l = "${l}&xredirect=$doc.getURL()")
-window.location.href=&quot;${l}&quot;##
+#set($link = $services.url.getURL($elemId, 'view', "$!l"))
+window.location.href=&quot;${link}&quot;##
 #end
 #end

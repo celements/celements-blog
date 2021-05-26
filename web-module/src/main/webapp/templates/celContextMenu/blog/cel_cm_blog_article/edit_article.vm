@@ -1,5 +1,6 @@
 #if("$!elemId" != '')
-#set($l = "$!xwiki.getURL($elemId, 'inline')")
-#set($l = "${l}?xredirect=$doc.getURL('view')")
-window.location.href=&quot;${l}&quot;##
+#set($articleRef = $services.reference.resolve($elemId))
+#set($l = "xredirect=$doc.getURL('view')")
+#set($link = $!services.url.getURL($articleRef, 'inline', "$!l"))
+window.location.href=&quot;${link}&quot;##
 #end

@@ -1,11 +1,11 @@
 #if(("$!elemId" == '')  && ($!elemParams.size() > 2))
 #set($spacename = "$!elemParams.get(2)")
- #set($spaceRef = $services.reference.create().space("$!{spacename}").build())
-#set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef("$!{spaceRef}"))
+#set($spaceRef = $services.reference.create().space("$!{spacename}").build())
+#set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
 #if("$!blogDocRef" != '')
 #set($blogDoc = $services.modelAccess.getDocument($blogDocRef))
 #set($blogConfig_obj = $!blogDoc.getObject('Celements2.BlogConfigClass'))
-#set($newArticleRef = $services.nextfreedoc.getNextTitledPageDocRef("$!{spacename}", "Article"))
+#set($newArticleRef = $services.nextfreedoc.getNextTitledPageDocRef($spaceRef, "Article"))
 #if($has_comments)
 #set($hasCommentsURL = '1')
 #else
@@ -22,11 +22,11 @@
   #end
 #end
 #set($blogeditor = "$!blogConfig_obj.getProperty('blogeditor').getValue()")
-#set($l = "${l}template=${blog_template}")
+#set($l = "template=${blog_template}")
 #set($l = "${l}&blogeditor=${blogeditor}")
 #set($l = "${l}&language=$!{services.webUtils.getDefaultLanguage()}")
 #set($l = "${l}&has_comments=${hasCommentsURL}&xredirect=${doc.getURL('view')}")
-#set($cmenu_pageLink = $!services.getURL($newArticleRef, 'inline', "$!l"))
+#set($cmenu_pageLink = $!services.url.getURL($newArticleRef, 'inline', "$!l"))
 window.location.href=&quot;${cmenu_pageLink}&quot;##
 #end
 #end
