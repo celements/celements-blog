@@ -1,10 +1,11 @@
 #if(("$!elemId" == '')  && ($!elemParams.size() > 2))
 #set($spacename = "$!elemParams.get(2)")
-#set($blogDocRef = $services.celblog.getBlogDocRefByBlogSpace("$!{spacename}"))
+ #set($spaceRef = $services.reference.create().space("$!{spacename}").build())
+#set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef("$!{spaceRef}"))
 #if("$!blogDocRef" != '')
-#set($blogDoc = $xwiki.getDocument($blogDocRef))
+#set($blogDoc = $services.modelAccess.getDocument($blogDocRef))
 #set($blogConfig_obj = $!blogDoc.getObject('Celements2.BlogConfigClass'))
-#set($new_name = $celementsweb.getNextTitledPageFullName("$!{spacename}", "Article"))
+#set($newArticleRef = $services.nextfreedoc.getNextTitledPageDocRef("$!{spacename}", "Article"))
 #if($has_comments)
 #set($hasCommentsURL = '1')
 #else
@@ -14,18 +15,18 @@
 #if("$!blog_template" == '')
   #set($defaultBlogTemplateDocRef = $services.model.createDocumentReference('','BlogTemplates','ArticleClassTemplate'))
   #set($defaultCentralBlogTemplateDocRef = $services.model.createDocumentReference('celements2web','BlogTemplates','ArticleClassTemplate'))
-  #if($xwiki.exists($defaultBlogTemplateDocRef))
+  #if($services.modelAccess.exists($defaultBlogTemplateDocRef))
     #set($blog_template = $services.model.serialize($defaultBlogTemplateDocRef, 'local'))
   #else
     #set($blog_template = $services.model.serialize($defaultCentralBlogTemplateDocRef))
   #end
 #end
 #set($blogeditor = "$!blogConfig_obj.getProperty('blogeditor').getValue()")
-#set($l = "$xwiki.getURL($new_name, 'inline')")
-#set($l = "${l}?template=${blog_template}")
+#set($l = "${l}template=${blog_template}")
 #set($l = "${l}&blogeditor=${blogeditor}")
 #set($l = "${l}&language=$!{services.webUtils.getDefaultLanguage()}")
-#set($cmenu_pageLink = "${l}&has_comments=${hasCommentsURL}&xredirect=${doc.getURL('view')}")
+#set($l = "${l}&has_comments=${hasCommentsURL}&xredirect=${doc.getURL('view')}")
+#set($cmenu_pageLink = $!services.getURL($newArticleRef, 'inline', "$!l"))
 window.location.href=&quot;${cmenu_pageLink}&quot;##
 #end
 #end
