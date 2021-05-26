@@ -1,10 +1,10 @@
-#set($blogname = $xwiki.celementsblog.getBlogPageByBlogSpace($doc.getSpace()).getFullName())
-#if(("$!{blogname}" == "") && ("$!doc.getObject('Celements2.BlogConfigClass')" != ""))
-  #set($blogname = $!services.model.serialize($doc.documentReference, 'local'))
+#set($spaceRef = $doc.lastSpaceReference)
+#set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
+#if(("$!{blogDocRef}" == "") && ("$!doc.getObject('Celements2.BlogConfigClass')" != ""))
+  #set($blogDocRef = $doc.documentReference)
 #end
-
+#set($blogname = $!services.model.serialize($blogDocRef, 'local'))
 #set($blogstr = "%$blogname%")
-
 #set($orderByDate = "$!request.orderByDate")
 #if("$!orderByDate" == "1")
   #set($sortText = "Alphabetisch sortieren")
@@ -25,9 +25,9 @@
 
 ##Aktive Emailadresse
 #if("$!orderByDate" == "1")
-  #set($emailActiveList = $services.celblog.getAddressesOrderedByDate($services.model.resolveDocument($blogname)))
+  #set($emailActiveList = $services.celblog.getAddressesOrderedByDate($blogDocRef))
 #else
-  #set($emailActiveList = $services.celblog.getAddresses($services.model.resolveDocument($blogname)))
+  #set($emailActiveList = $services.celblog.getAddresses($blogDocRef))
 #end
 #set($activeCount = $emailActiveList.size())
 

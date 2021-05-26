@@ -1,10 +1,14 @@
-#if(("$!request.get('sendarticle')" != '') && ($xwiki.exists("$!request.get('sendarticle')")))
-  #set($artDoc = $xwiki.getDocument("$!request.get('sendarticle')"))
+#set($sendArticleRef = '')
+#set($sendArticleRef = $!services.reference.resolve("$!request.get('sendarticle')"))
+#if($services.modelAccess.exists($sendArticleRef))
+  #set($artDoc = $services.modelAccess.getDocument($sendArticleRef))
 #else
   #set($artDoc = $doc)
 #end
 #set($artObj = $artDoc.getObject('XWiki.ArticleClass'))
-#set($blogDocument = $xwiki.celementsblog.getBlogPageByBlogSpace("$artDoc.getSpace()"))
+#set($spaceRef = $services.reference.create().space("$!{artDoc.getSpace()}").build())
+#set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
+#set($blogDocument = $services.modelAccess.getDocument($blogDocRef))
 #set($blogObj = $blogDocument.getObject('Celements2.BlogConfigClass'))
 #if(("$!blogObj" != '') && ("$!blogObj.getProperty('is_newsletter').getValue()" == '1') && $isAdmin)
   #set($configObj = $artDoc.getObject('Classes.NewsletterConfigClass'))
@@ -13,7 +17,9 @@
   #set($timesSent = $configObj.getProperty('times_sent').getValue())
   #if(("$!timesSent" != '') && ($timesSent > 0))
     $adminMsg.get('cel_newsletter_times_sent', ["$timesSent"])
-    #set($lastSernderDoc = $xwiki.getDocument("$configObj.getProperty('last_sender').getValue()"))
+    #set($lastSernderDocRef = '')
+    #set($lastSernderDocRef = $services.reference.resolve("$!configObj.getProperty('last_sender').getValue()"))
+    #set($lastSernderDoc = $services.modelAccess.getDocument($lastSernderDocRef))
     #set($lastSender = '')
     #if(("$!lastSernderDoc" != '') && !$lastSernderDoc.isNew())
       #set($lastSenderObj = $lastSernderDoc.getObject('XWiki.XWikiUsers'))
@@ -115,7 +121,7 @@
         <div class="cel_newsletter_form_description">$adminMsg.get('cel_newsletter_reply_to')</div><input type="text" class="cel_newsletter_form_input cel_newsletter_form_input_reply validate-email" name="reply_to" value="$!replyAddress" />
         #set($subject = $configObj.getProperty('subject').getValue())
         #if("$!subject" == '')
-          #set($subject = ${xwiki.celementsblog.getArticle($artDoc).getTitle()})
+          #set($subject = ${services.celblog.getArticle($artDoc.documentReference).getTitle()})
         #end
         <div class="cel_newsletter_form_description">$adminMsg.get('cel_newsletter_subject')</div> <input type="text" class="cel_newsletter_form_input cel_newsletter_form_input_subject required" name="subject" value="$!subject" />
         <input type="submit" id="newsletterSubmitButton" value="$adminMsg.get('cel_newsletter_submit')" onclick="$('testBox').value='0'; if(!valid.validate()){ return false; }" />

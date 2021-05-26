@@ -14,7 +14,9 @@ padding:0px; width: 590px; ##
 #else
     #set($defObj = $doc.getObject("XWiki.ArticleClass", 0))
 #end
-#set($blogDoc = $xwiki.celementsblog.getBlogPageByBlogSpace("${doc.web}"))
+#set($spaceRef = $doc.lastSpaceReference)
+#set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
+#set($blogDoc = $services.modelAccess.getDocument($blogDocRef))
 <h1 class="rlstitle" style="display: block; font-size: 14px;##
 font-weight: bold; height: 32px; line-height: 14px;##
 padding-top: 1px;">$!blogDoc.getTitle()</h1>
