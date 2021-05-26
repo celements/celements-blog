@@ -16,7 +16,7 @@ padding:0px; width: 590px; ##
 #else
     #set($defObj = $doc.getObject("XWiki.ArticleClass", 0))
 #end
-#set($spaceRef = $doc.lastSpaceReference)
+#set($spaceRef = $doc.documentReference.lastSpaceReference)
 #set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
 #set($blogDoc = $services.modelAccess.getDocument($blogDocRef))
 <h1 class="rlstitle" style="display: block; font-size: 14px;##

@@ -2,7 +2,7 @@ $celementsweb.addExtJSfileOnce(':celJS/stopDblClick.js')
 <div class="cel_newsletterImport">
 <h1>Newsletter Emailadressen Import: Aktiv-Liste</h1>
 <br/>
-#set($spaceRef = $doc.lastSpaceReference)
+#set($spaceRef = $doc.documentReference.lastSpaceReference)
 #set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
 #set($blogDocFN = "$!services.model.serialize($blogDocRef, 'local')")
 #if(("$!blogDocFN" != "") && $xwiki.hasAccessLevel("edit", $context.user, $blogDocFN))

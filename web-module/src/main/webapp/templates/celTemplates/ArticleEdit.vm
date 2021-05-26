@@ -57,7 +57,7 @@ $obj.set('lang', "$language")
 #end
 #end
 <!-- start visible content -->
-#set($spaceRef = $doc.lastSpaceReference)
+#set($spaceRef = $doc.documentReference.lastSpaceReference)
 #set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
 #set($blogDoc = $services.modelAccess.getDocument($blogDocRef))
 #set($pageTypeRef = $services.pageType.getPageTypeRef($blogDocRef))
