@@ -7,7 +7,7 @@ $set($elemDocRef = $services.reference.resolve($elemId))
 #if("$!blogConfig_obj.getProperty('is_newsletter').getValue()" == '1')
 #set($l = "xpage=overlay&conf=NewsletterImportActive")
 #set($l = "${l}&xredirect=$doc.getURL()")
-#set($link = $services.url.getURL($elemId, 'view', "$!l"))
+#set($link = $services.url.getURL($elemDocRef, 'view', "$!l"))
 window.location.href=&quot;${link}&quot;##
 #end
 #end
