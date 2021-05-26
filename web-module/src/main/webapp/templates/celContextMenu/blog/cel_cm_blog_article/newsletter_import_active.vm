@@ -1,5 +1,5 @@
 #if("$!elemId" != '')
-$set($elemDocRef = $services.reference.resolve($elemId))
+#set($elemDocRef = $services.reference.resolve($elemId))
 #set($spaceRef = $elemDocRef.lastSpaceReference)
 #set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
 #set($blogDoc = $services.modelAccess.getDocument($blogDocRef))
