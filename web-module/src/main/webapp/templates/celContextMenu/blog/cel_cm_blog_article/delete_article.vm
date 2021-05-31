@@ -1,0 +1,7 @@
+#if("$!elemId" != '')
+#set($articleRef = $services.reference.resolve("$!elemId"))
+#set($l = "xredirect=$doc.getURL('view')")
+#set($l = "${l}&confirm=1")
+#set($link = $!services.url.getURL($articleRef,'delete', "$!l"))
+confirmURL(&quot;$adminMsg.get('cel_ctm_blog_del_confirm', [$!elemId])&quot;, &quot;$!{link}&quot;)##
+#end

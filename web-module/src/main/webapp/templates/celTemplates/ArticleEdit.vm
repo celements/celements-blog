@@ -57,8 +57,13 @@ $obj.set('lang', "$language")
 #end
 #end
 <!-- start visible content -->
-  #set($blogPageDoc = $xwiki.celementsblog.getBlogPageByBlogSpace("$doc.space"))
-<div class="articleEdit blog_$!blogPageDoc pt_$celementsweb.getPageType($blogPageDoc.fullName).getPageType()">
+#set($spaceRef = $doc.documentReference.lastSpaceReference)
+#set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
+#set($blogDoc = $services.modelAccess.getDocument($blogDocRef))
+#set($pageTypeRef = $services.pageType.getPageTypeRef($blogDocRef))
+#set($pageTypeConfig = $services.pageType.getPageTypeConfig($pageTypeRef))
+#set($blogDocFN = "$!services.model.serialize($blogDocRef, 'local')")
+<div class="articleEdit blog_$!blogDocFN pt_$!{pageTypeConfig.name}">
 <div id="con_titblock" class="titleblock">
 #if($doc.isNew())
 $adminMsg.get('cel_tm_article_create')
@@ -149,12 +154,11 @@ $response.sendRedirect($defLangURL)
     <div id="con_newsTitleEdit" class="editblock">$adminMsg.get('cel_tm_title'):
         <input name='XWiki.ArticleClass_${obj.number}_title' type='text' class="fullwidth" value="$!xwiki.getFormEncoded($!obj.getProperty('title').getValue())" onfocus="setFocus('con_newsTitleEdit');" onblur="removeFocus('con_newsTitleEdit');"/>
     </div><!-- IE6 -->
-    #set($blogDocument = $xwiki.celementsblog.getBlogPageByBlogSpace("$doc.space"))
-    #set($blogConfig_obj = $blogDocument.getObject('Celements2.BlogConfigClass'))
+    #set($blogConfig_obj = $blogDoc.getObject('Celements2.BlogConfigClass'))
     #if("$!viewtype" == '')
       #set($viewtype = "$!blogConfig_obj.getProperty('viewtype').getValue()")
     #end
-    <!-- viewtype: "$blogDocument.getFullName()" - "$blogConfig_obj" - "$viewtype" -->
+    <!-- viewtype: "$!blogDocFN" - "$blogConfig_obj" - "$viewtype" -->
     #if("$!viewtype" == 'extract')
       <div id="con_extEdit" class="editblock">$adminMsg.get('cel_tm_extract'):     $adminMsg.get('cel_tm_extract_will_appear_on_news_page')<br />
           <textarea class="$!{hasWysiwigEditor} celEditorBody_articleExtract fullwidth"##

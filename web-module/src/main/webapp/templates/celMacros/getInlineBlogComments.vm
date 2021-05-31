@@ -32,7 +32,7 @@
 ## #set($date = $articleDoc.display("date","view",$comment))
 #set($date = $comment.getProperty("date").value)
 #if($date)
- | <span class="commentdate">$xwiki.formatDate($date, "dd.MM.yyyy") $msg.get("at") $xwiki.formatDate($date, "hh:mm a")</span>
+ | <span class="commentdate">$datetool.formatDate("dd.MM.yyyy", $date) $msg.get("at") $datetool.formatDate("hh:mm a", $date)</span>
 #end
 #if($hasEdit)<span class="commentdelete"><a class="commentremove" href="$articleDoc.getURL("objectremove" , "classname=XWiki.XWikiComments&amp;classid=${comment.number}&amp;xredirect=${request.getRequestURL()}")" onclick="return confirm('$msg.get("confirmcommentremove")')">[$msg.get("removethiscomment")]</a></span>#end
       </div>
@@ -42,8 +42,10 @@
 #else
 $msg.get("nocomments")
 #end
-#if($xwiki.hasAccessLevel("comment"))
-#set($cclass = $xwiki.getDocument("XWiki.XWikiComments").getxWikiClass())
+#set($editLevel = $services.rightsAccess.getEAccessLevel("comment"))
+#if($services.rightsAccess.hasAccessLevel($doc.documentReference, $editLevel))
+#set($commentClassRef = $services.reference.create().space("XWiki").doc("XWikiComments"))
+#set($cclass = $services.modelAccess.getDocument($commentClassRef).getxWikiClass())
 #set($comment = $cclass.newObject())
 #if("$!commentAddRedirect" == '')
 #set($commentAddRedirect = ${doc.getURL('view')})

@@ -1,3 +1,5 @@
+## This View-Template is deprecated
+$services.deprecated.logVelocityScript("ArtikelInlineView.vm old context-menu?")
 <div class="cel_blog"><div class="el_blog" ##
 style="font-family:Arial,Geneva,Helvetica,Verdana,sans-serif; ##
 margin-left: auto; margin-right: auto; ##
@@ -14,7 +16,9 @@ padding:0px; width: 590px; ##
 #else
     #set($defObj = $doc.getObject("XWiki.ArticleClass", 0))
 #end
-#set($blogDoc = $xwiki.celementsblog.getBlogPageByBlogSpace("${doc.web}"))
+#set($spaceRef = $doc.documentReference.lastSpaceReference)
+#set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
+#set($blogDoc = $services.modelAccess.getDocument($blogDocRef))
 <h1 class="rlstitle" style="display: block; font-size: 14px;##
 font-weight: bold; height: 32px; line-height: 14px;##
 padding-top: 1px;">$!blogDoc.getTitle()</h1>
@@ -32,16 +36,17 @@ padding-top: 1px;">$!blogDoc.getTitle()</h1>
     #set($blogeditor = "$!defObj.getProperty('blogeditor').getValue()")
     #set($isoldblog = ("$!blogeditor" == ''))
     #if($isoldblog)
-        #set($creationDate = $xwiki.formatDate($doc.creationDate,"dd. MMMM, yyyy"))
+      #set($creationDate = $datetool.format("dd. MMMM, yyyy", $doc.creationDate))
     #else
-    #set($creationDate = $xwiki.formatDate($defObj.getProperty('publishdate').getValue(),"dd. MMMM, yyyy"))
-    #set($additionalArticleClass = '')
-    #if($xwiki.getCurrentDate().before($defObj.getProperty('publishdate').getValue()))
-        #set($additionalArticleClass = " future")
+      #set($creationDate = $datetool.format("dd. MMMM, yyyy", $defObj.getProperty('publishdate').getValue()))
+      #set($additionalArticleClass = '')
+      #if($datetool.getDate().before($defObj.getProperty('publishdate').getValue()))
+          #set($additionalArticleClass = " future")
+      #end
     #end
-#end
 #set($bentrydoc = $doc)
-$xwiki.includeForm('celements2web:Macros.getArticleContext', false)
+## 26.05.2021; is this still needed for the context menu?!
+## $xwiki.includeForm('celements2web:Macros.getArticleContext', false)
 <style type="text/css">
 .el_blog p {
     margin: 0px;

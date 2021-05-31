@@ -2,14 +2,16 @@ $celementsweb.addExtJSfileOnce(':celJS/stopDblClick.js')
 <div class="cel_newsletterImport">
 <h1>Newsletter Emailadressen Import: Inaktiv-Liste</h1>
 <br/>
-#set($blogDoc = $xwiki.celementsblog.getBlogPageByBlogSpace($doc.getSpace()))
-#set($blogDocFN = "$!services.model.serialize($blogDoc.documentReference, 'local')")
-#if(("$!blogDocFN" != "") && $xwiki.hasAccessLevel("edit", $context.user, $blogDocFN))
+#set($spaceRef = $doc.documentReference.lastSpaceReference)
+#set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
+#set($editLevel = $services.rightsAccess.getEAccessLevel("edit"))
+#if(("$!blogDocRef" != "") && $services.rightsAccess.hasAccessLevel($blogDocRef, $editLevel))
   #template("celMacros/newsletterImportResult.vm")
   <form action="" method="post">
     <input type="hidden" name="isSubmit" value="1" />
     <input type="hidden" name="asInactive" value="1" />
-    <input type="hidden" name="subsBlog" value="$xwiki.celementsblog.getBlogPageByBlogSpace($doc.getSpace())" />
+    #set($blogDocFN = "$!services.model.serialize($blogDocRef, 'local')")
+    <input type="hidden" name="subsBlog" value="$!blogDocFN" />
     
     Zu importierende E-Mailadressen: Adressen m&uuml;ssen durch ein Komma oder 
     einen Zeilenumbruch voneinander getrennt werden. Die angegebenen Adressen werden 
@@ -23,5 +25,6 @@ $celementsweb.addExtJSfileOnce(':celJS/stopDblClick.js')
   </form>
   </div>
 #else
-<p>Not enough access rights. <a href="$xwiki.getURL('Content.login')">goto login</a></p>
+#set($loginDocRef = $services.reference.create().space("Content").doc("login").build())
+<p>Not enough access rights. <a href="$services.url.getURL($loginDocRef)">goto login</a></p>
 #end

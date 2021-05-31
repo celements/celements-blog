@@ -1,5 +1,5 @@
   #set($articleBlogMoreLinkParams = "$!articleBlogMoreLinkParams")
-  #set($bentrydoc = $xwiki.getDocument($article.getDocumentReference()))
+  #set($bentrydoc = $services.modelAccess.getDocument($article.getDocumentReference()))
   #if("$!bentrydoc" != '')
     #set($creationDate = '')
     #set($creationDateStr = '')
@@ -12,20 +12,19 @@
       #set($creationDateStr = $datetool.format($blog_dateFormat, $creationDate, $services.celementsweb.getLocal($language)))
     #end
     #set($additionalArticleClass = '')
-    #if(("$!creationDate" != '') && $xwiki.getCurrentDate().before($!creationDate))
+    #if(("$!creationDate" != '') && $datetool.getDate().before($!creationDate))
       #set($additionalArticleClass = " future")
     #end
     <div class="cel_cm_blog_article article_abstract$!{additionalArticleClass}" id="Art${blogDoc.getFullName()}:${bentrydoc.getFullName()}">
     #if($showArticleBlogName)
       <div class="article_blogPageName">
-      #set($articleBlogDoc = '')
-      #set($articleBlogDoc = $xwiki.getDocument($!article.getDocumentReference()))
-      #set($blogspaceName = "$!articleBlogDoc.getSpace()")
-      #set($blogDocument = $xwiki.celementsblog.getBlogPageByBlogSpace($blogspaceName))
+      #set($spaceRef = $article.getDocumentReference().lastSpaceReference)
+      #set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
+      #set($blogDocument = $services.modelAccess.getDocument($blogDocRef))
       #set($blogPageName = '')
       #set($blogPageName = $blogDocument.getTitle())
       #if(("$!blogPageName" == ''))
-        #set($blogPageName = $articleBlogDoc.name)
+        #set($blogPageName = $article.getDocumentReference().name)
       #end
       $blogPageName
       </div>
@@ -36,7 +35,7 @@
       </div>
       #set ($cdate = $creationDate)
     #end
-    #set($fullTextLink = "$xwiki.getURL($article.getDocName(),'view', $articleBlogMoreLinkParams)")
+    #set($fullTextLink = "$services.url.getURL($article.getDocumentReference(),'view', $articleBlogMoreLinkParams)")
     <div class="article_title $!{article.getTitleLang($language)} h1">
     #if(("$!viewtype" == 'extract') || ("$!viewtype" == 'title'))<a class='article_link' href="$fullTextLink">#end
     $article.getTitle($language)
@@ -50,13 +49,13 @@
           #set($content = "$content ...")
         #end
         <!-- moreLink: $language , $msg.get('cel_rls_blog_article_more') -->
-        #set($content = "$content <a class='article_link' href='$xwiki.getURL($article.getDocName(),'view', $articleBlogMoreLinkParams)'>$msg.get('cel_rls_blog_article_more')</a>")
+        #set($content = "$content <a class='article_link' href='$services.url.getURL($article.getDocumentReference(),'view', $articleBlogMoreLinkParams)'>$msg.get('cel_rls_blog_article_more')</a>")
       #end
       $xwiki.renderText($content, $bentrydoc)
       #if($has_comments)
         #if($viewtypefull)
 #set($inline = true)
-#set($articleDoc = $xwiki.getDocument($article.getDocumentReference()))
+#set($articleDoc = $services.modelAccess.getDocument($article.getDocumentReference()))
 #parse('celMacros/getInlineBlogComments.vm')
         #else
         <div class="comment">

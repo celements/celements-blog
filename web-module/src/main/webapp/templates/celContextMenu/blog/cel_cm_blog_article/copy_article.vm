@@ -1,0 +1,11 @@
+#if("$!elemId" != '')
+#set($blog_template = "$!elemId")
+#set($blog_templateRef = $services.reference.resolve($blog_template))
+#set($spaceRef = $blog_templateRef.lastSpaceReference)
+#set($newArticleRef = $services.nextfreedoc.getNextTitledPageDocRef($spaceRef, "Article"))
+#set($l = "template=${blog_template}")
+#set($l = "${l}&language=$!{services.webUtils.getDefaultLanguage()}")
+#set($l = "${l}&xredirect=${doc.getURL('view')}")
+#set($cmenu_pageLink = $!services.url.getURL($newArticleRef, 'inline', "$!l"))
+window.location.href=&quot;${cmenu_pageLink}&quot;##
+#end
