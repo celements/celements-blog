@@ -65,7 +65,7 @@
 
   const newsletterajax = function(form, answer) {
     const isTest = ($('testBox').value === "1");
-    const buttonBox = isText ? answer : form;
+    const buttonBox = isTest ? answer : form;
     const progressBarElem = buttonBox.next('.nlProgressBar');
     const confirmSend = isTest || confirm($('cel_newsletter_confirm_send_message').value);
     if (confirmSend) {
