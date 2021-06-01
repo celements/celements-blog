@@ -64,43 +64,27 @@
   };
 
   const newsletterajax = function(form, answer) {
-    const isTest = ($('testBox').value == "1");
-    let confirmSend = 0;
-    if (isTest) {
-      answer.setStyle({ display: "none" });
-      answer.siblings()[0].setStyle({ display: "" });
-    } else {
-      confirmSend = confirm($('cel_newsletter_confirm_send_message').value);
-      if (confirmSend) {
-        form.setStyle({ display: "none" });
-        form.siblings()[0].setStyle({ display: "" });
-      }
-    }
-
-    if (isTest || confirmSend) {
-      let url = form.action;
-      if (url == '') {
-        url = "?";
-      }
+    const isTest = ($('testBox').value === "1");
+    const buttonBox = isText ? answer : form;
+    const progressBarElem = buttonBox.next('.nlProgressBar');
+    const confirmSend = isTest || confirm($('cel_newsletter_confirm_send_message').value);
+    if (confirmSend) {
+      buttonBox.style.display = "none";
+      progressBarElem.style.display = "";
+      let url = form.action || '?';
       console.warn('TESTING! newsletter sending deactivated', form, answer, url);
-      /*      new Ajax.Request(url, {
-              parameters : form.serialize(true),
-              method : "post",
-              onComplete : function(transport){
-                answer.innerHTML = transport.responseText;
-                if (isTest){
-                  answer.setStyle({ display : ""});
-                  console.log('send test: ', answer, answer.siblings());
-                  answer.siblings()[0].setStyle({ display : "none" });
-                } else {
-                  form.reset();
-                  console.log('send: ', form, form.siblings());
-                  form.siblings()[0].setStyle({ display : "none" })
-                  form.setStyle({ display : "" });
-                }
-              }
-            });
-        */
+      new Ajax.Request(url, {
+        parameters: form.serialize(true),
+        method: "post",
+        onComplete: function(transport) {
+          answer.innerHTML = transport.responseText;
+          buttonBox.style.display = "";
+          progressBarElem.style.display = "none";
+          if (!isTest) {
+            form.reset();
+          }
+        }
+      });
     }
   };
 
