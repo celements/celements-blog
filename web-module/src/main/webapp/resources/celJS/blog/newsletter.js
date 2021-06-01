@@ -21,26 +21,26 @@
 (function(window, undefined) {
   "use strict";
 
-  Event.observe(window, 'load', function(){
-    if($('newsletter_subscribe')){
+  Event.observe(window, 'load', function() {
+    if ($('newsletter_subscribe')) {
       $('newsletter_subscribe').observe('submit', function(event){
         newsletterajax($('newsletter_subscribe'), $('newsletter_subscribe_answer'));
         event.stop();
       });
     }
-    if($('newsletter_unsubscribe')){
+    if ($('newsletter_unsubscribe')) {
       $('newsletter_unsubscribe').observe('submit', function(event){
         newsletterajax($('newsletter_unsubscribe'), $('newsletter_unsubscribe_answer'));
         event.stop();
       });
     }
-    if($('newsletter_activate')){
+    if ($('newsletter_activate')) {
       $('newsletter_activate').observe('submit', function(event){
         newsletterajax($('newsletter_activate'), $('newsletter_activate_answer'));
         event.stop();
       });
     }
-    if($('newsletter_send')){
+    if ($('newsletter_send')) {
       $('newsletter_send').observe('celValidation:submitFormAfterValidation',
         submitNewsletterFormHandler);
       $$('#newsletter_send .celNLsubmitButton').each(function(elem){
@@ -54,42 +54,43 @@
     $('testBox').value = button.dataset.testSend;
   };
 
-  const submitNewsletterFormHandler = function(event){
+  const submitNewsletterFormHandler = function(event) {
     event.stop();
     let answerBox = $('newsletter_send_answer');
-    if($('testBox').value == "1"){
+    if ($('testBox').value == "1") {
       answerBox = $('testResultBox');
     }
     console.warn('TESTING submitNewsletterFormHandler! newsletter sending deactivated', event);
     //newsletterajax($('newsletter_send'), answerBox);
   };
 
-  const newsletterajax = function(form, answer){
+  const newsletterajax = function(form, answer) {
     const isTest = ($('testBox').value == "1");
     let confirmSend = 0;
-    if(isTest){
+    if (isTest){
       answer.setStyle({ display : "none"});
       answer.siblings()[0].setStyle({ display : "" });
     } else {
       confirmSend = confirm($('cel_newsletter_confirm_send_message').value);
-      if(confirmSend){
+      if (confirmSend) {
         form.setStyle({ display : "none"});
         form.siblings()[0].setStyle({ display : "" });
       }
     }
     
-    if(isTest || confirmSend){
+    if (isTest || confirmSend){
       let url = form.action;
       if(url == ''){
         url = "?";
       }
-      console.warn('TESTING! newsletter sending deactivated', form, answer);
+      console.warn('TESTING! newsletter sending deactivated', form, answer, url);
 /*      new Ajax.Request(url, {
         parameters : form.serialize(true),
         method : "post",
         onComplete : function(transport){
           answer.innerHTML = transport.responseText;
-          if(isTest){
+*/
+          if (isTest){
             answer.setStyle({ display : ""});
             answer.siblings()[0].setStyle({ display : "none" });
           } else {
@@ -97,7 +98,7 @@
             form.siblings()[0].setStyle({ display : "none" })
             form.setStyle({ display : "" });
           }
-        }
+/*        }
       });
   */
     }

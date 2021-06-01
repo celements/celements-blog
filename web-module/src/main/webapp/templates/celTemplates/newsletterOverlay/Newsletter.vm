@@ -134,12 +134,12 @@
         <span id="testResultBoxSpan">
           <span id="testResultBox"></span>
           <span style="display:none">
-            <img src='/skin/skins/albatross/icons/ajax%2Dloader.gif' />
+            <img src="$!services.celementsweb.getSkinFile(':skins/albatross/icons/ajax-loader.gif', 'file')" />
           </span>
         </span>
       </form>
       <span style="display:none">
-        <img src='/skin/skins/albatross/icons/ajax%2Dloader.gif' />
+        <img src="$!services.celementsweb.getSkinFile(':skins/albatross/icons/ajax-loader.gif', 'file')" />
       </span>
     </div>
   #end
