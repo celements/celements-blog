@@ -50,7 +50,6 @@
 
   const celNLsubmitButtonListener = function(event) {
     let button = event.target;
-    console.log('celNLsubmitButtonListener', button.dataset.testSend);
     $('testBox').value = button.dataset.testSend;
   };
 
