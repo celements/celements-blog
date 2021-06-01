@@ -124,9 +124,9 @@
           #set($subject = ${services.celblog.getArticle($artDoc.documentReference).getTitle()})
         #end
         <div class="cel_newsletter_form_description">$adminMsg.get('cel_newsletter_subject')</div> <input type="text" class="cel_newsletter_form_input cel_newsletter_form_input_subject required" name="subject" value="$!subject" />
-        <input type="submit" id="newsletterSubmitButton" value="$adminMsg.get('cel_newsletter_submit')" onclick="$('testBox').value='0'; if(!valid.validate()){ return false; }" />
+        <input type="submit" data-test-send="0" id="newsletterSubmitButton" value="$adminMsg.get('cel_newsletter_submit')" onclick="$('testBox').value='0';" />
         <input type="hidden" name="testSend" id="testBox" value="1" />
-        <input type="submit" id="newsletterTestSubmitButton" value="$adminMsg.get('cel_newsletter_test_submit')" onclick="$('testBox').value='1'; if(!valid.validate()){ return false; }" />
+        <input type="submit" data-test-send="1" id="newsletterTestSubmitButton" value="$adminMsg.get('cel_newsletter_test_submit')" onclick="$('testBox').value='1';" />
         <span id="testResultBoxSpan">
           <span id="testResultBox"></span>
           <span style="display:none">

@@ -41,17 +41,20 @@
       });
     }
     if($('newsletter_send')){
-      $('newsletter_send').observe('submit', function(event){
-        let answerBox = $('newsletter_send_answer');
-        if($('testBox').value == "1"){
-          answerBox = $('testResultBox');
-        }
-        newsletterajax($('newsletter_send'), answerBox);
-        event.stop();
-      });
+      $('newsletter_send').observe('submit', submitNewsletterFormHandler);
     }
   });
   
+  const submitNewsletterFormHandler = function(event){
+    event.stop();
+    let answerBox = $('newsletter_send_answer');
+    if($('testBox').value == "1"){
+      answerBox = $('testResultBox');
+    }
+    console.warn('TESTING submitNewsletterFormHandler! newsletter sending deactivated', event);
+    //newsletterajax($('newsletter_send'), answerBox);
+  };
+
   const newsletterajax = function(form, answer){
     const isTest = ($('testBox').value == "1");
     let confirmSend = 0;
@@ -71,7 +74,8 @@
       if(url == ''){
         url = "?";
       }
-      new Ajax.Request(url, {
+      console.warn('TESTING! newsletter sending deactivated', form, answer);
+/*      new Ajax.Request(url, {
         parameters : form.serialize(true),
         method : "post",
         onComplete : function(transport){
@@ -86,6 +90,7 @@
           }
         }
       });
+  */
     }
   };
   
