@@ -54,11 +54,12 @@
   
   const newsletterajax = function(form, answer){
     const isTest = ($('testBox').value == "1");
+    let confirmSend = 0;
     if(isTest){
       answer.setStyle({ display : "none"});
       answer.siblings()[0].setStyle({ display : "" });
     } else {
-      const confirmSend = confirm($('cel_newsletter_confirm_send_message').value);
+      confirmSend = confirm($('cel_newsletter_confirm_send_message').value);
       if(confirmSend){
         form.setStyle({ display : "none"});
         form.siblings()[0].setStyle({ display : "" });
