@@ -60,8 +60,7 @@
     if ($('testBox').value == "1") {
       answerBox = $('testResultBox');
     }
-    console.warn('TESTING submitNewsletterFormHandler! newsletter sending deactivated', event);
-    //newsletterajax($('newsletter_send'), answerBox);
+    newsletterajax($('newsletter_send'), answerBox);
   };
 
   const newsletterajax = function(form, answer) {
