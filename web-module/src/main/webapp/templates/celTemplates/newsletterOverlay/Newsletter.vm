@@ -104,7 +104,7 @@
     <div class="cel_newsletter_receivers_form">
       #set($nrOfRec = "$!{xwiki.celementsblog.getNewsletterReceivers().getNrOfReceivers()}")
       <input type="hidden" id="cel_newsletter_confirm_send_message" value="$adminMsg.get('cel_newsletter_confirm_send', [$nrOfRec])" />
-      <form id="newsletter_send" action="?" method="post">
+      <form id="newsletter_send" class="celAddValidationToForm" action="?" method="post">
         <input type="hidden" name="doaction" value="sendArticle" />
         <input type="hidden" name="xpage" value="celements_ajax" />
         <input type="hidden" name="ajax_mode" value="BlogAjax" />
@@ -137,9 +137,6 @@
       <span style="display:none">
         <img src='/skin/skins/albatross/icons/ajax%2Dloader.gif' />
       </span>
-      <script type="text/javascript">
-        var valid = new Validation("newsletter_send",{immediate : true , useTitles : true, stopOnFirst : false});
-      </script>
     </div>
   #end
   </div>
