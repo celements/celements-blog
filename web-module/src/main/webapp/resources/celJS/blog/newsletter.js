@@ -23,19 +23,19 @@
 
   Event.observe(window, 'load', function() {
     if ($('newsletter_subscribe')) {
-      $('newsletter_subscribe').observe('submit', function(event){
+      $('newsletter_subscribe').observe('submit', function(event) {
         newsletterajax($('newsletter_subscribe'), $('newsletter_subscribe_answer'));
         event.stop();
       });
     }
     if ($('newsletter_unsubscribe')) {
-      $('newsletter_unsubscribe').observe('submit', function(event){
+      $('newsletter_unsubscribe').observe('submit', function(event) {
         newsletterajax($('newsletter_unsubscribe'), $('newsletter_unsubscribe_answer'));
         event.stop();
       });
     }
     if ($('newsletter_activate')) {
-      $('newsletter_activate').observe('submit', function(event){
+      $('newsletter_activate').observe('submit', function(event) {
         newsletterajax($('newsletter_activate'), $('newsletter_activate_answer'));
         event.stop();
       });
@@ -43,7 +43,7 @@
     if ($('newsletter_send')) {
       $('newsletter_send').observe('celValidation:submitFormAfterValidation',
         submitNewsletterFormHandler);
-      $$('#newsletter_send .celNLsubmitButton').each(function(elem){
+      $$('#newsletter_send .celNLsubmitButton').each(function(elem) {
         elem.observe('click', celNLsubmitButtonListener);
       });
     }
@@ -66,43 +66,42 @@
   const newsletterajax = function(form, answer) {
     const isTest = ($('testBox').value == "1");
     let confirmSend = 0;
-    if (isTest){
-      answer.setStyle({ display : "none"});
-      answer.siblings()[0].setStyle({ display : "" });
+    if (isTest) {
+      answer.setStyle({ display: "none" });
+      answer.siblings()[0].setStyle({ display: "" });
     } else {
       confirmSend = confirm($('cel_newsletter_confirm_send_message').value);
       if (confirmSend) {
-        form.setStyle({ display : "none"});
-        form.siblings()[0].setStyle({ display : "" });
+        form.setStyle({ display: "none" });
+        form.siblings()[0].setStyle({ display: "" });
       }
     }
-    
-    if (isTest || confirmSend){
+
+    if (isTest || confirmSend) {
       let url = form.action;
-      if(url == ''){
+      if (url == '') {
         url = "?";
       }
       console.warn('TESTING! newsletter sending deactivated', form, answer, url);
-/*      new Ajax.Request(url, {
-        parameters : form.serialize(true),
-        method : "post",
-        onComplete : function(transport){
-          answer.innerHTML = transport.responseText;
-*/
-          if (isTest){
-            answer.setStyle({ display : ""});
-            console.log('send test: ', answer, answer.siblings());
-            answer.siblings()[0].setStyle({ display : "none" });
-          } else {
-            form.reset();
-            console.log('send: ', form, form.siblings());
-            form.siblings()[0].setStyle({ display : "none" })
-            form.setStyle({ display : "" });
-          }
-/*        }
-      });
-  */
+      /*      new Ajax.Request(url, {
+              parameters : form.serialize(true),
+              method : "post",
+              onComplete : function(transport){
+                answer.innerHTML = transport.responseText;
+                if (isTest){
+                  answer.setStyle({ display : ""});
+                  console.log('send test: ', answer, answer.siblings());
+                  answer.siblings()[0].setStyle({ display : "none" });
+                } else {
+                  form.reset();
+                  console.log('send: ', form, form.siblings());
+                  form.siblings()[0].setStyle({ display : "none" })
+                  form.setStyle({ display : "" });
+                }
+              }
+            });
+        */
     }
   };
-  
+
 })(window);
