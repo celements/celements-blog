@@ -42,9 +42,18 @@
     }
     if($('newsletter_send')){
       $('newsletter_send').observe('submit', submitNewsletterFormHandler);
+      $$('#newsletter_send celNLsubmitButton').each(function(elem){
+        elem.observe('click', celNLsubmitButtonListener);
+      });
     }
   });
-  
+
+  const celNLsubmitButtonListener = function(event) {
+    let button = event.target;
+    console.log('celNLsubmitButtonListener', button.dataset.testSend);
+    $('testBox').value = button.dataset.testSend;
+  };
+
   const submitNewsletterFormHandler = function(event){
     event.stop();
     let answerBox = $('newsletter_send_answer');
