@@ -91,9 +91,11 @@
 */
           if (isTest){
             answer.setStyle({ display : ""});
+            console.log('send test: ', answer, answer.siblings());
             answer.siblings()[0].setStyle({ display : "none" });
           } else {
             form.reset();
+            console.log('send: ', form, form.siblings());
             form.siblings()[0].setStyle({ display : "none" })
             form.setStyle({ display : "" });
           }
