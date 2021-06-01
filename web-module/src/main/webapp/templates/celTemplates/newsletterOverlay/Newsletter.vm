@@ -133,12 +133,12 @@
         <input type="hidden" name="testSend" id="testBox" value="1" />
         <span id="testResultBoxSpan">
           <span id="testResultBox"></span>
-          <span style="display:none">
+          <span class="nlProgressBar" style="display:none">
             <img src="$!services.celementsweb.getSkinFile(':skins/albatross/icons/ajax-loader.gif', 'file')" />
           </span>
         </span>
       </form>
-      <span style="display:none">
+      <span class="nlProgressBar" style="display:none">
         <img src="$!services.celementsweb.getSkinFile(':skins/albatross/icons/ajax-loader.gif', 'file')" />
       </span>
     </div>
