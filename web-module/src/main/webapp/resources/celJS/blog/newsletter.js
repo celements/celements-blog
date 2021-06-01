@@ -42,7 +42,7 @@
     }
     if($('newsletter_send')){
       $('newsletter_send').observe('submit', submitNewsletterFormHandler);
-      $$('#newsletter_send celNLsubmitButton').each(function(elem){
+      $$('#newsletter_send .celNLsubmitButton').each(function(elem){
         elem.observe('click', celNLsubmitButtonListener);
       });
     }
