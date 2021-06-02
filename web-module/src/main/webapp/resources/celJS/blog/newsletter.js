@@ -21,36 +21,46 @@
 (function(window, undefined) {
   "use strict";
 
+  if (typeof $ === "undefined") { window.$ = document.getElementById; }
+
+  const stopEvent = function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+  };
+
   Event.observe(window, 'load', function() {
     if ($('newsletter_subscribe')) {
-      $('newsletter_subscribe').observe('submit', function(event) {
+      $('newsletter_subscribe').addEventListener('submit', function(event) {
         newsletterajax($('newsletter_subscribe'), $('newsletter_subscribe_answer'));
-        event.stop();
+        stopEvent(event);
       });
     }
     if ($('newsletter_unsubscribe')) {
-      $('newsletter_unsubscribe').observe('submit', function(event) {
+      $('newsletter_unsubscribe').addEventListener('submit', function(event) {
         newsletterajax($('newsletter_unsubscribe'), $('newsletter_unsubscribe_answer'));
-        event.stop();
+        stopEvent(event);
       });
     }
     if ($('newsletter_activate')) {
-      $('newsletter_activate').observe('submit', function(event) {
+      $('newsletter_activate').addEventListener('submit', function(event) {
         newsletterajax($('newsletter_activate'), $('newsletter_activate_answer'));
-        event.stop();
+        stopEvent(event);
       });
     }
     if ($('newsletter_send')) {
       $('newsletter_send').observe('celValidation:submitFormAfterValidation',
         submitNewsletterFormHandler);
-      $$('#newsletter_send .celNLsubmitButton').each(function(elem) {
-        elem.observe('click', celNLsubmitButtonListener);
-      });
+      document.querySelectorAll('#newsletter_send .celNLsubmitButton').forEach(
+        registerSubmitButtonListener);
     }
   });
 
+  const registerSubmitButtonListener = function(button) {
+    button.addEventListener('click', celNLsubmitButtonListener);
+  };
+
   const celNLsubmitButtonListener = function(event) {
-    let button = event.target;
+    const button = event.target;
     $('testBox').value = button.dataset.testSend;
   };
 
@@ -67,12 +77,10 @@
     const isTest = ($('testBox').value === "1");
     const buttonBox = isTest ? answer : form;
     const progressBarElem = buttonBox.next('.nlProgressBar');
-    const confirmSend = isTest || confirm($('cel_newsletter_confirm_send_message').value);
-    if (confirmSend) {
+    if (isTest || confirm($('cel_newsletter_confirm_send_message').value)) {
       buttonBox.style.display = "none";
       progressBarElem.style.display = "";
       let url = form.action || '?';
-      console.warn('TESTING! newsletter sending deactivated', form, answer, url);
       new Ajax.Request(url, {
         parameters: form.serialize(true),
         method: "post",
