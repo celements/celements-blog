@@ -78,7 +78,7 @@
     if (isTest || confirm($('cel_newsletter_confirm_send_message').value)) {
       buttonBox.style.display = "none";
       progressBarElem.style.display = "";
-      let url = form.action || '?';
+      const url = form.action || '?';
       new Ajax.Request(url, {
         parameters: form.serialize(true),
         method: "post",
