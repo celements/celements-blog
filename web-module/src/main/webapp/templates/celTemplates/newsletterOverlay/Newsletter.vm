@@ -104,7 +104,7 @@
     <div class="cel_newsletter_receivers_form">
       #set($nrOfRec = "$!{xwiki.celementsblog.getNewsletterReceivers().getNrOfReceivers()}")
       <input type="hidden" id="cel_newsletter_confirm_send_message" value="$adminMsg.get('cel_newsletter_confirm_send', [$nrOfRec])" />
-      <form id="newsletter_send" action="?" method="post">
+      <form id="newsletter_send" class="celAddValidationToForm" action="?" method="post">
         <input type="hidden" name="doaction" value="sendArticle" />
         <input type="hidden" name="xpage" value="celements_ajax" />
         <input type="hidden" name="ajax_mode" value="BlogAjax" />
@@ -123,23 +123,24 @@
         #if("$!subject" == '')
           #set($subject = ${services.celblog.getArticle($artDoc.documentReference).getTitle()})
         #end
-        <div class="cel_newsletter_form_description">$adminMsg.get('cel_newsletter_subject')</div> <input type="text" class="cel_newsletter_form_input cel_newsletter_form_input_subject required" name="subject" value="$!subject" />
-        <input type="submit" id="newsletterSubmitButton" value="$adminMsg.get('cel_newsletter_submit')" onclick="$('testBox').value='0'; if(!valid.validate()){ return false; }" />
+        <div class="cel_newsletter_form_description">$adminMsg.get('cel_newsletter_subject')</div>
+        <input type="text" class="cel_newsletter_form_input cel_newsletter_form_input_subject required"##
+         name="subject" value="$!subject" />
+        <input id="newsletterSubmitButton" type="submit" data-test-send="0"##
+         class="celNLsubmitButton" value="$adminMsg.get('cel_newsletter_submit')" />
+        <input id="newsletterTestSubmitButton" type="submit" data-test-send="1"##
+         class="celNLsubmitButton" value="$adminMsg.get('cel_newsletter_test_submit')" />
         <input type="hidden" name="testSend" id="testBox" value="1" />
-        <input type="submit" id="newsletterTestSubmitButton" value="$adminMsg.get('cel_newsletter_test_submit')" onclick="$('testBox').value='1'; if(!valid.validate()){ return false; }" />
         <span id="testResultBoxSpan">
           <span id="testResultBox"></span>
-          <span style="display:none">
-            <img src='/skin/skins/albatross/icons/ajax%2Dloader.gif' />
+          <span class="nlProgressBar" style="display:none">
+            <img src="$!services.celementsweb.getSkinFile(':skins/albatross/icons/ajax-loader.gif', 'file')" />
           </span>
         </span>
       </form>
-      <span style="display:none">
-        <img src='/skin/skins/albatross/icons/ajax%2Dloader.gif' />
+      <span class="nlProgressBar" style="display:none">
+        <img src="$!services.celementsweb.getSkinFile(':skins/albatross/icons/ajax-loader.gif', 'file')" />
       </span>
-      <script type="text/javascript">
-        var valid = new Validation("newsletter_send",{immediate : true , useTitles : true, stopOnFirst : false});
-      </script>
     </div>
   #end
   </div>
