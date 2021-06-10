@@ -66,10 +66,8 @@
 
   const submitNewsletterFormHandler = function(event) {
     event.stop();
-    let answerBox = $('newsletter_send_answer');
-    if ($('testBox').value == "1") {
-      answerBox = $('testResultBox');
-    }
+    const isTest = ($('testBox').value === "1");
+    const answerBox = isTest ? $('testResultBox') : $('newsletter_send_answer');
     newsletterajax($('newsletter_send'), answerBox);
   };
 
