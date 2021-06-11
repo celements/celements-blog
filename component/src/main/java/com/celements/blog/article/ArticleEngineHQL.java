@@ -2,12 +2,11 @@ package com.celements.blog.article;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -30,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 public class ArticleEngineHQL implements IArticleEngineRole {
 
-  private static final Log LOGGER = LogFactory.getFactory().getInstance(ArticleEngineHQL.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArticleEngineHQL.class);
 
   @Requirement
   private IBlogServiceRole blogService;
@@ -113,8 +112,7 @@ public class ArticleEngineHQL implements IArticleEngineRole {
       deleteArticles.addAll(articles);
     } else {
       Document origBlogDoc = spaceBlogDoc.newDocument(getContext());
-      for (Iterator<Article> artIter = articles.iterator(); artIter.hasNext();) {
-        Article article = artIter.next();
+      for (Article article : articles) {
         try {
           XWikiDocument articleDoc = getContext().getWiki().getDocument(
               article.getDocumentReference(), getContext());
@@ -139,7 +137,8 @@ public class ArticleEngineHQL implements IArticleEngineRole {
             }
             LOGGER.debug("'" + articleDoc.getSpace() + "' != '" + blogArticleSpace
                 + "' && origBlogDoc.hasAccessLevel('edit') => '" + origBlogDoc.hasAccessLevel(
-                    "edit") + "'");
+                    "edit")
+                + "'");
             if (!articleDoc.getSpace().equals(blogArticleSpace) && origBlogDoc.hasAccessLevel(
                 "edit")) {
               hasEditOnBlog = true;
@@ -192,8 +191,8 @@ public class ArticleEngineHQL implements IArticleEngineRole {
         }
       }
     }
-    for (Iterator<Article> delIter = deleteArticles.iterator(); delIter.hasNext();) {
-      articles.remove(delIter.next());
+    for (Article deleteArticle : deleteArticles) {
+      articles.remove(deleteArticle);
     }
   }
 
@@ -201,8 +200,7 @@ public class ArticleEngineHQL implements IArticleEngineRole {
       boolean archiveOnly, boolean withFutur, boolean futurOnly) {
     Date now = new Date();
     List<Article> deleteArticles = new ArrayList<>();
-    for (Iterator<Article> artIter = articles.iterator(); artIter.hasNext();) {
-      Article article = artIter.next();
+    for (Article article : articles) {
       Date archivedate = article.getArchiveDate(language);
       Date publishdate = article.getPublishDate(language);
       if (((archivedate != null) && archivedate.before(now)) && ((!withArchive && !archiveOnly)
@@ -219,8 +217,8 @@ public class ArticleEngineHQL implements IArticleEngineRole {
         deleteArticles.add(article);
       }
     }
-    for (Iterator<Article> delIter = deleteArticles.iterator(); delIter.hasNext();) {
-      articles.remove(delIter.next());
+    for (Article deleteArticle : deleteArticles) {
+      articles.remove(deleteArticle);
     }
   }
 
@@ -233,8 +231,8 @@ public class ArticleEngineHQL implements IArticleEngineRole {
       Article article = null;
       try {
         article = new Article(articleDoc.newDocument(getContext()), getContext());
-      } catch (EmptyArticleException e) {
-        LOGGER.info(e);
+      } catch (EmptyArticleException exc) {
+        LOGGER.info("Empty article on doc [{}]", articleDoc, exc);
       }
       if ((article != null) && (blogArticleSpace.equals(articleDoc.getSpace())
           || (article.isSubscribable() == Boolean.TRUE))) {
@@ -249,7 +247,8 @@ public class ArticleEngineHQL implements IArticleEngineRole {
     String subscribableHQL = "";
     String subscribedBlogsStr = "";
     LOGGER.debug("if params: (" + subscribedBlogs + "!= null) (" + ((subscribedBlogs != null)
-        ? subscribedBlogs.size() : "null") + " > 0) (withSubscribable = " + withSubscribable + ")");
+        ? subscribedBlogs.size()
+        : "null") + " > 0) (withSubscribable = " + withSubscribable + ")");
     if ((subscribedBlogs != null) && (subscribedBlogs.size() > 0) && withSubscribable) {
       // useInt = ", IntegerProperty as int ";
       subscribableHQL = /*
@@ -257,8 +256,7 @@ public class ArticleEngineHQL implements IArticleEngineRole {
                          * "and int.id.name = 'isSubscribable' " + "and int.value='1')
                          */ ")";
 
-      for (Iterator<String> blogIter = subscribedBlogs.iterator(); blogIter.hasNext();) {
-        String blogSpace = blogIter.next();
+      for (String blogSpace : subscribedBlogs) {
         Document blogDoc = blogService.getBlogPageByBlogSpace(blogSpace).newDocument(getContext());
         com.xpn.xwiki.api.Object obj = blogDoc.getObject("Celements2.BlogConfigClass");
         Property prop = obj.getProperty("is_subscribable");

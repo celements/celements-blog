@@ -30,8 +30,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -61,7 +61,7 @@ import com.xpn.xwiki.web.Utils;
 public class BlogPlugin extends XWikiDefaultPlugin {
 
   private static final String DEFAULT_RECEIVER_SPACE = "NewsletterReceivers";
-  private static Log LOGGER = LogFactory.getFactory().getInstance(BlogPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BlogPlugin.class);
   IBlogServiceRole injected_BlogService;
 
   public BlogPlugin(String name, String className, XWikiContext context) {

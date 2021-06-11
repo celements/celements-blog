@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.reference.DocumentReference;
@@ -48,7 +48,7 @@ public class NewsletterReceiversRemoveDoublesMigrator extends AbstractCelementsH
   @Requirement
   QueryManager queryManager;
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       NewsletterReceiversRemoveDoublesMigrator.class);
 
   @Override

@@ -5,9 +5,10 @@
     #set($creationDateStr = '')
     #set($creationDate = $article.getPublishDate())
     #if("$!creationDate" != '')
-      #set($blog_dateFormat = $msg.get('cel_blog_dateformat'))
-      #if("$!blog_dateFormat" == '')
-      #set($blog_dateFormat = "long_date")
+      #set($dateFormatDictKey = 'cel_blog_dateformat')
+      #set($blog_dateFormat = $msg.get($dateFormatDictKey))
+      #if(("$!blog_dateFormat" == '') || ("$!blog_dateFormat" == $dateFormatDictKey))
+        #set($blog_dateFormat = 'long_date')
       #end
       #set($creationDateStr = $datetool.format($blog_dateFormat, $creationDate, $services.celementsweb.getLocal($language)))
     #end

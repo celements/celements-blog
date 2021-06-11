@@ -303,7 +303,7 @@ public class Article extends Api {
     }
 
     String extr = extract.get(lang);
-    // mLogger.info("getExtract('" + lang + "', " + isViewtypeFull + "') => '" + extr + "'");
+    // LOGGER.info("getExtract('" + lang + "', " + isViewtypeFull + "') => '" + extr + "'");
     // TODO check if this code is unreachable / senseless since last refactoring, since
     // fallback to default language is already handled earlier
     // if(isEmptyStringAndNotDefLang(extr, lang)){

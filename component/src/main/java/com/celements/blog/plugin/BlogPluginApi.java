@@ -20,12 +20,11 @@
 package com.celements.blog.plugin;
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.blog.article.Article;
@@ -42,7 +41,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class BlogPluginApi extends Api {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(BlogPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BlogPlugin.class);
 
   private BlogPlugin plugin;
 
@@ -80,8 +79,8 @@ public class BlogPluginApi extends Api {
     Article article = null;
     try {
       article = new Article(doc, context);
-    } catch (EmptyArticleException e) {
-      LOGGER.info(e);
+    } catch (EmptyArticleException exc) {
+      LOGGER.info("empty article for doc [{}]", doc, exc);
     }
     return article;
   }
@@ -175,8 +174,8 @@ public class BlogPluginApi extends Api {
   @Deprecated
   public int containsSubscribableArticles(List<Article> articles, String blogArticleSpace) {
     int subsArts = 0;
-    for (Iterator<Article> iterator = articles.iterator(); iterator.hasNext();) {
-      if (iterator.next().isFromSubscribableBlog(blogArticleSpace)) {
+    for (Article article : articles) {
+      if (article.isFromSubscribableBlog(blogArticleSpace)) {
         subsArts++;
       }
     }
@@ -189,8 +188,7 @@ public class BlogPluginApi extends Api {
   @Deprecated
   public int containsUndecidedArticles(List<Article> articles, String blogArticleSpace) {
     int unSubsArts = 0;
-    for (Iterator<Article> iterator = articles.iterator(); iterator.hasNext();) {
-      Article article = iterator.next();
+    for (Article article : articles) {
       if (article.isFromSubscribableBlog(blogArticleSpace) && (article.isSubscribed() == null)) {
         unSubsArts++;
       }
