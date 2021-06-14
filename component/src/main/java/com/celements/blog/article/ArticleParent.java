@@ -33,9 +33,7 @@ public class ArticleParent implements IDocParentProviderRole {
       if (nextParent != null) {
         docParents.add(nextParent);
       }
-    } catch (QueryException exp) {
-      LOGGER.error("Failed to get parent reference. ", exp);
-    } catch (XWikiException exp) {
+    } catch (QueryException | XWikiException exp) {
       LOGGER.error("Failed to get parent reference. ", exp);
     }
     return docParents;
