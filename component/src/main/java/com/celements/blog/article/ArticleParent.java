@@ -17,7 +17,7 @@ import com.xpn.xwiki.XWikiException;
 @Component(ArticleParent.DOC_PROVIDER_NAME)
 public class ArticleParent implements IDocParentProviderRole {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(ArticleParent.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArticleParent.class);
 
   public static final String DOC_PROVIDER_NAME = "celblog";
 

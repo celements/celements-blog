@@ -57,7 +57,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class NewsletterReceivers {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(NewsletterReceivers.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(NewsletterReceivers.class);
   private UserNameForUserDataCommand userNameForUserDataCmd = new UserNameForUserDataCommand();
   private RenderCommand renderCommand = new RenderCommand();
   private List<String> allAddresses = new ArrayList<>();

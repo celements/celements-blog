@@ -24,7 +24,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component("celements.blog.articleDatesListener")
 public class ArticleDatesListener extends AbstractEventListener {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(ArticleDatesListener.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArticleDatesListener.class);
 
   @Requirement
   private IWebUtilsService webUtilsService;
