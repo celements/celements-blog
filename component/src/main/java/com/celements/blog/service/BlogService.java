@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -39,7 +39,7 @@ import com.xpn.xwiki.objects.BaseObject;
 @Component
 public class BlogService implements IBlogServiceRole {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(BlogService.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BlogService.class);
 
   @Requirement(BlogCache.NAME)
   IDocumentReferenceCache<SpaceReference> blogCache;

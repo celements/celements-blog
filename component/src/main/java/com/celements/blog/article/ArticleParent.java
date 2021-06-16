@@ -17,7 +17,7 @@ import com.xpn.xwiki.XWikiException;
 @Component(ArticleParent.DOC_PROVIDER_NAME)
 public class ArticleParent implements IDocParentProviderRole {
 
-  private static Logger _LOGGER = LoggerFactory.getLogger(ArticleParent.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArticleParent.class);
 
   public static final String DOC_PROVIDER_NAME = "celblog";
 
@@ -33,10 +33,8 @@ public class ArticleParent implements IDocParentProviderRole {
       if (nextParent != null) {
         docParents.add(nextParent);
       }
-    } catch (QueryException exp) {
-      _LOGGER.error("Failed to get parent reference. ", exp);
-    } catch (XWikiException exp) {
-      _LOGGER.error("Failed to get parent reference. ", exp);
+    } catch (QueryException | XWikiException exp) {
+      LOGGER.error("Failed to get parent reference. ", exp);
     }
     return docParents;
   }

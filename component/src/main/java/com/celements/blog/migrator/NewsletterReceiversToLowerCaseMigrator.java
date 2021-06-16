@@ -25,8 +25,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -42,7 +42,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 @Component("NewsletterReceiversToLowerCase")
 public class NewsletterReceiversToLowerCaseMigrator extends AbstractCelementsHibernateMigrator {
 
-  private static Log mLogger = LogFactory.getFactory().getInstance(
+  private static final Logger LOGGER = LoggerFactory.getLogger(
       NewsletterReceiversToLowerCaseMigrator.class);
   private XWikiHibernateStore store;
 
@@ -54,7 +54,7 @@ public class NewsletterReceiversToLowerCaseMigrator extends AbstractCelementsHib
     Map<String, String> lowerMap = new HashMap<>();
     Map<String, String> upperMap = new LinkedHashMap<>();
     buildMaps(lowerMap, upperMap, context);
-    mLogger.info(context.getDatabase() + ": found " + upperMap.size() + " / " + (upperMap.size()
+    LOGGER.info(context.getDatabase() + ": found " + upperMap.size() + " / " + (upperMap.size()
         + lowerMap.size()) + " with upper case letters.");
     for (String key : upperMap.keySet()) {
       DocumentReference upperRef = new DocumentReference(context.getDatabase(), getDocSpace(
@@ -70,17 +70,17 @@ public class NewsletterReceiversToLowerCaseMigrator extends AbstractCelementsHib
         if ((lowerObj.getIntValue("isactive") == 1) && (upperObj.getIntValue("isactive") == 0)) {
           lowerObj.setIntValue("isactive", 0);
           context.getWiki().saveDocument(lowerDoc, context);
-          mLogger.info(context.getDatabase() + ": deactivated " + loKey);
+          LOGGER.info(context.getDatabase() + ": deactivated " + loKey);
         }
         if (upperDoc.getXObjectSize(recObjRef) <= 1) {
           context.getWiki().deleteDocument(upperDoc, context);
-          mLogger.info(context.getDatabase() + ": removed duplicat document " + key);
+          LOGGER.info(context.getDatabase() + ": removed duplicat document " + key);
         } else {
           upperDoc.removeXObject(upperObj);
-          mLogger.info(context.getDatabase() + ": removed duplicat object " + key);
+          LOGGER.info(context.getDatabase() + ": removed duplicat object " + key);
         }
       } else {
-        mLogger.info(context.getDatabase() + ": changed " + key);
+        LOGGER.info(context.getDatabase() + ": changed " + key);
         upperObj.setStringValue("email", upperObj.getStringValue("email").toLowerCase());
         context.getWiki().saveDocument(upperDoc, context);
         DocumentReference docRef = upperDoc.getDocumentReference();
@@ -101,14 +101,14 @@ public class NewsletterReceiversToLowerCaseMigrator extends AbstractCelementsHib
           if (!lowerMap.containsKey(key)) {
             lowerMap.put(key, row[3] + ";" + row[2]);
           } else {
-            mLogger.error(context.getDatabase() + ": found multiple objects for " + row[0]
+            LOGGER.error(context.getDatabase() + ": found multiple objects for " + row[0]
                 + " subscribing to " + row[1]);
           }
         } else {
           if (!upperMap.containsKey(keyUp)) {
             upperMap.put(keyUp, row[3] + ";" + row[2]);
           } else {
-            mLogger.error(context.getDatabase() + ": found multiple objects for " + row[0]
+            LOGGER.error(context.getDatabase() + ": found multiple objects for " + row[0]
                 + " subscribing to " + row[1]);
           }
         }

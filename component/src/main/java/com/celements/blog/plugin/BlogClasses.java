@@ -19,8 +19,8 @@
  */
 package com.celements.blog.plugin;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -33,7 +33,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component("celements.celBlogClasses")
 public class BlogClasses extends AbstractClassCollection {
 
-  private static Log LOGGER = LogFactory.getFactory().getInstance(BlogClasses.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BlogClasses.class);
 
   public static final String NEWSLETTER_RECEIVER_CLASS_DOC = "NewsletterReceiverClass";
   public static final String NEWSLETTER_RECEIVER_CLASS_SPACE = "Celements";
@@ -74,17 +74,11 @@ public class BlogClasses extends AbstractClassCollection {
   public static final String PROPERTY_ARTICLE_SUBSCRIPTION_SUBSCRIBER = "subscriber";
   public static final String PROPERTY_ARTICLE_SUBSCRIPTION_DO_SUBSCRIBE = "doSubscribe";
 
-  public BlogClasses() {
-  }
+  public BlogClasses() {}
 
   @Override
   public String getConfigName() {
     return "blog";
-  }
-
-  @Override
-  protected Log getLogger() {
-    return LOGGER;
   }
 
   @Override
@@ -111,8 +105,8 @@ public class BlogClasses extends AbstractClassCollection {
         getContext().getDatabase());
     try {
       doc = xwiki.getDocument(newsletterReceiverClassRef, getContext());
-    } catch (XWikiException e) {
-      LOGGER.error(e);
+    } catch (XWikiException xwe) {
+      LOGGER.error("getNewsletterReceiverClass failed", xwe);
       doc = new XWikiDocument(newsletterReceiverClassRef);
       needsUpdate = true;
     }

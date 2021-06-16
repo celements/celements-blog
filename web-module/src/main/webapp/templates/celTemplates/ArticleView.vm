@@ -26,22 +26,27 @@
   #if($obj.getProperty('hasComments').getValue() && ("$!obj.getProperty('hasComments').getValue()" == '1'))
     #set($has_comments = '1')
   #end
+  #set($creationDate = $defObj.getProperty('publishdate').getValue())
   ## blog editor: RTE or plain
-  #set($blogeditor = "$!defObj.getProperty('blogeditor').getValue()")
+  #set($blogeditor = $defObj.getProperty('blogeditor').getValue())
   #set($isoldblog = ("$!blogeditor" == ''))
-  #if($isoldblog || ("$!defObj.getProperty('publishdate').getValue()" == ''))
-    #set($creationDate = $xwiki.formatDate($theDoc.creationDate,"dd. MMMM, yyyy"))
-  #else
-  #set($creationDate = $xwiki.formatDate($defObj.getProperty('publishdate').getValue(),"dd. MMMM, yyyy"))
+  #if($isoldblog || ("$!creationDate" == ''))
+    #set($creationDate = $theDoc.creationDate)
+  #end
+  #set($dateFormatDictKey = 'cel_blog_article_dateformat')
+  #set($dateFormat = $msg.get($dateFormatDictKey))
+  #if(("$!dateFormat" == '') || ("$!dateFormat" == $dateFormatDictKey))
+    #set($dateFormat = 'd. MMMM yyyy')
+  #end
+  #set($creationDateStr = $datetool.format($dateFormat, $creationDate, $services.celementsweb.getLocal($language)))
   #set($additionalArticleClass = '')
-  #if($xwiki.getCurrentDate().before($defObj.getProperty('publishdate').getValue()))
+  #if($datetool.date.before($creationDate))
     #set($additionalArticleClass = " future")
   #end
-#end
 #set($bentrydoc = $theDoc)
 $xwiki.includeForm('celements2web:Macros.getArticleContext', false)
 <div class="article_detail$!{additionalArticleClass}" $!contextMenu>
-  <div class="article_date">$creationDate</div>
+  <div class="article_date">$creationDateStr</div>
   #set($displayTitle = $theDoc.display("title", "view", $obj))
   <div class="article_title $!{obj.getProperty('lang').getTitle()} h1">$displayTitle</div>
   #set($displayContent = $theDoc.display("content", "rendered", $obj))
