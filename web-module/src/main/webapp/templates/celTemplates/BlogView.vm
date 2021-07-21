@@ -1,27 +1,27 @@
 #parse('celMacros/setupBlogView.vm')
 
 ## performance optimisation for browser cache
-#set($sql = "where (doc.space = '$!spaceRef.getName()'")
+#set($hql = "where (doc.space = '$!spaceRef.getName()'")
 #foreach($subsSpaceRef in $services.celblog.getSubribedToBlogs($blogDocRef))
   #set($subsSpace = $subsSpaceRef.getName())
-  #set($sql = "${sql} or doc.space='$subsSpace'")
+  #set($hql = "${hql} or doc.space='$subsSpace'")
 #end
-#set($sql = "${sql}) order by doc.date desc")
-#set($mostRecentChangedArticle = $xwiki.searchDocuments($sql, 1, 0))
-#if($mostRecentChangedArticle.size() > 0)
-  #set($lastChanged = $xwiki.getDocument($mostRecentChangedArticle.get(0)).getDate())
+#set($hql = "${hql}) order by doc.date desc")
+#set($mostRecentChangedArticle = $xwiki.searchDocuments($hql, 1, 0))
+#if(!$mostRecentChangedArticle.isEmpty())
+  #set($articleDocRef = $services.reference.resolve($mostRecentChangedArticle.get(0)))
+  #set($lastChanged = $services.modelAccess.getDocument($articleDocRef).getDate())
 #else
   #set($lastChanged = $blogDoc)
 #end
 #set($reqIfModifiedSince = $request.getDateHeader("If-Modified-Since"))
 #set($If_Modified_Since = ($lastChanged.getTime() == $reqIfModifiedSince))
-#set($If_Not_loggedIn = ($context.getUser() == "XWiki.XWikiGuest"))
-#if($If_Not_loggedIn && $If_Modified_Since)
+#if(!$services.rightsAccess.isLoggedIn() && $If_Modified_Since)
   $response.setStatus(304)
   $context.setFinished(true)
 #else
-#if($If_Not_loggedIn)
-  $response.setDateHeader("Last-Modified", $lastChanged.getTime())
+#if(!$services.rightsAccess.isLoggedIn())
+  $!response.setDateHeader("Last-Modified", $lastChanged.getTime())
 #end
 
 ##render blog title
@@ -38,7 +38,9 @@
   #end
 #end
 #if("$!supressBlogTitle" == '')
-  #set($supressBlogTitle = !$celementsweb.getPageType($blogDoc.fullName).hasPageTitle())
+  #set($pageTypeRef = $services.pageType.getPageTypeRef($blogDocRef))
+  #set($pageTypeConfig = $services.pageType.getPageTypeConfig($pageTypeRef))
+  #set($supressBlogTitle = !$pageTypeConfig.hasPageTitle())
 #end
 
 #if("$!request.xpage" == 'rdf') ## RSS mode
