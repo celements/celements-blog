@@ -44,7 +44,7 @@ $msg.get("nocomments")
 #end
 #set($editLevel = $services.rightsAccess.getEAccessLevel("comment"))
 #if($services.rightsAccess.hasAccessLevel($doc.documentReference, $editLevel))
-#set($commentClassRef = $services.reference.create().space("XWiki").doc("XWikiComments"))
+#set($commentClassRef = $services.reference.create().space("XWiki").doc("XWikiComments").build())
 #set($cclass = $services.modelAccess.getDocument($commentClassRef).getxWikiClass())
 #set($comment = $cclass.newObject())
 #if("$!commentAddRedirect" == '')
