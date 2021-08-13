@@ -6,7 +6,7 @@
 
 #set($articleLoadParameter = $services.celblog.getDefaultArticleLoadParameter())
 $!articleLoadParameter.setLanguage("$default_language")
-#set($spaceRef = $services.reference.create().space("$!spacename").create())
+#set($spaceRef = $services.reference.create().space("$!spacename").build())
 #set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($!{spaceRef}))
 #set($articles = $services.celblog.getArticles($blogDocRef, $articleLoadParameter))
 #if($articles.size() > 0)
