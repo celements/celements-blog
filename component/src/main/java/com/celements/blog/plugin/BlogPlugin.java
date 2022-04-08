@@ -30,13 +30,15 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.velocity.VelocityContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadException;
@@ -93,36 +95,44 @@ public class BlogPlugin extends XWikiDefaultPlugin {
    * @deprecated since 1.32 instead use
    *             {@link BlogService#getArticles(DocumentReference, ArticleLoadParameter)}
    * @param blogArticleSpace
-   *          Space where the blog's articles are saved.
+   *                             Space where the blog's articles are saved.
    * @param subscribedBlogsStr
-   *          Comma separated String with all the blog article spaces the blog has subscribed to.
+   *                             Comma separated String with all the blog article spaces the blog
+   *                             has subscribed to.
    * @param language
-   *          default language
+   *                             default language
    * @param archiveOnly
-   *          Only get articles from the archive (archivedate < now)
+   *                             Only get articles from the archive (archivedate < now)
    * @param futurOnly
-   *          Only get articles that are not yet published (publishdate > now)
+   *                             Only get articles that are not yet published (publishdate > now)
    * @param subscribableOnly
-   *          Only get articles from subscribed blogs, but not the ones from the blog the user is
-   *          on.
+   *                             Only get articles from subscribed blogs, but not the ones from the
+   *                             blog the user is
+   *                             on.
    * @param withArchive
-   *          Include archived articles in the answer. Has no effect if archiveOnly = true.
+   *                             Include archived articles in the answer. Has no effect if
+   *                             archiveOnly = true.
    * @param withFutur
-   *          Include not yet published articles. Only possible if the page has been saved with
-   *          programmingrights or the user has edit right on the article. Has no effect if
-   *          futurOnly = true.
+   *                             Include not yet published articles. Only possible if the page has
+   *                             been saved with
+   *                             programmingrights or the user has edit right on the article. Has no
+   *                             effect if
+   *                             futurOnly = true.
    * @param withSubscribable
-   *          Include articles from subscribed blogs.
+   *                             Include articles from subscribed blogs.
    * @param withSubscribed
-   *          Include articles the blog has subscribed to.
+   *                             Include articles the blog has subscribed to.
    * @param withUnsubscribed
-   *          Include articles the blog has unsubscribed from. Only works with edit rights or
-   *          programmingrights.
+   *                             Include articles the blog has unsubscribed from. Only works with
+   *                             edit rights or
+   *                             programmingrights.
    * @param withUndecided
-   *          Include articles the blog has not yet desided about a subscription. Only works with
-   *          edit rights or programmingrights.
+   *                             Include articles the blog has not yet desided about a subscription.
+   *                             Only works with
+   *                             edit rights or programmingrights.
    * @param checkAccessRights
-   *          Do pay attention to the rights. Default = true if no programmingrights.
+   *                             Do pay attention to the rights. Default = true if no
+   *                             programmingrights.
    * @param context
    * @return
    * @throws XWikiException
@@ -418,14 +428,18 @@ public class BlogPlugin extends XWikiDefaultPlugin {
   }
 
   public String getSubscriberDoc(String email, XWikiContext context) throws XWikiException {
-    email = email.toLowerCase();
-    String hql = "select distinct doc.fullName " + "from XWikiDocument as doc, BaseObject as obj, "
-        + "Celements.NewsletterReceiverClass as nr " + "where doc.fullName=obj.name "
-        + "and obj.id=nr.id " + "and nr.email='" + email + "'";
-    List<String> docs = context.getWiki().search(hql, context);
+    String xwql = "from doc.object(Celements.NewsletterReceiverClass) as nr "
+        + "where nr.email = :email";
     String docName = "";
-    if ((docs != null) && (docs.size() > 0)) {
-      docName = docs.get(0);
+    try {
+      List<String> docs = getQueryManager().createQuery(xwql, Query.XWQL)
+          .bindValue("email", email.toLowerCase())
+          .execute();
+      if ((docs != null) && (docs.size() > 0)) {
+        docName = docs.get(0);
+      }
+    } catch (QueryException qe) {
+      LOGGER.error("Failed to get NewsletterReceiver for mail [{}]", email);
     }
     return docName;
   }
@@ -480,7 +494,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
    *
    * @param article
    * @param next
-   *          true gets the next, false the previous article
+   *                  true gets the next, false the previous article
    * @return
    */
   public Article getNeighbourArticle(Article article, boolean next, XWikiContext context) {
@@ -521,6 +535,10 @@ public class BlogPlugin extends XWikiDefaultPlugin {
       return injected_BlogService;
     }
     return Utils.getComponent(IBlogServiceRole.class);
+  }
+
+  private QueryManager getQueryManager() {
+    return Utils.getComponent(QueryManager.class);
   }
 
 }
