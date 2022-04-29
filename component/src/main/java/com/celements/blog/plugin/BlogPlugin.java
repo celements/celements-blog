@@ -441,6 +441,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
     } catch (QueryException qe) {
       LOGGER.error("Failed to get NewsletterReceiver for mail [{}]", email);
     }
+    LOGGER.debug("For email [{}] found receiver docName [{}]", email, docName);
     return docName;
   }
 
