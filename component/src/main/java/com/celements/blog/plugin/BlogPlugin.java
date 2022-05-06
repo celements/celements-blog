@@ -402,7 +402,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
   public boolean unsubscribeNewsletter(XWikiContext context) throws XWikiException {
     boolean unsubscribed = false;
     String email = context.getRequest().get("emailadresse");
-    email = email.toLowerCase();
+    email = email.toLowerCase().replaceAll(" ", "+");
     XWikiDocument blogDoc = getBlogDoc(null, context);
     String subsDocName = getSubscriberDoc(email, context);
     if (!"".equals(subsDocName) && context.getWiki().exists(subsDocName, context)) {
