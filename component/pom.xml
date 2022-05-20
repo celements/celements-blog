@@ -24,7 +24,7 @@
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celements</artifactId>
-    <version>5.5</version>
+    <version>5.6</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-blog</artifactId>
@@ -47,7 +47,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-core</artifactId>
-      <version>5.4</version>
+      <version>5.5</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -59,7 +59,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-photo</artifactId>
-      <version>5.1</version>
+      <version>5.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
