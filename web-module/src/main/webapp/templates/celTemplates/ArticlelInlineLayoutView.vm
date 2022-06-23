@@ -1,8 +1,19 @@
 #set($articleInlineLayoutSpaceRef = $services.reference.create().space("ArticleInlineLayout").build())
 #set($layout = $services.layout.getPageLayoutApiForRef($articleInlineLayoutSpaceRef))
 #if($services.layout.canRenderLayout($layout.layoutSpaceRef))
-  $!services.layout.renderPageLayout($layout.layoutSpaceRef)
+  #set($inlineCss = "")
+  ## include CSS defined on struct layout
+  #set($articleInlineLayoutCfgDocRef = $layout.layoutConfigDocRef)
+  #set($articleInlineLayoutCfgDoc = $services.modelAccess.getDocument($articleInlineLayoutCfgDocRef))
+  #foreach($cssObj in $articleInlineLayoutCfgDoc.getObjects('Skins.UserCSS'))
+    #set($cssFile = $services.celementsweb.getSkinFile($!cssObj.getProperty('cssname').value, 'file'))
+    #if ("$!cssFile" != '')
+      #set($inlineCss = "$!{inlineCss}<link rel='stylesheet' type='text/css' href='$!cssFile'>")
+    #end
+  #end
+  #set($html = $!services.layout.renderPageLayout($layout.layoutSpaceRef))
   #set($articleInlineLayoutSpaceRef = $null)
+  $services.cssTools.inline("${inlineCss}${html}")
 #elseif($isSuperAdmin) ## canRenderLayout
   <p>No ArticleInline Layout found.</p>
 #end
