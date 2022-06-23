@@ -1,0 +1,11 @@
+#if($xwiki.isMultiLingual())
+  #set($defArticleObj = $doc.getObject("XWiki.ArticleClass", "lang", $!{default_language}, false))
+  #set($articleObj = $doc.getObject("XWiki.ArticleClass","lang",$language))
+  #if(("$!articleObj" == '') || ($!articleObj.getProperty('content').getValue() == ""))
+    #set($articleObj = $defArticleObj)
+  #end
+#else
+  #set($defArticleObj = $doc.getObject("XWiki.ArticleClass"))
+  #set($articleObj = $defArticleObj)
+#end
+$!articleObj.getProperty('content').getValue()
