@@ -1,0 +1,8 @@
+#set($articleInlineLayoutSpaceRef = $services.reference.create().space("ArticleInlineLayout").build())
+#set($layout = $services.layout.getPageLayoutApiForRef($articleInlineLayoutSpaceRef))
+#if($services.layout.canRenderLayout($layout.layoutSpaceRef))
+  $!services.layout.renderPageLayout($layout.layoutSpaceRef)
+  #set($articleInlineLayoutSpaceRef = $null)
+#elseif($isSuperAdmin) ## canRenderLayout
+  <p>No ArticleInline Layout found.</p>
+#end
