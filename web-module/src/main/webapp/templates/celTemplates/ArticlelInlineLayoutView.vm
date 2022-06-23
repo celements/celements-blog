@@ -6,7 +6,7 @@
   #set($articleInlineLayoutCfgDocRef = $layout.layoutConfigDocRef)
   #set($articleInlineLayoutCfgDoc = $services.modelAccess.getDocument($articleInlineLayoutCfgDocRef))
   #foreach($cssObj in $articleInlineLayoutCfgDoc.getObjects('Skins.UserCSS'))
-    #set($cssFile = $services.celementsweb.getSkinFile($!cssObj.getProperty('cssname').value, 'file'))
+    #set($cssFile = $services.celementsweb.getSkinFileExternal($!cssObj.getProperty('cssname').value, 'file'))
     #if ("$!cssFile" != '')
       #set($inlineCss = "$!{inlineCss}<link rel='stylesheet' type='text/css' href='$!cssFile'>")
     #end
