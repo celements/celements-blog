@@ -61,7 +61,7 @@ public class NewsletterReceiversTest extends AbstractComponentTest {
     blogObj.setIntValue("unsubscribe_info", 1);
     doc.addXObject(blogObj);
     expect(blogServiceMock.getBlogPageByBlogSpace(eq(spaceName))).andReturn(doc);
-    XWikiURLFactory urlFactoryMock = createMockAndAddToDefault(XWikiURLFactory.class);
+    XWikiURLFactory urlFactoryMock = createDefaultMock(XWikiURLFactory.class);
     getContext().setURLFactory(urlFactoryMock);
     expect(urlFactoryMock.createExternalURL(eq(spaceName), eq(docName), eq("view"), eq(urlParams
         + URLEncoder.encode(email, UTF_8.name())), (String) eq(null), eq(

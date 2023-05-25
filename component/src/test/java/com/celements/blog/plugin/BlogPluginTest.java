@@ -55,7 +55,7 @@ public class BlogPluginTest extends AbstractComponentTest {
   @Before
   public void setUp_BlogPluginTest() throws Exception {
     plugin = new BlogPlugin("", "", getContext());
-    blogServiceMock = createMockAndAddToDefault(IBlogServiceRole.class);
+    blogServiceMock = createDefaultMock(IBlogServiceRole.class);
     plugin.injected_BlogService = blogServiceMock;
   }
 
@@ -65,7 +65,7 @@ public class BlogPluginTest extends AbstractComponentTest {
     result.put("myname@email.com", "invalid");
     String importData = "\r\n,My Name <myName@email.com>,,,,";
     String nl = "My.Newsletter";
-    XWikiMessageTool messageTool = createMockAndAddToDefault(XWikiMessageTool.class);
+    XWikiMessageTool messageTool = createDefaultMock(XWikiMessageTool.class);
     expect(messageTool.get(eq("cel_newsletter_subscriber_invalid"))).andReturn("invalid").once();
     XWikiContext context = mockContext(messageTool, null);
     expect(getWikiMock().search((String) anyObject(), same(context))).andReturn(null).anyTimes();
@@ -88,8 +88,8 @@ public class BlogPluginTest extends AbstractComponentTest {
     String nl = "My.Newsletter";
     DocumentReference nlDocRef = new DocumentReference(getContext().getDatabase(), "My",
         "Newsletter");
-    XWikiDocument doc1 = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiMessageTool messageTool = createMockAndAddToDefault(XWikiMessageTool.class);
+    XWikiDocument doc1 = createDefaultMock(XWikiDocument.class);
+    XWikiMessageTool messageTool = createDefaultMock(XWikiMessageTool.class);
     expect(messageTool.get(eq("cel_newsletter_subscriber_active"))).andReturn("active").once();
     XWikiContext context = mockContext(messageTool, doc1);
     expect(getWikiMock().search((String) anyObject(), same(context))).andReturn(null).anyTimes();
@@ -125,8 +125,8 @@ public class BlogPluginTest extends AbstractComponentTest {
     String nl = "My.Newsletter";
     DocumentReference nlDocRef = new DocumentReference(getContext().getDatabase(), "My",
         "Newsletter");
-    XWikiDocument doc1 = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiMessageTool messageTool = createMockAndAddToDefault(XWikiMessageTool.class);
+    XWikiDocument doc1 = createDefaultMock(XWikiDocument.class);
+    XWikiMessageTool messageTool = createDefaultMock(XWikiMessageTool.class);
     expect(messageTool.get(eq("cel_newsletter_subscriber_inactive"))).andReturn("inactive").once();
     XWikiContext context = mockContext(messageTool, doc1);
     expect(getWikiMock().exists(eq("NewsletterReceivers.abc"), same(context))).andReturn(
@@ -161,8 +161,8 @@ public class BlogPluginTest extends AbstractComponentTest {
     String nl = "My.Newsletter";
     DocumentReference nlDocRef = new DocumentReference(getContext().getDatabase(), "My",
         "Newsletter");
-    XWikiDocument doc1 = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiMessageTool messageTool = createMockAndAddToDefault(XWikiMessageTool.class);
+    XWikiDocument doc1 = createDefaultMock(XWikiDocument.class);
+    XWikiMessageTool messageTool = createDefaultMock(XWikiMessageTool.class);
     expect(messageTool.get(eq("cel_newsletter_subscriber_inactive"))).andReturn("inactive").once();
     XWikiContext context = mockContext(messageTool, doc1);
     expect(getWikiMock().exists(eq("NewsletterReceivers.abc"), same(context))).andReturn(false)
@@ -198,8 +198,8 @@ public class BlogPluginTest extends AbstractComponentTest {
     String nl = "My.Newsletter";
     DocumentReference nlDocRef = new DocumentReference(getContext().getDatabase(), "My",
         "Newsletter");
-    XWikiDocument doc1 = createMockAndAddToDefault(XWikiDocument.class);
-    XWikiMessageTool messageTool = createMockAndAddToDefault(XWikiMessageTool.class);
+    XWikiDocument doc1 = createDefaultMock(XWikiDocument.class);
+    XWikiMessageTool messageTool = createDefaultMock(XWikiMessageTool.class);
     expect(messageTool.get(eq("cel_newsletter_subscriber_invalid"))).andReturn("invalid").times(2);
     expect(messageTool.get(eq("cel_newsletter_subscriber_inactive"))).andReturn("inactive").once();
     XWikiContext context = mockContext(messageTool, doc1);
@@ -317,7 +317,7 @@ public class BlogPluginTest extends AbstractComponentTest {
   }
 
   private XWikiContext mockContext(XWikiMessageTool messageTool, XWikiDocument doc) {
-    XWikiContext context = createMockAndAddToDefault(XWikiContext.class);
+    XWikiContext context = createDefaultMock(XWikiContext.class);
     expect(context.getWiki()).andReturn(getWikiMock()).anyTimes();
     expect(context.getUser()).andReturn("XWiki.Admin").anyTimes();
     expect(context.getDoc()).andReturn(doc).anyTimes();
@@ -338,7 +338,7 @@ public class BlogPluginTest extends AbstractComponentTest {
 
   private void mockHibernate(List<Object> list, XWikiDocument nlDoc, XWikiContext context)
       throws Exception {
-    XWikiHibernateStore hibStore = createMockAndAddToDefault(XWikiHibernateStore.class);
+    XWikiHibernateStore hibStore = createDefaultMock(XWikiHibernateStore.class);
     expect(getWikiMock().getHibernateStore()).andReturn(hibStore).atLeastOnce();
     expect(getWikiMock().getStore()).andReturn(hibStore).anyTimes();
     expect(hibStore.loadXWikiDoc((XWikiDocument) anyObject(), same(context))).andReturn(nlDoc)
