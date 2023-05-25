@@ -1,5 +1,6 @@
 package com.celements.blog.article;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -11,12 +12,12 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.blog.service.IBlogServiceRole;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.parents.IDocParentProviderRole;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
-public class ArticleParentTest extends AbstractBridgedComponentTestCase {
+public class ArticleParentTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private IBlogServiceRole blogServiceMock;
@@ -25,7 +26,7 @@ public class ArticleParentTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_ArticleParentTest() throws Exception {
     context = getContext();
-    blogServiceMock = createMockAndAddToDefault(IBlogServiceRole.class);
+    blogServiceMock = createDefaultMock(IBlogServiceRole.class);
     articleParentProvider = (ArticleParent) Utils.getComponent(IDocParentProviderRole.class,
         ArticleParent.DOC_PROVIDER_NAME);
     articleParentProvider.injectBlogService(blogServiceMock);

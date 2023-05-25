@@ -12,10 +12,10 @@ import org.xwiki.observation.event.Event;
 import com.celements.blog.observation.event.BlogCreatedEvent;
 import com.celements.blog.observation.event.BlogCreatingEvent;
 import com.celements.blog.plugin.BlogClasses;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
-public class BlogCreateListenerTest extends AbstractBridgedComponentTestCase {
+public class BlogCreateListenerTest extends AbstractComponentTest {
 
   private BlogCreateListener listener;
 

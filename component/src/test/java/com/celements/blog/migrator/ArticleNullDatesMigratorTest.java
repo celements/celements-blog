@@ -1,5 +1,6 @@
 package com.celements.blog.migrator;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -14,14 +15,14 @@ import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.migrations.celSubSystem.ICelementsMigrator;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-public class ArticleNullDatesMigratorTest extends AbstractBridgedComponentTestCase {
+public class ArticleNullDatesMigratorTest extends AbstractComponentTest {
 
   private ArticleNullDatesMigrator migrator;
 
@@ -36,8 +37,8 @@ public class ArticleNullDatesMigratorTest extends AbstractBridgedComponentTestCa
     xwiki = getWikiMock();
     migrator = (ArticleNullDatesMigrator) Utils.getComponent(ICelementsMigrator.class,
         "ArticleNullDates");
-    queryManagerMock = createMockAndAddToDefault(QueryManager.class);
-    queryExecutorMock = createMockAndAddToDefault(QueryExecutor.class);
+    queryManagerMock = createDefaultMock(QueryManager.class);
+    queryExecutorMock = createDefaultMock(QueryExecutor.class);
     migrator.injectQueryManager(queryManagerMock);
   }
 

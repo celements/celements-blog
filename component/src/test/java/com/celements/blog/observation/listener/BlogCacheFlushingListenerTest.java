@@ -14,11 +14,11 @@ import com.celements.blog.observation.event.BlogCreatedEvent;
 import com.celements.blog.observation.event.BlogDeletedEvent;
 import com.celements.blog.observation.event.BlogUpdatedEvent;
 import com.celements.common.cache.IDocumentReferenceCache;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-public class BlogCacheFlushingListenerTest extends AbstractBridgedComponentTestCase {
+public class BlogCacheFlushingListenerTest extends AbstractComponentTest {
 
   private BlogCacheFlushingListener listener;
 
@@ -26,7 +26,7 @@ public class BlogCacheFlushingListenerTest extends AbstractBridgedComponentTestC
   @SuppressWarnings("unchecked")
   public void setUp_BlogCacheFlushingListenerTest() throws Exception {
     listener = (BlogCacheFlushingListener) Utils.getComponent(EventListener.class, BlogCache.NAME);
-    listener.navCache = createMockAndAddToDefault(IDocumentReferenceCache.class);
+    listener.navCache = createDefaultMock(IDocumentReferenceCache.class);
   }
 
   @After

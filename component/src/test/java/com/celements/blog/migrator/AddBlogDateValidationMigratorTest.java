@@ -1,5 +1,6 @@
 package com.celements.blog.migrator;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -7,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.migrations.celSubSystem.ICelementsMigrator;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -16,7 +17,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.web.Utils;
 
-public class AddBlogDateValidationMigratorTest extends AbstractBridgedComponentTestCase {
+public class AddBlogDateValidationMigratorTest extends AbstractComponentTest {
 
   private XWikiContext context;
   private XWiki xwiki;
@@ -39,7 +40,7 @@ public class AddBlogDateValidationMigratorTest extends AbstractBridgedComponentT
 
   @Test
   public void testMigrate() throws Exception {
-    XWikiDocument docMock = createMockAndAddToDefault(XWikiDocument.class);
+    XWikiDocument docMock = createDefaultMock(XWikiDocument.class);
     DocumentReference docRef = new DocumentReference(context.getDatabase(), "XWiki",
         "ArticleClass");
     expect(xwiki.getDocument(eq(docRef), same(context))).andReturn(docMock).once();

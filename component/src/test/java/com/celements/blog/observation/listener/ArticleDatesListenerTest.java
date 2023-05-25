@@ -14,13 +14,13 @@ import org.xwiki.observation.event.Event;
 import com.celements.blog.observation.event.ArticleCreatingEvent;
 import com.celements.blog.observation.event.ArticleUpdatingEvent;
 import com.celements.blog.plugin.BlogClasses;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.search.lucene.ILuceneSearchService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class ArticleDatesListenerTest extends AbstractBridgedComponentTestCase {
+public class ArticleDatesListenerTest extends AbstractComponentTest {
 
   private ArticleDatesListener listener;
 
