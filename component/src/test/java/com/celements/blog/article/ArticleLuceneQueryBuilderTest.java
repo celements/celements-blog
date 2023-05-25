@@ -1,5 +1,6 @@
 package com.celements.blog.article;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -19,17 +20,18 @@ import org.xwiki.model.reference.WikiReference;
 import com.celements.blog.article.ArticleLoadParameter.DateMode;
 import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
 import com.celements.blog.service.IBlogServiceRole;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.rights.access.EAccessLevel;
 import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.celements.search.lucene.ILuceneSearchService;
 import com.celements.search.lucene.query.IQueryRestriction;
 import com.celements.search.lucene.query.QueryRestrictionGroup;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.lucene.LucenePlugin;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
-public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestCase {
+public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
 
   private static final String RESTR_ARTICLE_ISSUBS = "XWiki.ArticleClass.isSubscribable:"
       + "(+\"1\")";
@@ -49,12 +51,16 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   private XWikiRightService rightsServiceMock;
 
   @Before
-  public void setUp_ArticleEngineLuceneTest() {
+  public void prepare() {
+    LucenePlugin lucenePlugin = createDefaultMock(LucenePlugin.class);
+    expect(getWikiMock().getPlugin(eq("lucene"), same(getContext())))
+        .andReturn(lucenePlugin).anyTimes();
+    expect(lucenePlugin.getAnalyzer()).andReturn(null).anyTimes();
     builder = (ArticleLuceneQueryBuilder) Utils.getComponent(IArticleLuceneQueryBuilderRole.class);
-    rightsServiceMock = createMockAndAddToDefault(XWikiRightService.class);
+    rightsServiceMock = createDefaultMock(XWikiRightService.class);
     expect(getWikiMock().getRightService()).andReturn(rightsServiceMock).anyTimes();
-    builder.blogService = createMockAndAddToDefault(IBlogServiceRole.class);
-    builder.rightsAccess = createMockAndAddToDefault(IRightsAccessFacadeRole.class);
+    builder.blogService = createDefaultMock(IBlogServiceRole.class);
+    builder.rightsAccess = createDefaultMock(IRightsAccessFacadeRole.class);
   }
 
   @After
@@ -264,8 +270,10 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
 
     assertNotNull(ret);
     String expected = "(" + RESTR_ARTICLE_ISSUBS + " AND (" + getSubsPublishQuery(subsSpaceRef1,
-        param.getExecutionDate()) + " OR " + getSubsPublishQuery(subsSpaceRef3,
-            param.getExecutionDate()) + "))";
+        param.getExecutionDate()) + " OR "
+        + getSubsPublishQuery(subsSpaceRef3,
+            param.getExecutionDate())
+        + "))";
     assertEquals(expected, ret.getQueryString());
   }
 
@@ -360,7 +368,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = Collections.emptySet();
     Date date = new Date();
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     assertNull(ret);
   }
 
@@ -369,7 +379,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED));
     Date date = new Date();
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     assertEquals(getPublishedQuery(date), ret.getQueryString());
   }
 
@@ -378,7 +390,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED));
     Date date = new Date();
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     assertEquals(getPublishedQuery(date), ret.getQueryString());
   }
 
@@ -387,7 +401,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.ARCHIVED));
     Date date = new Date();
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     assertEquals(getArchivedQuery(date), ret.getQueryString());
   }
 
@@ -396,7 +412,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.ARCHIVED));
     Date date = new Date();
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     assertEquals(getArchivedQuery(date), ret.getQueryString());
   }
 
@@ -405,7 +423,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     assertEquals(getFutureQuery(date), ret.getQueryString());
   }
 
@@ -414,7 +434,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     assertNull(ret);
   }
 
@@ -423,7 +445,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.ARCHIVED));
     Date date = new Date();
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getArchivedQuery(date) + ")";
     assertEquals(expectedQuery, ret.getQueryString());
   }
@@ -433,7 +457,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.ARCHIVED));
     Date date = new Date();
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getArchivedQuery(date) + ")";
     assertEquals(expectedQuery, ret.getQueryString());
   }
@@ -443,7 +469,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getFutureQuery(date) + ")";
     assertEquals(expectedQuery, ret.getQueryString());
   }
@@ -453,7 +481,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.PUBLISHED, DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     assertEquals(getPublishedQuery(date), ret.getQueryString());
   }
 
@@ -462,7 +492,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.ARCHIVED, DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     String expectedQuery = "(" + getFutureQuery(date) + " OR " + getArchivedQuery(date) + ")";
     assertEquals(expectedQuery, ret.getQueryString());
   }
@@ -472,7 +504,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<DateMode> modes = new HashSet<>(Arrays.asList(DateMode.ARCHIVED, DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     assertEquals(getArchivedQuery(date), ret.getQueryString());
   }
 
@@ -482,7 +516,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
         DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     assertEquals("", ret.getQueryString());
   }
 
@@ -492,7 +528,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
         DateMode.FUTURE));
     Date date = new Date();
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    verifyDefault();
     String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getArchivedQuery(date) + ")";
     assertEquals(expectedQuery, ret.getQueryString());
   }
@@ -500,28 +538,30 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   private String getArchivedQuery(Date date) {
     String dateString = ILuceneSearchService.SDF.format(date);
     return IArticleLuceneQueryBuilderRole.ARTICLE_FIELD_ARCHIVE + ":(["
-        + ILuceneSearchService.DATE_LOW + " TO " + dateString + "])";
+        + "0" + " TO " + dateString + "])";
   }
 
   private String getPublishedQuery(Date date) {
     String dateString = ILuceneSearchService.SDF.format(date);
     return "(" + IArticleLuceneQueryBuilderRole.ARTICLE_FIELD_PUBLISH + ":(["
-        + ILuceneSearchService.DATE_LOW + " TO " + dateString + "]) AND "
+        + "0" + " TO " + dateString + "]) AND "
         + IArticleLuceneQueryBuilderRole.ARTICLE_FIELD_ARCHIVE + ":([" + dateString + " TO "
-        + ILuceneSearchService.DATE_HIGH + "]))";
+        + "zzzzzzzzzzzz" + "]))";
   }
 
   private String getFutureQuery(Date date) {
     String dateString = ILuceneSearchService.SDF.format(date);
     return IArticleLuceneQueryBuilderRole.ARTICLE_FIELD_PUBLISH + ":([" + dateString + " TO "
-        + ILuceneSearchService.DATE_HIGH + "])";
+        + "zzzzzzzzzzzz" + "])";
   }
 
   @Test
   public void testGetArticleSubsRestrictions_none() {
     Set<SubscriptionMode> modes = Collections.emptySet();
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertNull(ret);
   }
 
@@ -529,7 +569,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   public void testGetArticleSubsRestrictions_subscribed() {
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertEquals(getSubsQuery(false), ret.getQueryString());
   }
 
@@ -537,7 +579,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   public void testGetArticleSubsRestrictions_subscribed_noEditRights() {
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertEquals(getSubsQuery(false), ret.getQueryString());
   }
 
@@ -545,7 +589,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   public void testGetArticleSubsRestrictions_unsubscribed() {
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertEquals(getUnsubsQuery(false), ret.getQueryString());
   }
 
@@ -553,7 +599,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   public void testGetArticleSubsRestrictions_unsubscribed_noEditRights() {
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertNull(ret);
   }
 
@@ -562,7 +610,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED,
         SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertEquals(getSubsUnsubsQuery(false), ret.getQueryString());
   }
 
@@ -571,7 +621,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED,
         SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertEquals(getSubsQuery(false), ret.getQueryString());
   }
 
@@ -579,7 +631,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   public void testGetArticleSubsRestrictions_undecided() {
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED));
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertEquals(getSubsUnsubsQuery(true), ret.getQueryString());
   }
 
@@ -587,7 +641,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
   public void testGetArticleSubsRestrictions_undecided_noEditRights() {
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED));
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertNull(ret);
   }
 
@@ -596,7 +652,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED,
         SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertEquals(getSubsQuery(true), ret.getQueryString());
   }
 
@@ -605,7 +663,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED,
         SubscriptionMode.UNSUBSCRIBED));
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertNull(ret);
   }
 
@@ -614,7 +674,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED,
         SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertEquals(getUnsubsQuery(true), ret.getQueryString());
   }
 
@@ -623,7 +685,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.UNDECIDED,
         SubscriptionMode.SUBSCRIBED));
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, docRef, hasEditRights);
+    verifyDefault();
     assertEquals(getSubsQuery(false), ret.getQueryString());
   }
 
@@ -633,8 +697,10 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED,
         SubscriptionMode.UNSUBSCRIBED, SubscriptionMode.UNDECIDED));
     boolean hasEditRights = true;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef,
         hasEditRights);
+    verifyDefault();
     assertEquals("", ret.getQueryString());
   }
 
@@ -644,8 +710,10 @@ public class ArticleLuceneQueryBuilderTest extends AbstractBridgedComponentTestC
     Set<SubscriptionMode> modes = new HashSet<>(Arrays.asList(SubscriptionMode.SUBSCRIBED,
         SubscriptionMode.UNSUBSCRIBED, SubscriptionMode.UNDECIDED));
     boolean hasEditRights = false;
+    replayDefault();
     QueryRestrictionGroup ret = builder.getArticleSubsRestrictions(modes, blogConfDocRef,
         hasEditRights);
+    verifyDefault();
     assertEquals(getSubsQuery(false), ret.getQueryString());
   }
 
