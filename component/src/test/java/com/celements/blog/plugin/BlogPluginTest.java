@@ -339,12 +339,12 @@ public class BlogPluginTest extends AbstractComponentTest {
   private void mockHibernate(List<Object> list, XWikiDocument nlDoc, XWikiContext context)
       throws Exception {
     XWikiHibernateStore hibStore = createDefaultMock(XWikiHibernateStore.class);
-    expect(getWikiMock().getHibernateStore()).andReturn(hibStore).atLeastOnce();
+    expect(getWikiMock().getHibernateStore()).andReturn(hibStore).anyTimes();
     expect(getWikiMock().getStore()).andReturn(hibStore).anyTimes();
     expect(hibStore.loadXWikiDoc((XWikiDocument) anyObject(), same(context))).andReturn(nlDoc)
         .anyTimes();
     expect(hibStore.executeRead((XWikiContext) anyObject(), eq(true),
-        (HibernateCallback) anyObject())).andReturn(list).atLeastOnce();
+        (HibernateCallback) anyObject())).andReturn(list).anyTimes();
   }
 
 }
