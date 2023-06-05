@@ -129,6 +129,7 @@ public class BlogPluginTest extends AbstractComponentTest {
     XWikiMessageTool messageTool = createDefaultMock(XWikiMessageTool.class);
     expect(messageTool.get(eq("cel_newsletter_subscriber_inactive"))).andReturn("inactive").once();
     XWikiContext context = mockContext(messageTool, doc1);
+    expect(getWikiMock().generateRandomString(16)).andReturn("abc").anyTimes();
     expect(getWikiMock().exists(eq("NewsletterReceivers.abc"), same(context))).andReturn(
         false).times(2);
     expect(doc1.getObject(eq("Celements2.BlogConfigClass"))).andReturn(null);
@@ -165,6 +166,7 @@ public class BlogPluginTest extends AbstractComponentTest {
     XWikiMessageTool messageTool = createDefaultMock(XWikiMessageTool.class);
     expect(messageTool.get(eq("cel_newsletter_subscriber_inactive"))).andReturn("inactive").once();
     XWikiContext context = mockContext(messageTool, doc1);
+    expect(getWikiMock().generateRandomString(16)).andReturn("abc").anyTimes();
     expect(getWikiMock().exists(eq("NewsletterReceivers.abc"), same(context))).andReturn(false)
         .atLeastOnce();
     expect(doc1.getObject(eq("Celements2.BlogConfigClass"))).andReturn(null);
