@@ -34,9 +34,9 @@ public class ArticleEngineLuceneTest extends AbstractComponentTest {
   @Before
   public void setUp_ArticleEngineLuceneTest() throws Exception {
     engine = (ArticleEngineLucene) Utils.getComponent(IArticleEngineRole.class, "lucene");
-    searchServiceMock = createMockAndAddToDefault(ILuceneSearchService.class);
+    searchServiceMock = createDefaultMock(ILuceneSearchService.class);
     engine.injectSearchService(searchServiceMock);
-    queryBuilderMock = createMockAndAddToDefault(IArticleLuceneQueryBuilderRole.class);
+    queryBuilderMock = createDefaultMock(IArticleLuceneQueryBuilderRole.class);
     engine.injectQueryBuilder(queryBuilderMock);
     DocumentReference xwikiPrefsDocRef = new DocumentReference("xwikidb", "XWiki",
         "XWikiPreferences");
@@ -56,7 +56,7 @@ public class ArticleEngineLuceneTest extends AbstractComponentTest {
     int limit = 10;
     param.setLimit(limit);
     LuceneQuery query = new LuceneQuery(Arrays.asList(LucenePlugin.DOCTYPE_WIKIPAGE));
-    LuceneSearchResult resultMock = createMockAndAddToDefault(LuceneSearchResult.class);
+    LuceneSearchResult resultMock = createDefaultMock(LuceneSearchResult.class);
     DocumentReference artDocRef = new DocumentReference("wiki", "blogSpace", "article");
     XWikiDocument artDoc = new XWikiDocument(artDocRef);
     artDoc.setSyntax(Syntax.XWIKI_1_0);
@@ -109,8 +109,8 @@ public class ArticleEngineLuceneTest extends AbstractComponentTest {
     int limit = 10;
     param.setLimit(limit);
     LuceneQuery query = new LuceneQuery(Arrays.asList(LucenePlugin.DOCTYPE_WIKIPAGE));
-    LuceneSearchResult resultMock = createMockAndAddToDefault(LuceneSearchResult.class);
-    Throwable cause = createMockAndAddToDefault(LuceneSearchException.class);
+    LuceneSearchResult resultMock = createDefaultMock(LuceneSearchResult.class);
+    Throwable cause = createDefaultMock(LuceneSearchException.class);
 
     expect(queryBuilderMock.build(same(param))).andReturn(query).once();
     expect(searchServiceMock.searchWithoutChecks(same(query), eq(sortFields), eq(Arrays.asList(

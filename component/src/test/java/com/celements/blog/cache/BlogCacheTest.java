@@ -21,13 +21,13 @@ import org.xwiki.query.QueryManager;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.common.cache.CacheLoadingException;
 import com.celements.common.cache.IDocumentReferenceCache;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.celements.query.IQueryExecutionServiceRole;
 import com.google.common.collect.ImmutableSet;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.Utils;
 
-public class BlogCacheTest extends AbstractBridgedComponentTestCase {
+public class BlogCacheTest extends AbstractComponentTest {
 
   private BlogCache cache;
   private QueryManager queryManagerMock;
@@ -36,11 +36,11 @@ public class BlogCacheTest extends AbstractBridgedComponentTestCase {
   @Before
   public void setUp_BlogCacheTest() {
     cache = (BlogCache) Utils.getComponent(IDocumentReferenceCache.class, BlogCache.NAME);
-    queryManagerMock = createMockAndAddToDefault(QueryManager.class);
+    queryManagerMock = createDefaultMock(QueryManager.class);
     cache.injectQueryManager(queryManagerMock);
-    queryExecServiceMock = createMockAndAddToDefault(IQueryExecutionServiceRole.class);
+    queryExecServiceMock = createDefaultMock(IQueryExecutionServiceRole.class);
     cache.injectQueryExecService(queryExecServiceMock);
-    cache.blogService = createMockAndAddToDefault(IBlogServiceRole.class);
+    cache.blogService = createDefaultMock(IBlogServiceRole.class);
   }
 
   @After
@@ -194,7 +194,7 @@ public class BlogCacheTest extends AbstractBridgedComponentTestCase {
   }
 
   private void expectXWQL(WikiReference wikiRef, List<DocumentReference> ret) throws Exception {
-    Query queryMock = createMockAndAddToDefault(Query.class);
+    Query queryMock = createDefaultMock(Query.class);
     String xwql = "select distinct doc.fullName from Document doc, doc.object("
         + "Celements2.BlogConfigClass) as obj";
     expect(queryManagerMock.createQuery(eq(xwql), eq(Query.XWQL))).andReturn(queryMock).once();

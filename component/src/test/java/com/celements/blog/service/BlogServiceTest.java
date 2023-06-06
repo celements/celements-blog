@@ -10,10 +10,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.easymock.Capture;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -47,25 +45,13 @@ public class BlogServiceTest extends AbstractComponentTest {
 
   @Before
   @SuppressWarnings("unchecked")
-  public void setUp_BlogServiceTest() throws Exception {
+  public void prepare() throws Exception {
     context = getContext();
     xwiki = getWikiMock();
+    articleEngineMock = registerComponentMock(IArticleEngineRole.class, testEngineHint);
     blogService = (BlogService) Utils.getComponent(IBlogServiceRole.class);
-    blogCacheMock = createMockAndAddToDefault(IDocumentReferenceCache.class);
+    blogCacheMock = createDefaultMock(IDocumentReferenceCache.class);
     blogService.blogCache = blogCacheMock;
-    articleEngineMock = createMockAndAddToDefault(IArticleEngineRole.class);
-
-    DefaultComponentDescriptor<IArticleEngineRole> descriptor = new DefaultComponentDescriptor<>();
-    descriptor.setRole(IArticleEngineRole.class);
-    descriptor.setRoleHint(testEngineHint);
-    Utils.getComponentManager().registerComponent(descriptor, articleEngineMock);
-  }
-
-  @After
-  public void breakDown_BlogServiceTest() {
-    DefaultComponentDescriptor<IArticleEngineRole> descriptor = new DefaultComponentDescriptor<>();
-    descriptor.setRole(IArticleEngineRole.class);
-    Utils.getComponentManager().unregisterComponent(IArticleEngineRole.class, testEngineHint);
   }
 
   @Test

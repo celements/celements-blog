@@ -1,6 +1,7 @@
 package com.celements.blog.search;
 
 import static com.celements.common.test.CelementsTestUtils.*;
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
@@ -14,6 +15,7 @@ import com.celements.search.lucene.query.IQueryRestriction;
 import com.celements.search.lucene.query.LuceneDocType;
 import com.celements.search.web.packages.WebSearchPackage;
 import com.google.common.base.Joiner;
+import com.xpn.xwiki.plugin.lucene.LucenePlugin;
 import com.xpn.xwiki.web.Utils;
 
 public class BlogWebSearchPackageTest extends AbstractComponentTest {
@@ -22,6 +24,10 @@ public class BlogWebSearchPackageTest extends AbstractComponentTest {
 
   @Before
   public void prepareTest() throws Exception {
+    LucenePlugin lucenePlugin = createDefaultMock(LucenePlugin.class);
+    expect(getWikiMock().getPlugin(eq("lucene"), same(getContext())))
+        .andReturn(lucenePlugin).anyTimes();
+    expect(lucenePlugin.getAnalyzer()).andReturn(null).anyTimes();
     webSearchPackage = (BlogWebSearchPackage) Utils.getComponent(WebSearchPackage.class,
         BlogWebSearchPackage.NAME);
   }
@@ -49,7 +55,9 @@ public class BlogWebSearchPackageTest extends AbstractComponentTest {
   @Test
   public void test_getQueryRestriction_empty() {
     String searchTerm = "";
+    replayDefault();
     IQueryRestriction restriction = webSearchPackage.getQueryRestriction(null, searchTerm);
+    verifyDefault();
     assertNotNull(restriction);
     assertEquals(String.format("XWiki.ArticleClass.lang:(+%s*)", getContext().getLanguage()),
         restriction.getQueryString());
@@ -58,7 +66,9 @@ public class BlogWebSearchPackageTest extends AbstractComponentTest {
   @Test
   public void test_getQueryRestriction_date() {
     String searchTerm = "201708010830";
+    replayDefault();
     IQueryRestriction restriction = webSearchPackage.getQueryRestriction(null, searchTerm);
+    verifyDefault();
     assertNotNull(restriction);
     assertEquals(String.format("(XWiki.ArticleClass.lang:(+%s*) AND "
         + "XWiki.ArticleClass.publishdate:(%s))", getContext().getLanguage(), searchTerm),
@@ -68,7 +78,9 @@ public class BlogWebSearchPackageTest extends AbstractComponentTest {
   @Test
   public void test_getQueryRestriction_text_exact() {
     String searchTerm = LuceneUtils.exactify("find me");
+    replayDefault();
     IQueryRestriction restriction = webSearchPackage.getQueryRestriction(null, searchTerm);
+    verifyDefault();
     assertNotNull(restriction);
     assertEquals(String.format("(XWiki.ArticleClass.lang:(+%s*) AND "
         + "(XWiki.ArticleClass.title:(+%s) OR XWiki.ArticleClass.extract:(+%s) OR "
@@ -80,8 +92,10 @@ public class BlogWebSearchPackageTest extends AbstractComponentTest {
   public void test_getQueryRestriction_text_tokenized() {
     String searchTerm1 = "find";
     String searchTerm2 = "us";
-    IQueryRestriction restriction = webSearchPackage.getQueryRestriction(null, Joiner.on(' ').join(
-        searchTerm1, searchTerm2));
+    replayDefault();
+    IQueryRestriction restriction = webSearchPackage.getQueryRestriction(null,
+        Joiner.on(' ').join(searchTerm1, searchTerm2));
+    verifyDefault();
     assertNotNull(restriction);
     assertEquals(String.format("(XWiki.ArticleClass.lang:(+%s*) AND "
         + "(XWiki.ArticleClass.title:(+%s* +%s*) OR XWiki.ArticleClass.extract:(+%s* +%s*) OR "

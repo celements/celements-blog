@@ -12,10 +12,10 @@ import org.xwiki.observation.event.Event;
 import com.celements.blog.observation.event.ArticleDeletedEvent;
 import com.celements.blog.observation.event.ArticleDeletingEvent;
 import com.celements.blog.plugin.BlogClasses;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
-public class ArticleDeleteListenerTest extends AbstractBridgedComponentTestCase {
+public class ArticleDeleteListenerTest extends AbstractComponentTest {
 
   private ArticleDeleteListener listener;
 

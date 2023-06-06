@@ -1,5 +1,6 @@
 package com.celements.blog.article;
 
+import static com.celements.common.test.CelementsTestUtils.*;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -14,7 +15,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.blog.service.IBlogServiceRole;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -23,7 +24,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
 
-public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
+public class ArticleEngineHQLTest extends AbstractComponentTest {
 
   private ArticleEngineHQL engine;
 
@@ -36,13 +37,12 @@ public class ArticleEngineHQLTest extends AbstractBridgedComponentTestCase {
     xwiki = getWikiMock();
     context = getContext();
     engine = (ArticleEngineHQL) Utils.getComponent(IArticleEngineRole.class);
-    blogServiceMock = createMockAndAddToDefault(IBlogServiceRole.class);
+    blogServiceMock = createDefaultMock(IBlogServiceRole.class);
     engine.injectBlogService(blogServiceMock);
   }
 
   @Test
-  public void testGetArticles() throws Exception {
-  }
+  public void testGetArticles() throws Exception {}
 
   @Test
   public void testGetBlogArticles_getArchivedArticles() throws XWikiException {

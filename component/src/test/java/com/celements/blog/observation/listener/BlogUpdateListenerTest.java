@@ -16,10 +16,10 @@ import com.celements.blog.observation.event.BlogDeletingEvent;
 import com.celements.blog.observation.event.BlogUpdatedEvent;
 import com.celements.blog.observation.event.BlogUpdatingEvent;
 import com.celements.blog.plugin.BlogClasses;
-import com.celements.common.test.AbstractBridgedComponentTestCase;
+import com.celements.common.test.AbstractComponentTest;
 import com.xpn.xwiki.web.Utils;
 
-public class BlogUpdateListenerTest extends AbstractBridgedComponentTestCase {
+public class BlogUpdateListenerTest extends AbstractComponentTest {
 
   private BlogUpdateListener listener;
 

@@ -247,21 +247,20 @@ public class Article extends Api {
    * @param lang
    * @return
    */
-  public @NotNull String getExtractLang(@NotNull String lang, @Nullable boolean isViewtypeFull) {
+  public @NotNull String getExtractLang(@NotNull String lang, boolean isViewtypeFull) {
     return getExtractDetailed(lang, isViewtypeFull, getMaxNumChars())[0];
   }
 
-  public @NotNull String getExtract(@NotNull String lang, @Nullable boolean isViewtypeFull) {
+  public @NotNull String getExtract(@NotNull String lang, boolean isViewtypeFull) {
     return getExtractDetailed(lang, isViewtypeFull, getMaxNumChars())[1];
   }
 
-  public @NotNull String getExtract(@NotNull String lang, @Nullable boolean isViewtypeFull,
-      @Nullable int maxNumChars) {
+  public @NotNull String getExtract(@NotNull String lang, boolean isViewtypeFull, int maxNumChars) {
     return getExtractDetailed(lang, isViewtypeFull, maxNumChars)[1];
   }
 
-  public @NotNull String[] getExtractDetailed(@NotNull String lang,
-      @Nullable boolean isViewtypeFull, @Nullable int maxNumChars) {
+  public @NotNull String[] getExtractDetailed(@NotNull String lang, boolean isViewtypeFull,
+      int maxNumChars) {
     String effectiveLang = lang;
     LOGGER.info("getExtract('" + lang + "', " + isViewtypeFull + "')");
     if ((extract == null) || !extract.containsKey(lang)) {
