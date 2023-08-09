@@ -12,18 +12,16 @@ import java.util.Set;
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.common.test.AbstractComponentTest;
 import com.celements.filebase.IAttachmentServiceRole;
-import com.celements.web.service.IWebUtilsService;
+import com.celements.web.plugin.cmd.AttachmentURLCommand;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
 
 public class NewsletterAttachmentServiceTest extends AbstractComponentTest {
 
@@ -32,14 +30,11 @@ public class NewsletterAttachmentServiceTest extends AbstractComponentTest {
   XWiki xwiki;
 
   @Before
-  public void setUp_NewsletterAttachmentServiceTest() throws Exception {
-    getContext().put("vcontext", new VelocityContext());
-    xwiki = getWikiMock();
-    service = new NewsletterAttachmentService();
-    service.execution = Utils.getComponent(Execution.class);
-    service.webUtils = Utils.getComponent(IWebUtilsService.class);
+  public void prepare() throws Exception {
     attService = registerComponentMock(IAttachmentServiceRole.class);
-    service.attService = attService;
+    getXContext().put("vcontext", new VelocityContext());
+    xwiki = getMock(XWiki.class);
+    service = getBeanFactory().getBean(NewsletterAttachmentService.class);
   }
 
   @Test
@@ -85,13 +80,10 @@ public class NewsletterAttachmentServiceTest extends AbstractComponentTest {
 
   @Test
   public void testGetImageURL_notEmbedded() throws Exception {
+    service.attUrlCmd = createDefaultMock(AttachmentURLCommand.class);
     String expectedResult = "/download/Test/Img/file.jpg";
-    XWikiDocument doc = createDefaultMock(XWikiDocument.class);
-    XWikiAttachment att = new XWikiAttachment();
-    expect(attService.getAttachmentNameEqual(same(doc), eq("file.jpg"))).andReturn(att).anyTimes();
-    expect(doc.getAttachmentURL(eq("file.jpg"), eq("download"), same(getContext()))).andReturn(
-        expectedResult).once();
-    expect(xwiki.getDocument(eq("Test.Img"), same(getContext()))).andReturn(doc).once();
+    expect(service.attUrlCmd.getAttachmentURL("Test.Img;file.jpg", "download", getContext()))
+        .andReturn(expectedResult);
     replayDefault();
     assertTrue(service.getImageURL("Test.Img;file.jpg", false).startsWith(expectedResult));
     verifyDefault();
