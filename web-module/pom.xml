@@ -26,7 +26,7 @@
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celementsweb</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>6.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>blog-web</artifactId>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-blog</artifactId>
-      <version>6.0-SNAPSHOT</version>
+      <version>6.0</version>
     </dependency>
   </dependencies>
   <build>
