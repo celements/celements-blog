@@ -7,11 +7,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
 import com.celements.filebase.IAttachmentServiceRole;
@@ -34,14 +35,16 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
 
   private static final Logger LOGGER = LoggerFactory.getLogger(NewsletterAttachmentService.class);
 
-  @Requirement
-  Execution execution;
+  @Inject
+  private Execution execution;
 
-  @Requirement
-  IWebUtilsService webUtils;
+  @Inject
+  private IWebUtilsService webUtils;
 
-  @Requirement
-  IAttachmentServiceRole attService;
+  @Inject
+  private IAttachmentServiceRole attService;
+
+  AttachmentURLCommand attUrlCmd = new AttachmentURLCommand();
 
   @Override
   public String embedImagesInContent(String content) {
@@ -68,12 +71,11 @@ public class NewsletterAttachmentService implements INewsletterAttachmentService
   @Override
   public String getImageURL(String imgFullname, boolean embedImage) {
     String imgURL = "";
-    AttachmentURLCommand attURL = new AttachmentURLCommand();
     if (embedImage) {
       extendAttachmentList(getAttachmentForFullname(imgFullname), DEFAULT_NL_ATTACHMENT_LIST);
-      imgURL = "cid:" + attURL.getAttachmentName(imgFullname);
+      imgURL = "cid:" + attUrlCmd.getAttachmentName(imgFullname);
     } else {
-      imgURL = attURL.getAttachmentURL(imgFullname, "download", getContext());
+      imgURL = attUrlCmd.getAttachmentURL(imgFullname, "download", getContext());
     }
     return imgURL;
   }
