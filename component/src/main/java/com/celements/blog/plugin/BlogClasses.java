@@ -48,7 +48,8 @@ public class BlogClasses extends AbstractClassCollection {
   public static final String PROPERTY_BLOG_CONFIG_SUBSCRIBE_TO = "subscribe_to";
   public static final String PROPERTY_BLOG_CONFIG_IS_SUBSCRIBABLE = "is_subscribable";
   public static final String PROPERTY_BLOG_CONFIG_MAX_NUM_CHARS_FIELD = "max_num_chars";
-  public static final String PROPERTY_BLOG_ARTICLE_PER_PAGE = "art_per_page";
+  public static final String PROPERTY_BLOG_CONFIG_ARTICLE_PER_PAGE = "art_per_page";
+  public static final String PROPERTY_BLOG_CONFIG_VIEW_TYPE = "viewtype";
 
   public static final String ARTICLE_CLASS_DOC = "ArticleClass";
   public static final String ARTICLE_CLASS_SPACE = "XWiki";
@@ -161,8 +162,8 @@ public class BlogClasses extends AbstractClassCollection {
         PROPERTY_BLOG_CONFIG_IS_SUBSCRIBABLE, "yesno");
     needsUpdate |= bclass.addTextField(PROPERTY_BLOG_CONFIG_SUBSCRIBE_TO,
         PROPERTY_BLOG_CONFIG_SUBSCRIBE_TO, 30);
-    needsUpdate |= bclass.addNumberField(PROPERTY_BLOG_ARTICLE_PER_PAGE,
-        PROPERTY_BLOG_ARTICLE_PER_PAGE, 5, "integer");
+    needsUpdate |= bclass.addNumberField(PROPERTY_BLOG_CONFIG_ARTICLE_PER_PAGE,
+        PROPERTY_BLOG_CONFIG_ARTICLE_PER_PAGE, 5, "integer");
     needsUpdate |= bclass.addBooleanField("is_newsletter", "is_newsletter", "yesno");
     needsUpdate |= bclass.addTextField("from_address", "from_address", 30);
     needsUpdate |= bclass.addTextField("reply_to_address", "reply_to_address", 30);

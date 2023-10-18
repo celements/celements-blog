@@ -15,11 +15,13 @@ public final class BlogConfig {
 
   public final SpaceReference configSpaceRef;
   public final int articlePerPage;
+  public final String viewType;
 
   public static class Builder {
 
     private SpaceReference configSpaceRef;
     private int articlePerPage;
+    private String viewType;
 
     public Builder setConfigSpaceRef(SpaceReference spaceRef) {
       configSpaceRef = spaceRef;
@@ -28,6 +30,11 @@ public final class BlogConfig {
 
     public Builder setArticlePerPage(int artPerPage) {
       this.articlePerPage = artPerPage;
+      return this;
+    }
+
+    public Builder setViewType(String viewType) {
+      this.viewType = viewType;
       return this;
     }
 
@@ -41,7 +48,9 @@ public final class BlogConfig {
           .space(configObj.getStringValue(BlogClasses.PROPERTY_BLOG_CONFIG_BLOGSPACE))
           .buildOpt(SpaceReference.class)
           .ifPresent(builder::setConfigSpaceRef);
-      builder.setArticlePerPage(configObj.getIntValue(BlogClasses.PROPERTY_BLOG_ARTICLE_PER_PAGE));
+      builder.setArticlePerPage(
+          configObj.getIntValue(BlogClasses.PROPERTY_BLOG_CONFIG_ARTICLE_PER_PAGE));
+      builder.setViewType(configObj.getStringValue(BlogClasses.PROPERTY_BLOG_CONFIG_VIEW_TYPE));
       return builder;
     }
 
@@ -53,6 +62,7 @@ public final class BlogConfig {
   private BlogConfig(Builder builder) {
     this.configSpaceRef = builder.configSpaceRef;
     this.articlePerPage = builder.articlePerPage;
+    this.viewType = builder.viewType;
   }
 
 }

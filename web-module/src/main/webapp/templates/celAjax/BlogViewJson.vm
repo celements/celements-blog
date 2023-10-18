@@ -2,8 +2,7 @@
 #set($blogDoc = $doc)
 #set($blogDocRef = $blogDoc.getDocumentReference())
 #set($spaceRef = $services.celblog.getBlogSpaceRef($blogDocRef))
-#set($blogObj = $!blogDoc.getObject('Celements2.BlogConfigClass'))
-
+#set($blogConfig = $services.celblog.getBlogConfig($blogDocRef))
 ## set article load parameter & get articles
 #set($setPublishdateASC = $request.get('publishdatesort') == 'asc')
 #set($isarchive = (("$request.get('archive')" == '1') || ("$cel_redParams_Map.get('archive')" == '1')))
@@ -42,33 +41,60 @@
 #set($devNull = $articleParam.setLimit(0))
 #set($devNull = $articleParam.setOffset(0))
 #set($articlesCountTotal = $services.celblog.getArticles($blogDocRef, $articleParam).size())
-#set($viewtype = "$!blogObj.getProperty('viewtype').getValue()")
+#set($viewtype = "$!blogConfig.viewType")
 #if("$!viewtype" == '')
   #set($viewtype = 'extract')
 #end
 #if("$!showArticleBlogName" == '')
   #set($showArticleBlogName = false)
 #end
-#set($articleParamJSON = $services.celementsweb.getNewJSONBuilder())
-$articleParamJSON.openDictionary()
-$articleParamJSON.openProperty('articlesCountTotal')
-$articleParamJSON.addInteger($articlesCountTotal)
-#if("$!articleParam.getLimit()" != '')
-$articleParamJSON.openProperty('limit')
-$articleParamJSON.addInteger($articleParam.getLimit())
+#set($showFieldsStr = "$!{request.showFields}")
+#set($showFields = $showFieldsStr.split(','))
+#set($showAll = $showFields.isEmpty() || $showFields.contains('all'))
+#set($showSearchInfoAll = ($request.debug == 'true')  || $showAll || $showFields.contains('searchInfo'))
+#set($showSearchInfoAny = $showSearchInfoAll || $showFields.contains('searchParameters'))
+#set($showSearchInfoAny = $showSearchInfoAny || $showFields.contains('navigationParameters'))
+#set($showSearchInfoAny = $showSearchInfoAny || $showFields.contains('resultParameters'))
+#set($showSearchInfoAny = $showSearchInfoAny || $showFields.contains('hitCount'))
+##
+#set($builder = $services.json.newBuilder())
+$builder.openDictionary()
+#if($showSearchInfoAny)
+$builder.openProperty('searchInfo')
+$builder.openDictionary()
+  #if($showSearchInfoAll || $showFields.contains('searchParameters'))
+  $builder.openProperty('searchParameters')
+  $builder.openDictionary()
+    $builder.addPropertyNonEmpty('searchTerm', $searchTerm)
+    $builder.addPropertyNonEmpty('sortField', $query.sortFields)
+  $builder.closeDictionary() ## searchParamters
+  #end
+  #if($showSearchInfoAll || $showFields.contains('navigationParameters'))
+  $builder.openProperty('navigationParameters')
+  $builder.openDictionary()
+    $builder.addPropertyNonEmpty('start', $articleParam.getOffset())
+    $builder.addPropertyNonEmpty('nb', $articleParam.getLimit())
+  $builder.closeDictionary() ## navigationParamters
+  #end
+  #if($showSearchInfoAll || $showFields.contains('resultParameters'))
+  $builder.openProperty('resultParameters')
+    $builder.addPropertyNonEmpty('showFields', $request.showFieldsStr)
+  $builder.closeDictionary() ## resultParamters
+  #end
+  #if($showSearchInfoAll || $showFields.contains('hitCount'))
+  $builder.openProperty('hitCount')
+  $builder.openDictionary()
+    $builder.addPropertyNonEmpty('countTotal', $articlesCountTotal)
+  $builder.closeDictionary() ## hitCount
+  #end
+$builder.closeDictionary() ## searchInfo
+#end ## request.debug
+$builder.openProperty('results')
+$builder.openArray()
+#set($cdate = '')
+#foreach($article in $articles)
+ #parse('celMacros/renderOneBlogArticle.vm')
 #end
-#if("$!articleParam.getOffset()" != '')
-$articleParamJSON.openProperty('offset')
-$articleParamJSON.addInteger($articleParam.getOffset())
-#end
-$articleParamJSON.closeDictionary()
-
-
-  <span class="cel_paging_details_json" style="display:none">$!articleParamJSON.getJSON()</span>
-#set($renderArticlesMacroRef = $services.reference.resolveDocRef("$renderArticlesMacro"))
-#if(("$!renderArticlesMacro" != '') && $services.modelAccess.exists($renderArticlesMacroRef))
-  $services.celementsweb.renderCelementsDocument($renderArticlesMacroRef)
-#else
-  #set($renderArticlesMacro = 'celMacros/renderBlogArticles.vm')
-  #parse('celMacros/renderBlogArticles.vm')
-#end
+$builder.closeArray()
+$builder.closeDictionary()
+$!builder.getJSON()
