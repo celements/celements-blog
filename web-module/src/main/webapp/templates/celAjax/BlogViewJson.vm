@@ -91,9 +91,9 @@ $builder.closeDictionary() ## searchInfo
 #end ## request.debug
 $builder.openProperty('results')
 $builder.openArray()
-#set($cdate = '')
+#set($viewAccessLevel = $services.rightsAccess.getEAccessLevel('view'))
 #foreach($article in $articles)
- #parse('celMacros/renderOneBlogArticle.vm')
+ #parse('celMacros/renderOneBlogArticleJson.vm')
 #end
 $builder.closeArray()
 $builder.closeDictionary()
