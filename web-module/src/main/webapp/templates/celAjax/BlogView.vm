@@ -1,8 +1,9 @@
 #parse('celMacros/setupBlogView.vm')
   <span class="cel_paging_details_json" style="display:none">$!articleParamJSON.getJSON()</span>
-#if(("$!renderArticlesMacro" == '') || !$xwiki.exists($renderArticlesMacro))
+#set($renderArticlesMacroRef = $services.reference.resolveDocRef("$renderArticlesMacro"))
+#if(("$!renderArticlesMacro" != '') && $services.modelAccess.exists($renderArticlesMacroRef))
+  $services.celementsweb.renderCelementsDocument($renderArticlesMacroRef)
+#else
   #set($renderArticlesMacro = 'celMacros/renderBlogArticles.vm')
   #parse('celMacros/renderBlogArticles.vm')
-#else
-  $xwiki.includeForm("$renderArticlesMacro", false)
 #end
