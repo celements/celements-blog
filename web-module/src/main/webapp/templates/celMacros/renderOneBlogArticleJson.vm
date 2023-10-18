@@ -54,4 +54,4 @@ $builder.openDictionary()
       $builder.addPropertyNonEmpty('moreLinkText', $msg.get('cel_rls_blog_article_more'))
     #end
   #end
-$builder.closeDictionary() ## oneArticleS
+$builder.closeDictionary() ## oneArticle
