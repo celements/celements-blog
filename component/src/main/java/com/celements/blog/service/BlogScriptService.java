@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -19,6 +20,7 @@ import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadParameter;
 import com.celements.blog.article.ArticleLoadParameter.DateMode;
 import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
+import com.celements.blog.dto.BlogConfig;
 import com.celements.blog.plugin.EmailAddressDate;
 import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.plugin.NewsletterReceivers;
@@ -45,6 +47,10 @@ public class BlogScriptService implements ScriptService {
     this.mContext = mContext;
     this.rightsAccess = rightsAccess;
     this.modelAccess = modelAccess;
+  }
+
+  public Optional<BlogConfig> getBlogConfig(DocumentReference blogConfDocRef) {
+    return blogService.getBlogConfig(blogConfDocRef);
   }
 
   public List<String> getAddresses(DocumentReference blogDocRef) {

@@ -1,6 +1,10 @@
 package com.celements.blog.service;
 
 import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.reference.DocumentReference;
@@ -10,6 +14,7 @@ import org.xwiki.query.QueryException;
 import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadException;
 import com.celements.blog.article.ArticleLoadParameter;
+import com.celements.blog.dto.BlogConfig;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -22,7 +27,7 @@ public interface IBlogServiceRole {
    * @return
    */
   @Deprecated
-  public DocumentReference getBlogDocRefByBlogSpace(String blogSpaceName);
+  DocumentReference getBlogDocRefByBlogSpace(String blogSpaceName);
 
   /**
    * @deprecated since 1.32 instead use {@link #getBlogConfigDocRef(SpaceReference)}
@@ -30,7 +35,7 @@ public interface IBlogServiceRole {
    * @return
    */
   @Deprecated
-  public XWikiDocument getBlogPageByBlogSpace(String blogSpaceName);
+  XWikiDocument getBlogPageByBlogSpace(String blogSpaceName);
 
   /**
    * gets the blog ref for the given space reference
@@ -40,7 +45,7 @@ public interface IBlogServiceRole {
    * @throws QueryException
    * @throws XWikiException
    */
-  public DocumentReference getBlogConfigDocRef(SpaceReference spaceRef) throws QueryException,
+  DocumentReference getBlogConfigDocRef(SpaceReference spaceRef) throws QueryException,
       XWikiException;
 
   /**
@@ -50,7 +55,7 @@ public interface IBlogServiceRole {
    * @return
    * @throws XWikiException
    */
-  public SpaceReference getBlogSpaceRef(DocumentReference blogConfDocRef) throws XWikiException;
+  SpaceReference getBlogSpaceRef(DocumentReference blogConfDocRef) throws XWikiException;
 
   /**
    * checks whether blog ref is subscribable
@@ -59,7 +64,7 @@ public interface IBlogServiceRole {
    * @return
    * @throws XWikiException
    */
-  public boolean isSubscribable(DocumentReference blogConfDocRef) throws XWikiException;
+  boolean isSubscribable(DocumentReference blogConfDocRef) throws XWikiException;
 
   /**
    * gets all subscribed blog refs for the given blog ref
@@ -69,7 +74,7 @@ public interface IBlogServiceRole {
    * @throws QueryException
    * @throws XWikiException
    */
-  public List<DocumentReference> getSubribedToBlogs(DocumentReference blogConfDocRef)
+  List<DocumentReference> getSubribedToBlogs(DocumentReference blogConfDocRef)
       throws QueryException, XWikiException;
 
   /**
@@ -80,7 +85,7 @@ public interface IBlogServiceRole {
    * @throws QueryException
    * @throws XWikiException
    */
-  public List<SpaceReference> getSubribedToBlogsSpaceRefs(DocumentReference blogConfDocRef)
+  List<SpaceReference> getSubribedToBlogsSpaceRefs(DocumentReference blogConfDocRef)
       throws QueryException, XWikiException;
 
   /**
@@ -94,7 +99,16 @@ public interface IBlogServiceRole {
    * @throws ArticleLoadException
    *           if there was an error loading articles
    */
-  public List<Article> getArticles(DocumentReference blogConfDocRef, ArticleLoadParameter param)
+  List<Article> getArticles(DocumentReference blogConfDocRef, ArticleLoadParameter param)
       throws ArticleLoadException;
+
+  /**
+   * get DTO blog config object
+   *
+   * @param blogConfDocRef
+   * @return
+   */
+  @NotNull
+  Optional<BlogConfig> getBlogConfig(@Nullable DocumentReference blogConfDocRef);
 
 }

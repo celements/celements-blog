@@ -1,17 +1,5 @@
 ## set blog doc
-#if("$!renderDocument" != '')
-  #set($blogDoc = $renderDocument)
-#end
-#if("$!pageDoc.documentReference" != '')
-  #set($theDoc = $xwiki.getDocument($pageDoc.documentReference))
-#elseif("$!celldoc" != '')
-  #set($theDoc = $celldoc)
-#else
-  #set($theDoc = $doc)
-#end
-#if("$!blogDoc" ==  '')
-  #set($blogDoc = $theDoc)
-#end
+#set($blogDoc = $doc)
 #set($blogDocRef = $blogDoc.getDocumentReference())
 #set($spaceRef = $services.celblog.getBlogSpaceRef($blogDocRef))
 #set($blogObj = $!blogDoc.getObject('Celements2.BlogConfigClass'))
