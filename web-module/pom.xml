@@ -51,6 +51,12 @@
   </dependencies>
   <build>
     <finalName>blog-web</finalName>
+    <plugins>
+      <plugin>
+        <groupId>com.jarslab.maven</groupId>
+        <artifactId>babel-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
   <scm>
     <connection>scm:git:git://github.com/celements/celements-blog</connection>
