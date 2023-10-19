@@ -38,7 +38,6 @@
 #end
 #set($devNull = $articleParam.setSearchTerm("$!searchTerm"))
 #set($articles = $services.celblog.getArticles($blogDocRef, $articleParam))
-#set($articlesCountTotal = $services.celblog.getArticles($blogDocRef, $articleParam).size())
 #set($viewtype = "$!blogConfig.viewType")
 #if("$!viewtype" == '')
   #set($viewtype = 'extract')
@@ -73,10 +72,14 @@ $builder.openDictionary('searchInfo')
   #end
   #if($showSearchInfoAll || $showFields.contains('resultParameters'))
   $builder.openDictionary('resultParameters')
-    $builder.addPropertyNonEmpty('showFields', $request.showFieldsStr)
+    $builder.addPropertyNonEmpty('showFields', $request.showFields)
   $builder.closeDictionary() ## resultParamters
   #end
   #if($showSearchInfoAll || $showFields.contains('hitCount'))
+  ## TODO probably really slow
+  ##set($devNull = $articleParam.setOffset(0))
+  ##set($devNull = $articleParam.setLimit(0))
+  ##set($articlesCountTotal = $services.celblog.getArticles($blogDocRef, $articleParam).size())
   $builder.openDictionary('hitCount')
     $builder.addPropertyNonEmpty('countTotal', $articlesCountTotal)
   $builder.closeDictionary() ## hitCount
