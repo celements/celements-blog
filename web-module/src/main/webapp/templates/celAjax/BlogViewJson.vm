@@ -76,12 +76,13 @@ $builder.openDictionary('searchInfo')
   $builder.closeDictionary() ## resultParamters
   #end
   #if($showSearchInfoAll || $showFields.contains('hitCount'))
-  ## TODO probably really slow
-  ##set($devNull = $articleParam.setOffset(0))
-  ##set($devNull = $articleParam.setLimit(0))
-  ##set($articlesCountTotal = $services.celblog.getArticles($blogDocRef, $articleParam).size())
+  #set($offset = $articleParam.getOffset())
+  #set($devNull = $articleParam.setOffset(0))
+  #set($devNull = $articleParam.setLimit(0))
+  #set($articlesCountTotal = $services.celblog.getArticles($blogDocRef, $articleParam).size())
   $builder.openDictionary('hitCount')
     $builder.addPropertyNonEmpty('countTotal', $articlesCountTotal)
+    $builder.addPropertyNonEmpty('countAfter', $mathtool.max(0,$mathtool.sub($articlesCountTotal, $offset)))
   $builder.closeDictionary() ## hitCount
   #end
 $builder.closeDictionary() ## searchInfo
