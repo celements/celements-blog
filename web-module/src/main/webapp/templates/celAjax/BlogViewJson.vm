@@ -60,37 +60,32 @@
 #set($builder = $services.json.newBuilder())
 $builder.openDictionary()
 #if($showSearchInfoAny)
-$builder.openProperty('searchInfo')
-$builder.openDictionary()
+$builder.openDictionary('searchInfo')
   #if($showSearchInfoAll || $showFields.contains('searchParameters'))
-  $builder.openProperty('searchParameters')
-  $builder.openDictionary()
+  $builder.openDictionary('searchParameters')
     $builder.addPropertyNonEmpty('searchTerm', $searchTerm)
     $builder.addPropertyNonEmpty('sortField', $query.sortFields)
   $builder.closeDictionary() ## searchParamters
   #end
   #if($showSearchInfoAll || $showFields.contains('navigationParameters'))
-  $builder.openProperty('navigationParameters')
-  $builder.openDictionary()
+  $builder.openDictionary('navigationParameters')
     $builder.addPropertyNonEmpty('start', $articleParam.getOffset())
     $builder.addPropertyNonEmpty('nb', $articleParam.getLimit())
   $builder.closeDictionary() ## navigationParamters
   #end
   #if($showSearchInfoAll || $showFields.contains('resultParameters'))
-  $builder.openProperty('resultParameters')
+  $builder.openDictionary('resultParameters')
     $builder.addPropertyNonEmpty('showFields', $request.showFieldsStr)
   $builder.closeDictionary() ## resultParamters
   #end
   #if($showSearchInfoAll || $showFields.contains('hitCount'))
-  $builder.openProperty('hitCount')
-  $builder.openDictionary()
+  $builder.openDictionary('hitCount')
     $builder.addPropertyNonEmpty('countTotal', $articlesCountTotal)
   $builder.closeDictionary() ## hitCount
   #end
 $builder.closeDictionary() ## searchInfo
 #end ## request.debug
-$builder.openProperty('results')
-$builder.openArray()
+$builder.openArray('results')
 #set($viewAccessLevel = $services.rightsAccess.getEAccessLevel('view'))
 #foreach($article in $articles)
  #parse('celMacros/renderOneBlogArticleJson.vm')
