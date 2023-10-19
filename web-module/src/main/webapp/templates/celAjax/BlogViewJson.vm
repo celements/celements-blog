@@ -38,8 +38,6 @@
 #end
 #set($devNull = $articleParam.setSearchTerm("$!searchTerm"))
 #set($articles = $services.celblog.getArticles($blogDocRef, $articleParam))
-#set($devNull = $articleParam.setLimit(0))
-#set($devNull = $articleParam.setOffset(0))
 #set($articlesCountTotal = $services.celblog.getArticles($blogDocRef, $articleParam).size())
 #set($viewtype = "$!blogConfig.viewType")
 #if("$!viewtype" == '')
