@@ -505,7 +505,7 @@ public class Article extends Api {
     return articleExtract;
   }
 
-  List<ImageUrl> getArticleImagesBySizeAsc(String lang) {
+  public List<ImageUrl> getArticleImagesBySizeAsc(String lang) {
     List<ImageUrl> articleImages = getImageUrlExtractor().extractImagesSocialMediaUrlList(
         getFullArticle(lang));
     if (articleImages.isEmpty()) {
