@@ -75,7 +75,8 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     if (param.isWithBlogArticles() && rightsAccess.hasAccessLevel(blogSpaceRef,
         EAccessLevel.VIEW)) {
       IQueryRestriction dateRestr = getDateRestrictions(param.getDateModes(),
-          param.getExecutionDate(), rightsAccess.hasAccessLevel(blogSpaceRef, EAccessLevel.EDIT));
+          param.getExecutionDate(), param.getFromPublishDate(),
+          rightsAccess.hasAccessLevel(blogSpaceRef, EAccessLevel.EDIT));
       if (dateRestr != null) {
         restr = searchService.createRestrictionGroup(Type.AND);
         restr.add(searchService.createSpaceRestriction(blogSpaceRef));
@@ -124,7 +125,7 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     QueryRestrictionGroup subsSpaceGrp = null;
     boolean hasEditRights = rightsAccess.hasAccessLevel(spaceRef, EAccessLevel.EDIT);
     IQueryRestriction dateRestr = getDateRestrictions(param.getDateModes(),
-        param.getExecutionDate(), hasEditRights);
+        param.getExecutionDate(), param.getFromPublishDate(), hasEditRights);
     IQueryRestriction artSubsRestr = getArticleSubsRestrictions(param.getSubscriptionModes(),
         param.getBlogDocRef(), hasEditRights);
     if ((artSubsRestr != null) && (dateRestr != null)) {
@@ -141,43 +142,38 @@ public class ArticleLuceneQueryBuilder implements IArticleLuceneQueryBuilderRole
     return subsSpaceGrp;
   }
 
-  QueryRestrictionGroup getDateRestrictions(Set<DateMode> modes, Date date, boolean hasEditRights) {
-    QueryRestrictionGroup ret = null;
+  QueryRestrictionGroup getDateRestrictions(Set<DateMode> modes, Date execDate,
+      Date fromPublishDate, boolean hasEditRights) {
+    QueryRestrictionGroup ret = searchService.createRestrictionGroup(Type.OR);
     if ((modes.size() < DateMode.values().length) || !hasEditRights) {
       // TODO not-restrictions shouldn't be inclusive of date but rather
       // {date TO highdate]). this doesn't work for now, see Ticket #7245
       IQueryRestriction publishRestr = searchService.createFromToDateRestriction(
-          ARTICLE_FIELD_PUBLISH, null, date, true);
+          ARTICLE_FIELD_PUBLISH, null, execDate, true);
       IQueryRestriction notPublishRestr = searchService.createFromToDateRestriction(
-          ARTICLE_FIELD_PUBLISH, date, null, true);
+          ARTICLE_FIELD_PUBLISH, execDate, null, true);
       IQueryRestriction archiveRestr = searchService.createFromToDateRestriction(
-          ARTICLE_FIELD_ARCHIVE, null, date, true);
+          ARTICLE_FIELD_ARCHIVE, null, execDate, true);
       IQueryRestriction notArchiveRestr = searchService.createFromToDateRestriction(
-          ARTICLE_FIELD_ARCHIVE, date, null, true);
+          ARTICLE_FIELD_ARCHIVE, execDate, null, true);
       if (modes.contains(DateMode.PUBLISHED)) {
         QueryRestrictionGroup restrs = searchService.createRestrictionGroup(Type.AND);
         restrs.add(publishRestr);
         restrs.add(notArchiveRestr);
-        ret = addRestrToGrp(ret, restrs);
+        if (fromPublishDate != null) {
+          restrs.add(searchService.createFromToDateRestriction(
+              ARTICLE_FIELD_PUBLISH, fromPublishDate, null, true));
+        }
+        ret.add(restrs);
       }
       if (modes.contains(DateMode.FUTURE) && hasEditRights) {
-        ret = addRestrToGrp(ret, notPublishRestr);
+        ret.add(notPublishRestr);
       }
       if (modes.contains(DateMode.ARCHIVED)) {
-        ret = addRestrToGrp(ret, archiveRestr);
+        ret.add(archiveRestr);
       }
-    } else {
-      ret = searchService.createRestrictionGroup(Type.OR);
     }
-    return ret;
-  }
-
-  private QueryRestrictionGroup addRestrToGrp(QueryRestrictionGroup grp, IQueryRestriction restr) {
-    if (grp == null) {
-      grp = searchService.createRestrictionGroup(Type.OR);
-    }
-    grp.add(restr);
-    return grp;
+    return !ret.isEmpty() ? ret : null;
   }
 
   QueryRestrictionGroup getArticleSubsRestrictions(Set<SubscriptionMode> modes,

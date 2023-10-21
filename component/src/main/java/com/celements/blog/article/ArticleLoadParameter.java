@@ -30,6 +30,7 @@ public class ArticleLoadParameter {
   private List<DocumentReference> subscribedToBlogs = Collections.emptyList();
   private Set<DateMode> dateModes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
       DateMode.PUBLISHED)));
+  private Date fromPublishDate;
   private Set<SubscriptionMode> subsModes = Collections.emptySet();
   private String language = null;
   private String searchTerm = null;
@@ -39,8 +40,7 @@ public class ArticleLoadParameter {
   private List<String> sortFields = Arrays.asList("-" + BlogClasses.ARTICLE_CLASS + "."
       + BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE, "name");
 
-  public ArticleLoadParameter() {
-  }
+  public ArticleLoadParameter() {}
 
   public Date getExecutionDate() {
     return executionDate;
@@ -99,6 +99,15 @@ public class ArticleLoadParameter {
       modes.add(DateMode.valueOf(modeStr.toUpperCase()));
     }
     return setDateModes(modes);
+  }
+
+  public Date getFromPublishDate() {
+    return fromPublishDate;
+  }
+
+  public ArticleLoadParameter setFromPublishDate(Date date) {
+    this.fromPublishDate = date;
+    return this;
   }
 
   public Set<SubscriptionMode> getSubscriptionModes() {
