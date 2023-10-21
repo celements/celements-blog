@@ -3,7 +3,7 @@
   #if("$!bentrydoc" != '')
     #set($creationDate = '')
     #set($creationDateStr = '')
-    #set($creationDate = $article.getPublishDate())
+    #set($creationDate = $article.getPublishDate($language))
     #if("$!creationDate" != '')
       #set($dateFormatDictKey = 'cel_blog_dateformat')
       #set($blog_dateFormat = $msg.get($dateFormatDictKey))
