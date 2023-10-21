@@ -13,6 +13,7 @@ function safeAssign(obj, newProps) {
 
 export class BlogFilter {
   searchTerm;
+  fromPublishDate;
 }
 
 export class BlogParams {

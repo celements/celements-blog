@@ -33,6 +33,8 @@
 #if(("$!nb" != '') && ($nb > 0))
   #set($devNull = $articleParam.setLimit($nb))
 #end
+#set($fromPublishDate = $services.date.parseLocalISO($request.fromPublishDate))
+#set($devNull = $articleParam.setFromPublishDate($services.date.toDate($fromPublishDate)))
 #if("$!searchTerm" == '')
   #set($searchTerm = "$!{request.searchTerm}")
 #end
@@ -76,13 +78,16 @@ $builder.openDictionary('searchInfo')
   $builder.closeDictionary() ## resultParamters
   #end
   #if($showSearchInfoAll || $showFields.contains('hitCount'))
-  #set($offset = $articleParam.getOffset())
+  #set($countBefore = $mathtool.add($articleParam.offset, $articleParam.limit))
+  ## TODO
+  ##set($countTotal = $services.celblog.getArticleCount($blogDocRef, $articleParam))
   #set($devNull = $articleParam.setOffset(0))
   #set($devNull = $articleParam.setLimit(0))
-  #set($articlesCountTotal = $services.celblog.getArticles($blogDocRef, $articleParam).size())
+  #set($countTotal = $services.celblog.getArticles($blogDocRef, $articleParam).size())
+  #set($countAfter = $mathtool.sub($countTotal, $countBefore))
   $builder.openDictionary('hitCount')
-    $builder.addPropertyNonEmpty('countTotal', $articlesCountTotal)
-    $builder.addPropertyNonEmpty('countAfter', $mathtool.max(0,$mathtool.sub($articlesCountTotal, $offset)))
+    $builder.addPropertyNonEmpty('countTotal', $countTotal)
+    $builder.addPropertyNonEmpty('countAfter', $mathtool.max(0, $countAfter))
   $builder.closeDictionary() ## hitCount
   #end
 $builder.closeDictionary() ## searchInfo
