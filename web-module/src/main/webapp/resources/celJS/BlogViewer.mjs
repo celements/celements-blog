@@ -1,4 +1,4 @@
-import CelDataRenderer from '/file/resources/celDynJS/celData/cel-data-renderer.mjs?ver=2023100802';
+import CelDataRenderer from '/file/resources/celDynJS/celData/cel-data-renderer.mjs?ver=20231024';
 
 const tagName = 'blog-viewer';
 
