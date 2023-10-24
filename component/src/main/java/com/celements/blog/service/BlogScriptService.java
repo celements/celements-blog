@@ -4,25 +4,30 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.context.Execution;
+import org.springframework.stereotype.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 
 import com.celements.blog.article.Article;
 import com.celements.blog.article.ArticleLoadParameter;
 import com.celements.blog.article.ArticleLoadParameter.DateMode;
 import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
+import com.celements.blog.dto.BlogConfig;
 import com.celements.blog.plugin.EmailAddressDate;
 import com.celements.blog.plugin.EmptyArticleException;
 import com.celements.blog.plugin.NewsletterReceivers;
-import com.xpn.xwiki.XWikiContext;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
+import com.celements.model.context.ModelContext;
+import com.celements.rights.access.IRightsAccessFacadeRole;
 import com.xpn.xwiki.XWikiException;
 
 @Component("celblog")
@@ -30,61 +35,50 @@ public class BlogScriptService implements ScriptService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BlogScriptService.class);
 
-  @Requirement
-  private IBlogServiceRole blogService;
+  private final IBlogServiceRole blogService;
+  private final ModelContext mContext;
+  private final IRightsAccessFacadeRole rightsAccess;
+  private final IModelAccessFacade modelAccess;
 
-  @Requirement
-  private Execution execution;
+  @Inject
+  public BlogScriptService(IBlogServiceRole blogService, ModelContext mContext,
+      IRightsAccessFacadeRole rightsAccess, IModelAccessFacade modelAccess) {
+    this.blogService = blogService;
+    this.mContext = mContext;
+    this.rightsAccess = rightsAccess;
+    this.modelAccess = modelAccess;
+  }
 
-  private XWikiContext getContext() {
-    return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+  public Optional<BlogConfig> getBlogConfig(DocumentReference blogConfDocRef) {
+    return blogService.getBlogConfig(blogConfDocRef);
   }
 
   public List<String> getAddresses(DocumentReference blogDocRef) {
-    if (getContext().getWiki().getRightService().hasAdminRights(getContext())) {
-      try {
-        NewsletterReceivers newsletterReceivers = new NewsletterReceivers(
-            getContext().getWiki().getDocument(blogDocRef, getContext()), getContext());
-        List<String> addresses = newsletterReceivers.getAllAddresses();
-        Collections.sort(addresses);
-        return addresses;
-      } catch (XWikiException exp) {
-        LOGGER.error("Failed to get Blog document for [" + blogDocRef + "].", exp);
-      }
-    } else {
-      LOGGER.info("getAddresses failed because user [" + getContext().getUser()
-          + "] has no admin rights.");
-    }
-    return Collections.emptyList();
+    return getNewsletterReceiversDetails(blogDocRef, nR -> nR.getAllAddresses());
   }
 
   public List<EmailAddressDate> getAddressesOrderedByDate(DocumentReference blogDocRef) {
-    if (getContext().getWiki().getRightService().hasAdminRights(getContext())) {
-      try {
-        NewsletterReceivers newsletterReceivers = new NewsletterReceivers(
-            getContext().getWiki().getDocument(blogDocRef, getContext()), getContext());
-        List<EmailAddressDate> addresses = newsletterReceivers.getAddressesOrderByDate();
-        Collections.sort(addresses);
-        return addresses;
-      } catch (XWikiException exp) {
-        LOGGER.error("Failed to get Blog document for [" + blogDocRef + "].", exp);
-      }
-    } else {
-      LOGGER.info("getAddresses failed because user [" + getContext().getUser()
-          + "] has no admin rights.");
-    }
-    return Collections.emptyList();
+    return getNewsletterReceiversDetails(blogDocRef, nR -> nR.getAddressesOrderByDate());
   }
 
-  /**
-   * @deprecated since 1.32 instead use {@link #getBlogDocRefForSpaceRef(SpaceReference)}
-   * @param blogSpaceName
-   * @return
-   */
-  @Deprecated
-  public DocumentReference getBlogDocRefByBlogSpace(String blogSpaceName) {
-    return getBlogDocRefForSpaceRef(new SpaceReference(blogSpaceName, new WikiReference(
-        getContext().getDatabase())));
+  private <T extends Comparable<? super T>> List<T> getNewsletterReceiversDetails(
+      DocumentReference blogDocRef,
+      Function<NewsletterReceivers, List<T>> dataAccessor) {
+    if (rightsAccess.isAdmin()) {
+      try {
+        NewsletterReceivers newsletterReceivers = new NewsletterReceivers(
+            modelAccess.getDocument(blogDocRef));
+        List<T> data = dataAccessor.apply(newsletterReceivers);
+        Collections.sort(data);
+        return data;
+      } catch (XWikiException | DocumentNotExistsException exp) {
+        LOGGER.error("Failed to get Blog document for [{}].", blogDocRef, exp);
+      }
+    } else {
+      LOGGER.info("getAddresses failed because user [{}] has no admin rights.",
+          mContext.getUserName());
+    }
+    return Collections.emptyList();
   }
 
   public DocumentReference getBlogDocRefForSpaceRef(SpaceReference spaceRef) {
@@ -94,7 +88,7 @@ public class BlogScriptService implements ScriptService {
         ret = blogService.getBlogConfigDocRef(spaceRef);
       }
     } catch (Exception exc) {
-      LOGGER.error("Error getting blog config for '" + spaceRef + "'", exc);
+      LOGGER.error("Error getting blog config for '{}'", spaceRef, exc);
     }
     return ret;
   }
@@ -104,7 +98,7 @@ public class BlogScriptService implements ScriptService {
     try {
       ret = blogService.getBlogSpaceRef(blogConfDocRef);
     } catch (Exception exc) {
-      LOGGER.error("Error getting blog space ref for '" + blogConfDocRef + "'", exc);
+      LOGGER.error("Error getting blog space ref for '{}'", blogConfDocRef, exc);
     }
     return ret;
   }
@@ -114,7 +108,7 @@ public class BlogScriptService implements ScriptService {
     try {
       ret = blogService.getSubribedToBlogsSpaceRefs(blogConfDocRef);
     } catch (Exception exc) {
-      LOGGER.error("Error getting blog space ref for '" + blogConfDocRef + "'", exc);
+      LOGGER.error("Error getting blog space ref for '{}'", blogConfDocRef, exc);
       ret = Collections.emptyList();
     }
     return ret;
@@ -175,8 +169,7 @@ public class BlogScriptService implements ScriptService {
         ret = blogService.getArticles(blogConfDocRef, param);
       }
     } catch (Exception exc) {
-      LOGGER.error("Error getting articles for '" + blogConfDocRef + "' and param '" + param + "'",
-          exc);
+      LOGGER.error("Error getting articles for '{}' and param '{}'", blogConfDocRef, param, exc);
     }
     return ret;
   }
@@ -184,9 +177,9 @@ public class BlogScriptService implements ScriptService {
   public Article getArticle(DocumentReference articleDocRef) throws XWikiException {
     Article article = null;
     try {
-      article = new Article(getContext().getWiki().getDocument(articleDocRef, getContext()),
-          getContext());
-    } catch (EmptyArticleException exc) {
+      article = new Article(modelAccess.getDocument(articleDocRef),
+          mContext.getXWikiContext());
+    } catch (EmptyArticleException | DocumentNotExistsException exc) {
       LOGGER.info("Empty article {}", articleDocRef, exc);
     }
     return article;

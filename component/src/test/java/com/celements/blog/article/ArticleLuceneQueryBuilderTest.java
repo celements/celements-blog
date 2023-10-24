@@ -369,7 +369,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = true;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     assertNull(ret);
   }
@@ -380,7 +380,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = true;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     assertEquals(getPublishedQuery(date), ret.getQueryString());
   }
@@ -391,7 +391,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = false;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     assertEquals(getPublishedQuery(date), ret.getQueryString());
   }
@@ -402,7 +402,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = true;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     assertEquals(getArchivedQuery(date), ret.getQueryString());
   }
@@ -413,7 +413,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = false;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     assertEquals(getArchivedQuery(date), ret.getQueryString());
   }
@@ -424,7 +424,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = true;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     assertEquals(getFutureQuery(date), ret.getQueryString());
   }
@@ -435,7 +435,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = false;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     assertNull(ret);
   }
@@ -446,7 +446,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = true;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getArchivedQuery(date) + ")";
     assertEquals(expectedQuery, ret.getQueryString());
@@ -458,7 +458,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = false;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getArchivedQuery(date) + ")";
     assertEquals(expectedQuery, ret.getQueryString());
@@ -470,7 +470,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = true;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getFutureQuery(date) + ")";
     assertEquals(expectedQuery, ret.getQueryString());
@@ -482,7 +482,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = false;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     assertEquals(getPublishedQuery(date), ret.getQueryString());
   }
@@ -493,7 +493,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = true;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     String expectedQuery = "(" + getFutureQuery(date) + " OR " + getArchivedQuery(date) + ")";
     assertEquals(expectedQuery, ret.getQueryString());
@@ -505,7 +505,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = false;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     assertEquals(getArchivedQuery(date), ret.getQueryString());
   }
@@ -517,9 +517,9 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = true;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
-    assertEquals("", ret.getQueryString());
+    assertNull(ret);
   }
 
   @Test
@@ -529,7 +529,7 @@ public class ArticleLuceneQueryBuilderTest extends AbstractComponentTest {
     Date date = new Date();
     boolean hasEditRights = false;
     replayDefault();
-    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, hasEditRights);
+    QueryRestrictionGroup ret = builder.getDateRestrictions(modes, date, null, hasEditRights);
     verifyDefault();
     String expectedQuery = "(" + getPublishedQuery(date) + " OR " + getArchivedQuery(date) + ")";
     assertEquals(expectedQuery, ret.getQueryString());

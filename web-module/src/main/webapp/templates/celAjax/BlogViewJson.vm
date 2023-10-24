@@ -1,0 +1,102 @@
+## set blog doc
+#set($blogDoc = $doc)
+#set($blogDocRef = $blogDoc.getDocumentReference())
+#set($spaceRef = $services.celblog.getBlogSpaceRef($blogDocRef))
+#set($blogConfig = $services.celblog.getBlogConfig($blogDocRef))
+## set article load parameter & get articles
+#set($setPublishdateASC = $request.get('publishdatesort') == 'asc')
+#set($isarchive = (("$request.get('archive')" == '1') || ("$cel_redParams_Map.get('archive')" == '1')))
+#set($subscribable = "$!request.get('subscribable')" == '1')
+#set($newSubscribable = "$!request.get('newSubscribable')" == '1')
+#if($isarchive)
+  #set($articleParam = $services.celblog.getArchiveArticleLoadParameter())
+#elseif($subscribable)
+  #set($articleParam = $services.celblog.getAllSubsribedArticleLoadParameter())
+#elseif($newSubscribable)
+  #set($articleParam = $services.celblog.getUndecidedArticleLoadParameter())
+#else
+  #set($articleParam = $services.celblog.getDefaultArticleLoadParameter())
+#end
+#set($devNull = $articleParam.setLanguage("$default_language"))
+#if($setPublishdateASC)
+#set($devNull = $articleParam.setSortFields(["XWiki.ArticleClass.publishdate", "name"]))
+#end
+#set($start = $util.parseInt("$request.get('start')"))
+#if(("$!start" != '') && ($start > 0))
+  #set($devNull = $articleParam.setOffset($start))
+#end
+#if("$!request.get('nb')" != '')
+  #set($nb = $util.parseInt("$request.get('nb')"))
+#else
+  #set($nb = $util.parseInt("$!blogObj.getProperty('art_per_page').getValue()"))
+#end
+#if(("$!nb" != '') && ($nb > 0))
+  #set($devNull = $articleParam.setLimit($nb))
+#end
+#set($fromPublishDate = $services.date.parseLocalISO($request.fromPublishDate))
+#set($devNull = $articleParam.setFromPublishDate($services.date.toDate($fromPublishDate)))
+#if("$!searchTerm" == '')
+  #set($searchTerm = "$!{request.searchTerm}")
+#end
+#set($devNull = $articleParam.setSearchTerm("$!searchTerm"))
+#set($articles = $services.celblog.getArticles($blogDocRef, $articleParam))
+#set($viewtype = "$!blogConfig.viewType")
+#if("$!viewtype" == '')
+  #set($viewtype = 'extract')
+#end
+#if("$!showArticleBlogName" == '')
+  #set($showArticleBlogName = false)
+#end
+#set($showFieldsStr = "$!{request.showFields}")
+#set($showFields = $showFieldsStr.split(','))
+#set($showAll = $showFields.isEmpty() || $showFields.contains('all'))
+#set($showSearchInfoAll = ($request.debug == 'true')  || $showAll || $showFields.contains('searchInfo'))
+#set($showSearchInfoAny = $showSearchInfoAll || $showFields.contains('searchParameters'))
+#set($showSearchInfoAny = $showSearchInfoAny || $showFields.contains('navigationParameters'))
+#set($showSearchInfoAny = $showSearchInfoAny || $showFields.contains('resultParameters'))
+#set($showSearchInfoAny = $showSearchInfoAny || $showFields.contains('hitCount'))
+##
+#set($builder = $services.json.newBuilder())
+$builder.openDictionary()
+#if($showSearchInfoAny)
+$builder.openDictionary('searchInfo')
+  #if($showSearchInfoAll || $showFields.contains('searchParameters'))
+  $builder.openDictionary('searchParameters')
+    $builder.addPropertyNonEmpty('searchTerm', $searchTerm)
+    $builder.addPropertyNonEmpty('sortField', $query.sortFields)
+  $builder.closeDictionary() ## searchParamters
+  #end
+  #if($showSearchInfoAll || $showFields.contains('navigationParameters'))
+  $builder.openDictionary('navigationParameters')
+    $builder.addPropertyNonEmpty('start', $articleParam.getOffset())
+    $builder.addPropertyNonEmpty('nb', $articleParam.getLimit())
+  $builder.closeDictionary() ## navigationParamters
+  #end
+  #if($showSearchInfoAll || $showFields.contains('resultParameters'))
+  $builder.openDictionary('resultParameters')
+    $builder.addPropertyNonEmpty('showFields', $request.showFields)
+  $builder.closeDictionary() ## resultParamters
+  #end
+  #if($showSearchInfoAll || $showFields.contains('hitCount'))
+  #set($countBefore = $mathtool.add($articleParam.offset, $articleParam.limit))
+  ## TODO
+  ##set($countTotal = $services.celblog.getArticleCount($blogDocRef, $articleParam))
+  #set($devNull = $articleParam.setOffset(0))
+  #set($devNull = $articleParam.setLimit(0))
+  #set($countTotal = $services.celblog.getArticles($blogDocRef, $articleParam).size())
+  #set($countAfter = $mathtool.sub($countTotal, $countBefore))
+  $builder.openDictionary('hitCount')
+    $builder.addPropertyNonEmpty('countTotal', $countTotal)
+    $builder.addPropertyNonEmpty('countAfter', $mathtool.max(0, $countAfter))
+  $builder.closeDictionary() ## hitCount
+  #end
+$builder.closeDictionary() ## searchInfo
+#end ## request.debug
+$builder.openArray('results')
+#set($viewAccessLevel = $services.rightsAccess.getEAccessLevel('view'))
+#foreach($article in $articles)
+ #parse('celMacros/renderOneBlogArticleJson.vm')
+#end
+$builder.closeArray()
+$builder.closeDictionary()
+$!builder.getJSON()

@@ -1,0 +1,66 @@
+$builder.openDictionary()
+  #set($articleDocRef = $article.documentReference)
+  #set($articleId = $services.model.serialize($articleDocRef, 'local'))
+  $builder.addPropertyNonEmpty('articleId', $articleId)
+  #set($hasViewRights = $services.rightsAccess.hasAccessLevel($articleDocRef, $viewAccessLevel))
+  $builder.addPropertyNonEmpty('hasViewRights', $hasViewRights)
+  #if($hasViewRights)
+    #set($publishDate = '')
+    #set($publishDateStr = '')
+    #set($publishDate = $article.getPublishDate($language))
+    #if("$!publishDate" != '')
+      #set($dateFormatDictKey = 'cel_blog_dateformat')
+      #set($blog_dateFormat = $msg.get($dateFormatDictKey))
+      #if(("$!blog_dateFormat" == '') || ("$!blog_dateFormat" == $dateFormatDictKey))
+        #set($blog_dateFormat = 'long_date')
+      #end
+      #if($showFields.contains('publishDate') || $showAll)
+        #set($publishDateStr = $datetool.format($blog_dateFormat, $publishDate, $services.celementsweb.getLocal($language)))
+        $builder.addPropertyNonEmpty('publishDate', $publishDateStr)
+      #end
+    #end
+    #if($showFields.contains('isFuture') || $showAll)
+      #set($isFuture = ("$!publishDate" != '') && $datetool.getDate().before($!publishDate))
+      $builder.addPropertyNonEmpty('isFuture', $isFuture)
+    #end
+    #if($showFields.contains('blogName') || $showAll)
+      #set($blogDocRef = $services.celblog.getBlogDocRefForSpaceRef($articleDocRef.parent))
+      #set($blogName = $services.modelAccess.getDocument($blogDocRef).title)
+      #if("$!blogName" == '')
+        #set($blogName = $blogDocRef.name)
+      #end
+      $builder.addPropertyNonEmpty('blogName', $blogName)
+    #end
+    #if($showFields.contains('viewType') || $showAll)
+      $builder.addPropertyNonEmpty('viewType', $!viewtype)
+    #end
+    #if($showFields.contains('fullTextLink') || $showAll)
+      #set($fullTextLink = $services.url.getURL($article.getDocumentReference(),'view'))
+      $builder.addPropertyNonEmpty('fullTextLink', $fullTextLink)
+    #end
+    #if($showFields.contains('title') || $showAll)
+      $builder.addPropertyNonEmpty('titleLanguage', $!{article.getTitleLang($language)})
+      $builder.addPropertyNonEmpty('title', $article.getTitle($language))
+    #end
+    #if($showFields.contains('imageUrl') || $showAll)
+      $builder.openArray('imageUrl')
+      #foreach($imageUrl in $article.getAllImagesBySizeAsc("$language"))
+        $builder.openDictionary()
+          $builder.addPropertyNonEmpty('url', $imageUrl.externalUrl)
+          $builder.addPropertyNonEmpty('width', $imageUrl.width.orElse(""))
+          $builder.addPropertyNonEmpty('height', $imageUrl.height.orElse(""))
+        $builder.closeDictionary()
+      #end
+      $builder.closeArray()
+    #end
+    #set($viewtypefull = ("$!viewtype" == 'full'))
+    #if($showFields.contains('content') || $showAll)
+      $builder.addPropertyNonEmpty('contentLang', $!{article.getExtractLang($language, $viewtypefull)})
+      $builder.addPropertyNonEmpty('content', $article.getExtract("$language", $viewtypefull))
+      $builder.addPropertyNonEmpty('hasMoreLink', $article.hasMoreLink("$language", $viewtypefull))
+      $builder.addPropertyNonEmpty('hasMoreLinkDots', $article.hasMoreLinkDots("$language", $viewtypefull))
+      $builder.addPropertyNonEmpty('moreUrl', $services.url.getURL($articleDocRef, 'view'))
+      $builder.addPropertyNonEmpty('moreLinkText', $msg.get('cel_rls_blog_article_more'))
+    #end
+  #end
+$builder.closeDictionary() ## oneArticle

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,10 +27,13 @@ import com.celements.blog.article.ArticleLoadException;
 import com.celements.blog.article.ArticleLoadParameter;
 import com.celements.blog.article.IArticleEngineRole;
 import com.celements.blog.cache.BlogCache;
+import com.celements.blog.dto.BlogConfig;
 import com.celements.blog.plugin.BlogClasses;
 import com.celements.common.cache.CacheLoadingException;
 import com.celements.common.cache.IDocumentReferenceCache;
 import com.celements.common.classes.IClassCollectionRole;
+import com.celements.model.access.IModelAccessFacade;
+import com.celements.model.access.exception.DocumentNotExistsException;
 import com.celements.web.service.IWebUtilsService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -52,6 +56,9 @@ public class BlogService implements IBlogServiceRole {
 
   @Requirement("celements.celBlogClasses")
   private IClassCollectionRole blogClasses;
+
+  @Requirement
+  private IModelAccessFacade modelAccess;
 
   @Requirement
   private Execution execution;
@@ -206,6 +213,24 @@ public class BlogService implements IBlogServiceRole {
     }
   }
 
+  @Override
+  public Optional<BlogConfig> getBlogConfig(DocumentReference blogConfDocRef) {
+    if (blogConfDocRef != null) {
+      BaseObject configObj = null;
+      try {
+        XWikiDocument doc;
+        doc = modelAccess.getDocument(blogConfDocRef);
+        configObj = doc.getXObject(getBlogConfigClassRef(blogConfDocRef.getWikiReference()));
+        if (configObj != null) {
+          return Optional.of(BlogConfig.Builder.from(configObj).build());
+        }
+      } catch (DocumentNotExistsException exp) {
+        LOGGER.error("Blog config document [{}] does not exist.", blogConfDocRef, exp);
+      }
+    }
+    return Optional.empty();
+  }
+
   private IArticleEngineRole getArticleEngine() throws ArticleLoadException {
     IArticleEngineRole engine = null;
     String engineHint = getContext().getWiki().getXWikiPreference("blog_article_engine",
@@ -228,6 +253,10 @@ public class BlogService implements IBlogServiceRole {
     }
   }
 
+  /**
+   * @deprecated since 6.2 instead use {@link BlogService#getBlogConfig(DocumentReference)}
+   */
+  @Deprecated
   private BaseObject getBlogConfigObject(DocumentReference blogConfDocRef) throws XWikiException {
     BaseObject ret = null;
     if (blogConfDocRef != null) {
