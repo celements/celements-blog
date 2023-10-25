@@ -32,7 +32,7 @@
   <artifactId>blog-web</artifactId>
   <packaging>war</packaging>
   <name>Blog Web-Module</name>
-  <version>6.1-SNAPSHOT</version>
+  <version>6.1</version>
   <description>	</description>
   <licenses>
     <license>
@@ -62,6 +62,6 @@
     <connection>scm:git:git://github.com/celements/celements-blog</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-blog.git</developerConnection>
     <url>https://github.com/celements/celements-blog/web-module</url>
-    <tag>HEAD</tag>
+    <tag>blog-web-6.1</tag>
   </scm>
 </project>
