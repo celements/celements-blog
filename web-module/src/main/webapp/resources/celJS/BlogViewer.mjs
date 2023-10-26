@@ -79,7 +79,7 @@ export default class BlogViewer {
       response.ok || console.error('fetch failed', response);
       const data = response.ok ? await response.json() : {};
       return {
-        results: data.results || [],
+        results: data.results.filter(a => a.hasViewRights) || [],
         counts: data.searchInfo?.hitCount || {},
       };
     } catch (error) {
