@@ -129,10 +129,6 @@ class BlogViewerElement extends HTMLElement {
   #viewer;
   #currentRenderState = {};
 
-  constructor() {
-    super();
-  }
-
   get origin() {
     return this.getAttribute('origin') || (() => {
       const parser = document.createElement('a');
@@ -239,7 +235,8 @@ class BlogViewerElement extends HTMLElement {
   #init(page) {
     const hookElem = this.querySelector(`.${tagName}-hook, ul, ol`) ?? this;
     const template = document.querySelector(this.template);
-    this.#renderer = new CelDataRenderer(hookElem, template);
+    this.#renderer = new CelDataRenderer(hookElem, template
+      ).withCssClasses({ entry: 'cel_cm_blog_article' });
     this.#viewer = new BlogViewer(this.origin, this.blog);
     this.#viewer.filter = this.filter;
     this.#viewer.params = this.params;
@@ -283,7 +280,7 @@ class BlogViewerElement extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    console.trace('attributeChangedCallback', name, oldValue, newValue);
+    console.debug('attributeChangedCallback', name, oldValue, newValue);
     if (this.isConnected && this.viewer && (oldValue !== newValue)) {
       if (['params', 'filter', 'sort-fields'].includes(name)) {
         const key = name.replace('-f', 'F');
@@ -315,14 +312,20 @@ class BlogViewerElement extends HTMLElement {
       return renderPromise;
     }
   }
+  
+  #preInsert(entry, data) {
+    console.debug('preInsert blog', entry, data, this);
+    entry.id = 'Art' + this.blog + ':' + data.articleId;
+  }
 
   #renderResults(pagePromise) {
     this.#handleCounts(pagePromise.then(p => p.counts));
     const resultsPromise = pagePromise.then(p => p.results);
     if (this.mode === 'paging') {
-      return this.#renderer?.replace(resultsPromise);
+      return this.#renderer?.replace(resultsPromise, undefined,
+        (entry, data) => this.#preInsert(entry, data));
     } else if (this.mode === 'loadmore') {
-      return this.#renderer?.append(resultsPromise);
+      return this.#renderer?.append(resultsPromise, (entry, data) => this.#preInsert(entry, data));
     } else {
       throw new Error('unknown mode: ' + this.mode);
     }
@@ -355,7 +358,10 @@ class BlogViewerElement extends HTMLElement {
     this.#currentRenderState = {};
     this.#renderer?.remove();
     this.setAttribute('page', page);
-    return this.render();
+    await this.render();
+    if (window.initContextMenuAsync) {  
+      window.initContextMenuAsync();
+    }
   }
 
   disconnectedCallback() {
