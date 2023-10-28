@@ -28,7 +28,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-blog</artifactId>
-  <version>6.1-SNAPSHOT</version>
+  <version>6.2-SNAPSHOT</version>
   <description>Celements Blog</description>
   <dependencies>
     <dependency>
@@ -40,7 +40,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-core</artifactId>
-      <version>6.2</version>
+      <version>6.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -52,7 +52,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-image</artifactId>
-      <version>6.1-SNAPSHOT</version>
+      <version>6.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

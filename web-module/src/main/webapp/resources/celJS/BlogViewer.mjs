@@ -1,4 +1,4 @@
-import CelDataRenderer from '/file/resources/celDynJS/celData/cel-data-renderer.mjs?ver=20231024';
+import CelDataRenderer from '/file/resources/celDynJS/celData/cel-data-renderer.mjs?ver=20231026';
 
 const tagName = 'blog-viewer';
 
@@ -233,10 +233,10 @@ class BlogViewerElement extends HTMLElement {
   }
 
   connectedCallback() {
-    this.#init();
+    this.#init(this.page);
   }
 
-  #init() {
+  #init(page) {
     const hookElem = this.querySelector(`.${tagName}-hook, ul, ol`) ?? this;
     const template = document.querySelector(this.template);
     this.#renderer = new CelDataRenderer(hookElem, template);
@@ -245,7 +245,7 @@ class BlogViewerElement extends HTMLElement {
     this.#viewer.params = this.params;
     this.#collectFields(template).forEach(f => this.#viewer.params.showFields.push(f));
     this.#viewer.sortFields = this.sortFields;
-    this.#resetRenderState(this.page);
+    this.#resetRenderState(page);
     if (this.mode === 'loadmore') {
       this.#initLoadmore();
     }
