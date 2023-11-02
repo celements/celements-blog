@@ -235,8 +235,8 @@ class BlogViewerElement extends HTMLElement {
   #init(page) {
     const hookElem = this.querySelector(`.${tagName}-hook, ul, ol`) ?? this;
     const template = document.querySelector(this.template);
-    this.#renderer = new CelDataRenderer(hookElem, template
-      ).withCssClasses({ entry: 'cel_cm_blog_article' });
+    this.#renderer = new CelDataRenderer(hookElem, template)
+      .withCssClasses({ entry: 'cel_cm_blog_article' });
     this.#viewer = new BlogViewer(this.origin, this.blog);
     this.#viewer.filter = this.filter;
     this.#viewer.params = this.params;
