@@ -1,4 +1,4 @@
-import CelDataRenderer from '/file/resources/celDynJS/celData/cel-data-renderer.mjs?ver=20231024';
+import CelDataRenderer from '/file/resources/celDynJS/celData/cel-data-renderer.mjs?ver=20231026';
 
 const tagName = 'blog-viewer';
 
@@ -79,7 +79,7 @@ export default class BlogViewer {
       response.ok || console.error('fetch failed', response);
       const data = response.ok ? await response.json() : {};
       return {
-        results: data.results || [],
+        results: data.results.filter(a => a.hasViewRights) || [],
         counts: data.searchInfo?.hitCount || {},
       };
     } catch (error) {
