@@ -358,10 +358,11 @@ class BlogViewerElement extends HTMLElement {
     this.#currentRenderState = {};
     this.#renderer?.remove();
     this.setAttribute('page', page);
-    await this.render();
+    const result = await this.render();
     if (window.initContextMenuAsync) {  
       window.initContextMenuAsync();
     }
+    return result;
   }
 
   disconnectedCallback() {
