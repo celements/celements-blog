@@ -79,7 +79,7 @@ export default class BlogViewer {
       response.ok || console.error('fetch failed', response);
       const data = response.ok ? await response.json() : {};
       return {
-        results: data.results.filter(a => a.hasViewRights) || [],
+        results: data.results || [],
         counts: data.searchInfo?.hitCount || {},
       };
     } catch (error) {
@@ -235,8 +235,9 @@ class BlogViewerElement extends HTMLElement {
   #init(page) {
     const hookElem = this.querySelector(`.${tagName}-hook, ul, ol`) ?? this;
     const template = document.querySelector(this.template);
+    const classes = 'cel_cm_blog_article' + (!hookElem.isPublic ? ' cel_nav_restricted_rights' : '');
     this.#renderer = new CelDataRenderer(hookElem, template)
-      .withCssClasses({ entry: 'cel_cm_blog_article' });
+      .withCssClasses({ entry: classes });
     this.#viewer = new BlogViewer(this.origin, this.blog);
     this.#viewer.filter = this.filter;
     this.#viewer.params = this.params;
