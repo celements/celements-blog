@@ -235,10 +235,8 @@ class BlogViewerElement extends HTMLElement {
   #init(page) {
     const hookElem = this.querySelector(`.${tagName}-hook, ul, ol`) ?? this;
     const template = document.querySelector(this.template);
-    const classes = 'cel_cm_blog_article' + (!hookElem.isPublic ? ' cel_nav_restricted_rights' : '');
-    console.log('>>>>>>>>>>>>>>>>>>>', classes);
     this.#renderer = new CelDataRenderer(hookElem, template)
-      .withCssClasses({ entry: classes });
+      .withCssClasses({ entry: 'cel_cm_blog_article' });
     this.#viewer = new BlogViewer(this.origin, this.blog);
     this.#viewer.filter = this.filter;
     this.#viewer.params = this.params;
@@ -318,6 +316,9 @@ class BlogViewerElement extends HTMLElement {
   #preInsert(entry, data) {
     console.debug('preInsert blog', entry, data, this);
     entry.id = 'Art' + this.blog + ':' + data.articleId;
+	  if (!data.isPublic) {
+	    entry.classList.add('cel_nav_restricted_rights');
+	  }
   }
 
   #renderResults(pagePromise) {
