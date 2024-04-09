@@ -236,6 +236,7 @@ class BlogViewerElement extends HTMLElement {
     const hookElem = this.querySelector(`.${tagName}-hook, ul, ol`) ?? this;
     const template = document.querySelector(this.template);
     const classes = 'cel_cm_blog_article' + (!hookElem.isPublic ? ' cel_nav_restricted_rights' : '');
+    console.log('>>>>>>>>>>>>>>>>>>>', classes);
     this.#renderer = new CelDataRenderer(hookElem, template)
       .withCssClasses({ entry: classes });
     this.#viewer = new BlogViewer(this.origin, this.blog);
