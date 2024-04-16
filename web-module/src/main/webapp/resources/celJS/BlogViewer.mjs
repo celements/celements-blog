@@ -79,7 +79,7 @@ export default class BlogViewer {
       response.ok || console.error('fetch failed', response);
       const data = response.ok ? await response.json() : {};
       return {
-        results: data.results.filter(a => a.hasViewRights) || [],
+        results: data.results || [],
         counts: data.searchInfo?.hitCount || {},
       };
     } catch (error) {
@@ -316,6 +316,9 @@ class BlogViewerElement extends HTMLElement {
   #preInsert(entry, data) {
     console.debug('preInsert blog', entry, data, this);
     entry.id = 'Art' + this.blog + ':' + data.articleId;
+    if (!data.isPublic) {
+      entry.classList.add('cel_nav_restricted_rights');
+    }
   }
 
   #renderResults(pagePromise) {
