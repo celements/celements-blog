@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
+import com.celements.blog.classdefs.NewsletterReceiverClass;
 import com.celements.common.classes.AbstractClassCollection;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -85,7 +86,7 @@ public class BlogClasses extends AbstractClassCollection {
 
   @Override
   protected void initClasses() throws XWikiException {
-    getNewsletterReceiverClass();
+    // getNewsletterReceiverClass();
     getBlogConfigClass();
     getArticleClass();
     getReceiverEMailClass();
@@ -93,11 +94,21 @@ public class BlogClasses extends AbstractClassCollection {
     getBlogArticleSubscriptionClass();
   }
 
+  /**
+   * @deprecated instead use {@link NewsletterReceiverClass}
+   * @since 6.5
+   */
+  @Deprecated(since = "6.5", forRemoval = true)
   public DocumentReference getNewsletterReceiverClassRef(String wikiName) {
     return new DocumentReference(wikiName, NEWSLETTER_RECEIVER_CLASS_SPACE,
         NEWSLETTER_RECEIVER_CLASS_DOC);
   }
 
+  /**
+   * @deprecated instead use {@link NewsletterReceiverClass}
+   * @since 6.5
+   */
+  @Deprecated(since = "6.5", forRemoval = true)
   BaseClass getNewsletterReceiverClass() throws XWikiException {
     XWikiDocument doc;
     XWiki xwiki = getContext().getWiki();
