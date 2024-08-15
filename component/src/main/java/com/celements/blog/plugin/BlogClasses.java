@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.celements.blog.classdefs.ArticleClass;
+import com.celements.blog.classdefs.BlogArticleSubscriptionClass;
 import com.celements.blog.classdefs.BlogConfigClass;
 import com.celements.blog.classdefs.NewsletterConfigClass;
 import com.celements.blog.classdefs.NewsletterReceiverClass;
@@ -81,6 +82,11 @@ public class BlogClasses extends AbstractClassCollection {
   public static final String PROPERTY_ARTICLE_SUBSCRIPTION_SUBSCRIBER = "subscriber";
   public static final String PROPERTY_ARTICLE_SUBSCRIPTION_DO_SUBSCRIBE = "doSubscribe";
 
+  /**
+   * @deprecated instead use corresponding ClassDefinitons
+   * @since 6.5
+   */
+  @Deprecated(since = "6.5", forRemoval = true)
   public BlogClasses() {}
 
   @Override
@@ -95,7 +101,7 @@ public class BlogClasses extends AbstractClassCollection {
     // getArticleClass();
     // getReceiverEMailClass();
     // getNewsletterConfigClass();
-    getBlogArticleSubscriptionClass();
+    // getBlogArticleSubscriptionClass();
   }
 
   /**
@@ -340,11 +346,21 @@ public class BlogClasses extends AbstractClassCollection {
     return bclass;
   }
 
+  /**
+   * @deprecated instead use {@link BlogArticleSubscriptionClass}
+   * @since 6.5
+   */
+  @Deprecated(since = "6.5", forRemoval = true)
   public DocumentReference getBlogArticleSubscriptionClassRef(String wikiName) {
     return new DocumentReference(wikiName, BLOG_ARTICLE_SUBSCRIPTION_CLASS_SPACE,
         BLOG_ARTICLE_SUBSCRIPTION_CLASS_DOC);
   }
 
+  /**
+   * @deprecated instead use {@link BlogArticleSubscriptionClass}
+   * @since 6.5
+   */
+  @Deprecated(since = "6.5", forRemoval = true)
   BaseClass getBlogArticleSubscriptionClass() throws XWikiException {
     XWikiDocument doc;
     XWiki xwiki = getContext().getWiki();
