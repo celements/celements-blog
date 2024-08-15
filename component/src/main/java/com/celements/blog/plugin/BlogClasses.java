@@ -27,6 +27,7 @@ import org.xwiki.model.reference.DocumentReference;
 import com.celements.blog.classdefs.ArticleClass;
 import com.celements.blog.classdefs.BlogConfigClass;
 import com.celements.blog.classdefs.NewsletterReceiverClass;
+import com.celements.blog.classdefs.ReceiverEmailClass;
 import com.celements.common.classes.AbstractClassCollection;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -91,7 +92,7 @@ public class BlogClasses extends AbstractClassCollection {
     // getNewsletterReceiverClass();
     // getBlogConfigClass();
     // getArticleClass();
-    getReceiverEMailClass();
+    // getReceiverEMailClass();
     getNewsletterConfigClass();
     getBlogArticleSubscriptionClass();
   }
@@ -256,10 +257,20 @@ public class BlogClasses extends AbstractClassCollection {
     return bclass;
   }
 
+  /**
+   * @deprecated instead use {@link ReceiverEmailClass}
+   * @since 6.5
+   */
+  @Deprecated(since = "6.5", forRemoval = true)
   public DocumentReference getReceiverEMailClassRef(String wikiName) {
     return new DocumentReference(wikiName, RECEIVER_E_MAIL_CLASS_SPACE, RECEIVER_E_MAIL_CLASS_DOC);
   }
 
+  /**
+   * @deprecated instead use {@link ReceiverEmailClass}
+   * @since 6.5
+   */
+  @Deprecated(since = "6.5", forRemoval = true)
   BaseClass getReceiverEMailClass() throws XWikiException {
     XWikiDocument doc;
     XWiki xwiki = getContext().getWiki();
