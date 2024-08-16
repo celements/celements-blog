@@ -24,7 +24,6 @@ public class BlogConfigClass extends AbstractClassDefinition implements BlogClas
   public static final ClassField<Boolean> FIELD_IS_SUBSCRIBABLE = new BooleanField.Builder(
       CLASS_REF, "is_subscribable")
           .prettyName("is_subscribable")
-          .displayType("yesno")
           .build();
 
   public static final ClassField<String> FIELD_SUBSCRIBE_TO = new StringField.Builder(
@@ -42,7 +41,6 @@ public class BlogConfigClass extends AbstractClassDefinition implements BlogClas
   public static final ClassField<Boolean> FIELD_IS_NEWSLETTER = new BooleanField.Builder(
       CLASS_REF, "is_newsletter")
           .prettyName("is_newsletter")
-          .displayType("yesno")
           .build();
 
   public static final ClassField<String> FIELD_FROM_ADDRESS = new StringField.Builder(
@@ -60,7 +58,6 @@ public class BlogConfigClass extends AbstractClassDefinition implements BlogClas
   public static final ClassField<Boolean> FIELD_UNSSUBSCRIBE_INFO = new BooleanField.Builder(
       CLASS_REF, "unsubscribe_info")
           .prettyName("unsubscribe_info")
-          .displayType("yesno")
           .build();
 
   public static final ClassField<String> FIELD_TEMPLATE = new StringField.Builder(
@@ -96,7 +93,6 @@ public class BlogConfigClass extends AbstractClassDefinition implements BlogClas
   public static final ClassField<Boolean> FIELD_HAS_COMMENTS = new BooleanField.Builder(
       CLASS_REF, "has_comments")
           .prettyName("has_comments")
-          .displayType("yesno")
           .build();
 
   public static final ClassField<Integer> FIELD_MAX_NUM_CHARS_FIELD = new IntField.Builder(

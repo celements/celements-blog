@@ -29,7 +29,6 @@ public class ReceiverEmailClass extends AbstractClassDefinition implements BlogC
   public static final ClassField<Boolean> FIELD_IS_ACTIVE = new BooleanField.Builder(
       CLASS_REF, "is_active")
           .prettyName("is_active")
-          .displayType("yesno")
           .build();
 
   public static final ClassField<List<String>> FIELD_ADDRESS_TYPE = new StaticListField.Builder(

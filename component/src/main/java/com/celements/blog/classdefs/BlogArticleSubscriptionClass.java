@@ -26,7 +26,6 @@ public class BlogArticleSubscriptionClass extends AbstractClassDefinition
   public static final ClassField<Boolean> FIELD_DO_SUBSCRIBE = new BooleanField.Builder(
       CLASS_REF, "doSubscribe")
           .prettyName("doSubscribe")
-          .displayType("yesno")
           .build();
 
   public BlogArticleSubscriptionClass() {

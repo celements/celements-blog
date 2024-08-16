@@ -32,7 +32,6 @@ public class NewsletterReceiverClass extends AbstractClassDefinition
   public static final ClassField<Boolean> FIELD_ISACTIVE = new BooleanField.Builder(
       CLASS_REF, "isactive")
           .prettyName("Is Active")
-          .displayType("yesno")
           .build();
 
   public static final ClassField<String> FIELD_SUBSCRIBED = new StringField.Builder(

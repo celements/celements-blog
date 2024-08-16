@@ -74,7 +74,6 @@ public class ArticleClass extends AbstractClassDefinition implements BlogClassDe
   public static final ClassField<Boolean> FIELD_HAS_COMMENTS = new BooleanField.Builder(
       CLASS_REF, "hasComments")
           .prettyName("hasComments")
-          .displayType("yesno")
           .build();
 
   public static final ClassField<Date> FIELD_ARCHIVE_DATE = new DateField.Builder(
@@ -90,7 +89,6 @@ public class ArticleClass extends AbstractClassDefinition implements BlogClassDe
   public static final ClassField<Boolean> FIELD_IS_SUBSCRIBABLE = new BooleanField.Builder(
       CLASS_REF, "isSubscribable")
           .prettyName("isSubscribable")
-          .displayType("yesno")
           .build();
 
   public ArticleClass() {
