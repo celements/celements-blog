@@ -246,6 +246,15 @@ class BlogViewerElement extends HTMLElement {
     if (this.mode === 'loadmore') {
       this.#initLoadmore();
     }
+    this.#initContextMenuMutationObserver();
+  }
+
+  #initContextMenuMutationObserver() {
+    //TODO add Observer for changes inside BlogViewer-Element.
+    //if Child-Added
+    if (window.initContextMenuAsync) {
+      window.initContextMenuAsync();
+    }
   }
 
   #initLoadmore() {
@@ -362,7 +371,7 @@ class BlogViewerElement extends HTMLElement {
     this.#renderer?.remove();
     this.setAttribute('page', page);
     const result = await this.render();
-    if (window.initContextMenuAsync) {  
+    if (window.initContextMenuAsync) {
       window.initContextMenuAsync();
     }
     return result;
