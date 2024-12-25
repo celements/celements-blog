@@ -250,16 +250,14 @@ class BlogViewerElement extends HTMLElement {
   }
 
   #initContextMenuMutationObserver(hookElem) {
-    const mutObs = new MutationObserver((mutations, observer) => {
-        mutations.forEach(mut => {
-            if (mut.type === "childList") {
-              if (window.initContextMenuAsync) {
-                window.initContextMenuAsync();
-              }
-            }
-        });
+    const mutObs = new MutationObserver((mutations) => {
+      if (window.initContextMenuAsync
+         && mutations.some(mut => mut.type === "childList"
+         && mut.addedNodes.length > 0)) {
+        window.initContextMenuAsync();
+      }
     });
-    mutObs.observe(hookElem, {childList: true});
+    mutObs.observe(hookElem, {subtree: true, childList: true});
   }
 
   #initLoadmore() {
