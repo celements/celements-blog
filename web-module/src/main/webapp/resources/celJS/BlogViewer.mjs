@@ -253,7 +253,7 @@ class BlogViewerElement extends HTMLElement {
     const mutObs = new MutationObserver((mutations) => {
       if (window.initContextMenuAsync
          && mutations.some(mut => mut.type === "childList"
-         && mut.addedNodes.length > 0)) {
+            && mut.addedNodes.length > 0)) {
         window.initContextMenuAsync();
       }
     });
