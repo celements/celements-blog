@@ -246,6 +246,18 @@ class BlogViewerElement extends HTMLElement {
     if (this.mode === 'loadmore') {
       this.#initLoadmore();
     }
+    this.#initContextMenuMutationObserver(hookElem);
+  }
+
+  #initContextMenuMutationObserver(hookElem) {
+    const mutObs = new MutationObserver((mutations) => {
+      if (window.initContextMenuAsync
+         && mutations.some(mut => mut.type === "childList"
+            && mut.addedNodes.length > 0)) {
+        window.initContextMenuAsync();
+      }
+    });
+    mutObs.observe(hookElem, {subtree: true, childList: true});
   }
 
   #initLoadmore() {
@@ -362,9 +374,6 @@ class BlogViewerElement extends HTMLElement {
     this.#renderer?.remove();
     this.setAttribute('page', page);
     const result = await this.render();
-    if (window.initContextMenuAsync) {  
-      window.initContextMenuAsync();
-    }
     return result;
   }
 
