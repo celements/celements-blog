@@ -48,7 +48,7 @@ import com.celements.blog.article.ArticleLoadParameter.SubscriptionMode;
 import com.celements.blog.service.BlogService;
 import com.celements.blog.service.IBlogServiceRole;
 import com.celements.blog.service.INewsletterAttachmentServiceRole;
-import com.celements.web.plugin.api.CelementsWebPluginApi;
+import com.celements.mailsender.IMailSenderRole;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -95,44 +95,44 @@ public class BlogPlugin extends XWikiDefaultPlugin {
    * @deprecated since 1.32 instead use
    *             {@link BlogService#getArticles(DocumentReference, ArticleLoadParameter)}
    * @param blogArticleSpace
-   *                             Space where the blog's articles are saved.
+   *          Space where the blog's articles are saved.
    * @param subscribedBlogsStr
-   *                             Comma separated String with all the blog article spaces the blog
-   *                             has subscribed to.
+   *          Comma separated String with all the blog article spaces the blog
+   *          has subscribed to.
    * @param language
-   *                             default language
+   *          default language
    * @param archiveOnly
-   *                             Only get articles from the archive (archivedate < now)
+   *          Only get articles from the archive (archivedate < now)
    * @param futurOnly
-   *                             Only get articles that are not yet published (publishdate > now)
+   *          Only get articles that are not yet published (publishdate > now)
    * @param subscribableOnly
-   *                             Only get articles from subscribed blogs, but not the ones from the
-   *                             blog the user is
-   *                             on.
+   *          Only get articles from subscribed blogs, but not the ones from the
+   *          blog the user is
+   *          on.
    * @param withArchive
-   *                             Include archived articles in the answer. Has no effect if
-   *                             archiveOnly = true.
+   *          Include archived articles in the answer. Has no effect if
+   *          archiveOnly = true.
    * @param withFutur
-   *                             Include not yet published articles. Only possible if the page has
-   *                             been saved with
-   *                             programmingrights or the user has edit right on the article. Has no
-   *                             effect if
-   *                             futurOnly = true.
+   *          Include not yet published articles. Only possible if the page has
+   *          been saved with
+   *          programmingrights or the user has edit right on the article. Has no
+   *          effect if
+   *          futurOnly = true.
    * @param withSubscribable
-   *                             Include articles from subscribed blogs.
+   *          Include articles from subscribed blogs.
    * @param withSubscribed
-   *                             Include articles the blog has subscribed to.
+   *          Include articles the blog has subscribed to.
    * @param withUnsubscribed
-   *                             Include articles the blog has unsubscribed from. Only works with
-   *                             edit rights or
-   *                             programmingrights.
+   *          Include articles the blog has unsubscribed from. Only works with
+   *          edit rights or
+   *          programmingrights.
    * @param withUndecided
-   *                             Include articles the blog has not yet desided about a subscription.
-   *                             Only works with
-   *                             edit rights or programmingrights.
+   *          Include articles the blog has not yet desided about a subscription.
+   *          Only works with
+   *          edit rights or programmingrights.
    * @param checkAccessRights
-   *                             Do pay attention to the rights. Default = true if no
-   *                             programmingrights.
+   *          Do pay attention to the rights. Default = true if no
+   *          programmingrights.
    * @param context
    * @return
    * @throws XWikiException
@@ -358,13 +358,11 @@ public class BlogPlugin extends XWikiDefaultPlugin {
       if ((reply == null) || "".equals(reply.trim())) {
         reply = from;
       }
-      CelementsWebPluginApi celementsweb = (CelementsWebPluginApi) context.getWiki().getPluginApi(
-          "celementsweb", context);
-      celementsweb.getPlugin().sendMail(from, reply, email, null, null, renderedTitle, htmlContent,
-          "", getAllAttachmentsList(), null, context);
+      getMailSender().sendMail(from, reply, email, null, null, renderedTitle, htmlContent,
+          "", getAllAttachmentsList(), null);
     } else {
-      LOGGER.error("No newsletter activation Mail sent for '" + email + "'. No "
-          + "Mailcontent found in Tools.NewsletterSubscriptionActivation");
+      LOGGER.error("No newsletter activation Mail sent for '{}'. No "
+          + "Mailcontent found in Tools.NewsletterSubscriptionActivation", email);
     }
   }
 
@@ -495,7 +493,7 @@ public class BlogPlugin extends XWikiDefaultPlugin {
    *
    * @param article
    * @param next
-   *                  true gets the next, false the previous article
+   *          true gets the next, false the previous article
    * @return
    */
   public Article getNeighbourArticle(Article article, boolean next, XWikiContext context) {
@@ -540,6 +538,10 @@ public class BlogPlugin extends XWikiDefaultPlugin {
 
   private QueryManager getQueryManager() {
     return Utils.getComponent(QueryManager.class);
+  }
+
+  private IMailSenderRole getMailSender() {
+    return Utils.getComponent(IMailSenderRole.class);
   }
 
 }
