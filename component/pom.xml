@@ -24,11 +24,11 @@
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celements</artifactId>
-    <version>6.1</version>
+    <version>6.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-blog</artifactId>
-  <version>6.3-SNAPSHOT</version>
+  <version>6.4-SNAPSHOT</version>
   <description>Celements Blog</description>
   <dependencies>
     <dependency>
@@ -40,19 +40,19 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-core</artifactId>
-      <version>6.10-SNAPSHOT</version>
+      <version>6.10</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-search</artifactId>
-      <version>6.1</version>
+      <version>6.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-image</artifactId>
-      <version>6.1</version>
+      <version>6.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
