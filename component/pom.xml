@@ -28,7 +28,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-blog</artifactId>
-  <version>6.4-SNAPSHOT</version>
+  <version>6.4</version>
   <description>Celements Blog</description>
   <dependencies>
     <dependency>
@@ -72,6 +72,6 @@
     <connection>scm:git:git@github.com:celements/celements-blog.git</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-blog.git</developerConnection>
     <url>https://github.com/celements/celements-blog/component</url>
-    <tag>HEAD</tag>
+    <tag>celements-blog-6.4</tag>
   </scm>
 </project>
