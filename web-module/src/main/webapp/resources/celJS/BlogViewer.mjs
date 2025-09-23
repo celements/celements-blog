@@ -1,140 +1,77 @@
-import CelDataRenderer from '/file/resources/celDynJS/celData/cel-data-renderer.mjs?version=20240425';
+import pick from '/file/resource/deps/lodash/pick.js';
+import uniq from '/file/resource/deps/lodash/uniq.js';
+import {
+  CelDataViewerElement,
+  Config
+} from '/file/resources/celDynJS/celData/cel-data-viewer.mjs?version=20250901';
 
 const tagName = 'blog-viewer';
-
-function safeAssign(obj, newProps) {
-  Object.entries(newProps ?? {})
-    .filter(([key, ]) => obj.hasOwnProperty(key))
-    .map(([key, value]) => (Array.isArray(obj[key]) && !Array.isArray(value)) 
-        ? [key, [value].filter(Boolean)] : [key, value])
-    .forEach(([key, value]) => obj[key] = value);
-  return obj;
-}
 
 export class BlogFilter {
   searchTerm;
   fromPublishDate;
 }
 
-export class BlogParams {
+export class BlogParams extends BlogFilter {
+  xpage = 'celements_ajax';
+  ajax_mode = 'BlogViewJson';
+  ajax = 1;
   showFields = [];
+  start;
+  nb;
+  sortFields = [];
   maxImageHeight;
   maxImageWidth;
   debug;
 }
 
-export default class BlogViewer {
-  #resource;
-  #filter = new BlogFilter();
-  #params = new BlogParams();
-  #sortFields = [];
-  #abortController;
+class BlogConfig extends Config {
+  tagName = tagName;
+  ParamsClass = BlogParams;
 
-  constructor(origin, blog) {
-    this.#resource = origin + '/' + blog.split('.').join('/');
-    console.debug('BlogViewer init', this.#resource);
+  processParams(params) {
+    params.start = params.offset;
+    params.nb = params.limit;
+    params.showFields = uniq([
+      'searchInfo', // needed for hitCount
+      ...params.showFields,
+      ...params.fields,
+    ]);
+    return params;
   }
 
-  get resource() {
-    return this.#resource;
+  extractResults(data) {
+    return data.results;
   }
 
-  set filter(newPropValue) {
-    safeAssign(this.#filter, newPropValue);
+  extractCount(data) {
+    return data.searchInfo?.hitCount?.countTotal;
   }
 
-  get params() {
-    return this.#params;
+  extractHasMore(data) {
+    return (data.searchInfo?.hitCount?.countAfter ?? 1) > 0;
   }
-
-  set params(newPropValue) {
-    safeAssign(this.#params, newPropValue);
-  }
-
-  get sortFields() {
-    return this.#sortFields.filter(Boolean);
-  }
-
-  set sortFields(value) {
-    if (Array.isArray(value)) {
-      this.#sortFields = value;
-    } else {
-      throw new TypeError("sortFields must be an array");
-    }
-  }
-
-  get filter() {
-    return this.#filter;
-  }
-
-  abort() {
-    this.#abortController?.abort();
-  }
-
-  async getPage(page, size) {
-    this.abort();
-    const request = this.#buildRequest(page, size);
-    try {
-      const response = await fetch(request);
-      response.ok || console.error('fetch failed', response);
-      const data = response.ok ? await response.json() : {};
-      return {
-        results: data.results || [],
-        counts: data.searchInfo?.hitCount || {},
-      };
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        console.info('aborted', request);
-        return { results: [], counts: {} };
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  #buildRequest(page, size) {
-    const nb = Math.max(size, 1);
-    const start = Math.max(page - 1, 0) * nb;
-    this.#abortController = new AbortController();
-    if (!this.#params.showFields.includes('searchInfo')) {
-      this.#params.showFields.push('searchInfo'); // needed for hitCount
-    }
-    return new Request(this.resource, {
-      signal: this.#abortController.signal,
-      method: 'POST',
-      body: new URLSearchParams([
-        ['xpage', 'celements_ajax'],
-        ['ajax_mode', 'BlogViewJson'],
-        ['ajax', 1],
-        ['start', start],
-        ['nb', nb],
-        ...this.#toEntries(this.#params),
-        ...this.#toEntries(this.#filter),
-        ['sortFields', this.#sortFields.join(',')],
-      ]),
-    });
-  }
-
-  #toEntries(obj) {
-    return Object.entries(obj ?? {})
-      .map(([key, val]) => [key, Array.isArray(val) ? val.join(',') : val])
-      .filter(([, val]) => !!val);
-  }
-
 }
 
-class BlogViewerElement extends HTMLElement {
+class BlogViewerElement extends CelDataViewerElement {
 
-  #renderer;
-  #viewer;
-  #currentRenderState = {};
+  #mutationObserver;
 
-  get origin() {
-    return this.getAttribute('origin') || (() => {
-      const parser = document.createElement('a');
-      parser.href = import.meta.url;
-      return parser.origin;
-    })();
+  constructor() {
+    super(new BlogConfig());
+  }
+
+  get method() {
+    return super.method ?? 'POST';
+  }
+
+  get path() {
+    return super.path ?? this.#path;
+  }
+
+  get #path() {
+    if (!this.blog) throw new Error('attribute blog missing');
+    return `/${this.blog.split('.').join('/')}`;
   }
 
   get blog() {
@@ -146,36 +83,7 @@ class BlogViewerElement extends HTMLElement {
   }
 
   get viewer() {
-    return this.#viewer;
-  }
-
-  get template() {
-    return this.getAttribute('template') || undefined;
-  }
-
-  get mode() {
-    return this.getAttribute('mode') || 'paging';
-  }
-
-  get size() {
-    return Math.max(parseInt(this.getAttribute('size')), 1) || 10;
-  }
-
-  set size(value) {
-    this.setAttribute('size', Math.max(value, 1));
-  }
-
-  get page() {
-    return Math.max(parseInt(this.getAttribute('page')), 1) || 1;
-  }
-
-  set page(value) {
-    value = Math.max(value, 1);
-    if ((this.mode !== 'paging') && value < this.page) {
-      console.error(this.mode, 'doesnt support page decrease');
-    } else if (this.page !== value) {
-      this.setAttribute('page', value);
-    }
+  return this.loader;
   }
 
   get sortFields() {
@@ -183,36 +91,24 @@ class BlogViewerElement extends HTMLElement {
   }
 
   get params() {
-    const json = this.getAttribute('params') || '{}';
-    try {
-      return safeAssign(new BlogParams(), JSON.parse(json));
-    } catch (error) {
-      console.warn("failed parsing params", json, error);
-      return new BlogParams();
-    }
-  }
-
-  set params(value) {
-    const params = safeAssign(new BlogParams(), value);
-    this.setAttribute('params', JSON.stringify(params));
-  }
-
-  setParams(key, value) {
-    this.params = { ...this.params, [key]: value };
+    return Object.assign(super.params, this.filter, { sortFields: this.sortFields });
   }
 
   get filter() {
+    const ret = new BlogFilter();
     const json = this.getAttribute('filter') || '{}';
     try {
-      return safeAssign(new BlogFilter(), JSON.parse(json));
+      Object.assign(ret, JSON.parse(json));
     } catch (error) {
       console.warn("failed parsing filter", json, error);
-      return new CollectionFilter();
     }
+    return ret;
   }
 
   set filter(value) {
-    const filter = safeAssign(new BlogFilter(), value);
+    const filter = new BlogFilter();
+    const params = this.config.createParams(value) ?? value;
+    Object.assign(filter, pick(params, Object.keys(filter)));
     this.setAttribute('filter', JSON.stringify(filter));
   }
 
@@ -220,166 +116,35 @@ class BlogViewerElement extends HTMLElement {
     this.filter = { ...this.filter, [key]: value };
   }
 
-  get count() {
-    return parseInt(this.getAttribute('count'));
-  }
-
-  get hasMore() {
-    return this.getAttribute('has-more') === 'true';
-  }
-
   connectedCallback() {
-    this.#init(this.page);
+    super.connectedCallback();
+    this.#initBlogRenderer();
   }
 
-  #init(page) {
-    const hookElem = this.querySelector(`.${tagName}-hook, ul, ol`) ?? this;
-    const template = document.querySelector(this.template);
-    this.#renderer = new CelDataRenderer(hookElem, template)
-      .withCssClasses({ entry: 'cel_cm_blog_article' });
-    this.#viewer = new BlogViewer(this.origin, this.blog);
-    this.#viewer.filter = this.filter;
-    this.#viewer.params = this.params;
-    this.#collectFields(template).forEach(f => this.#viewer.params.showFields.push(f));
-    this.#viewer.sortFields = this.sortFields;
-    this.#resetRenderState(page);
-    if (this.mode === 'loadmore') {
-      this.#initLoadmore();
-    }
-    this.#initContextMenuMutationObserver(hookElem);
-  }
-
-  #initContextMenuMutationObserver(hookElem) {
-    const mutObs = new MutationObserver((mutations) => {
-      if (window.initContextMenuAsync
-         && mutations.some(mut => mut.type === "childList"
-            && mut.addedNodes.length > 0)) {
-        window.initContextMenuAsync();
-      }
+  #initBlogRenderer() {
+    this.renderer.withPreInsert((entry, data) => {
+      entry.id = 'Art' + this.blog + ':' + data.articleId;
+      entry.classList.add('cel_cm_blog_article');
+      if (!data.isPublic) entry.classList.add('cel_nav_restricted_rights');
     });
-    mutObs.observe(hookElem, {subtree: true, childList: true});
-  }
-
-  #initLoadmore() {
-    this.#forEachLoadmoreTrigger(trigger => {
-      trigger.addEventListener('click', e => !e.target.disabled && this.next());
-      trigger.disabled = true;
-      console.debug('registered loadmore trigger', trigger, this);
-    });
-  }
-
-  #collectFields(template) {
-    const fields = [...template?.content.querySelectorAll('[field]') || []]
-        .map(e => e.getAttribute('field'))
-        .filter(Boolean);
-    return [...new Set(fields)];
-  }
-
-  next() {
-    this.page++;
-  }
-
-  previous() {
-    this.page--;
+    this.#mutationObserver = new MutationObserver((mutations) => 
+      mutations.some(m => m.type === "childList" && m.addedNodes.length > 0) 
+      && window.initContextMenuAsync?.()
+    );
+    this.#mutationObserver.observe(this.renderer.htmlElem, {subtree: true, childList: true});
   }
 
   static get initAttributes() {
-    return ['origin', 'blog', 'template', 'mode'];
+    return uniq([...super.initAttributes, 'blog']);
   }
 
   static get observedAttributes() {
-    return ['page', 'size', 'params', 'filter', 'sort-fields'].concat(BlogViewerElement.initAttributes);
-  }
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    console.debug('attributeChangedCallback', name, oldValue, newValue);
-    if (this.isConnected && this.viewer && (oldValue !== newValue)) {
-      if (['params', 'filter', 'sort-fields'].includes(name)) {
-        const key = name.replace('-f', 'F');
-        this.#viewer[key] = this[key];
-        this.#resetRenderState();
-      } else if (name === 'size') {
-        this.#resetRenderState();
-      } else if (BlogViewerElement.initAttributes.includes(name)) {
-        this.#init();
-      } else {
-        this.render();
-      }
-    }
-  }
-
-  render() {
-    if (this.page === this.#currentRenderState.page) {
-      return this.#currentRenderState.promise;
-    } else {
-      const pagePromise = this.viewer?.getPage(this.page, this.size);
-      const renderPromise = this.#renderResults(pagePromise);
-      this.#currentRenderState = Object.freeze({
-        page: this.page,
-        promise: renderPromise,
-        loadPromise: pagePromise,
-      });
-      this.dispatchEvent(new CustomEvent(`progon:${tagName}:changed`,
-        { detail: this.#currentRenderState }));
-      return renderPromise;
-    }
-  }
-  
-  #preInsert(entry, data) {
-    console.debug('preInsert blog', entry, data, this);
-    entry.id = 'Art' + this.blog + ':' + data.articleId;
-    if (!data.isPublic) {
-      entry.classList.add('cel_nav_restricted_rights');
-    }
-  }
-
-  #renderResults(pagePromise) {
-    this.#handleCounts(pagePromise.then(p => p.counts));
-    const resultsPromise = pagePromise.then(p => p.results);
-    if (this.mode === 'paging') {
-      return this.#renderer?.replace(resultsPromise, undefined,
-        (entry, data) => this.#preInsert(entry, data));
-    } else if (this.mode === 'loadmore') {
-      return this.#renderer?.append(resultsPromise, (entry, data) => this.#preInsert(entry, data));
-    } else {
-      throw new Error('unknown mode: ' + this.mode);
-    }
-  }
-
-  async #handleCounts(countsPromise) {
-    this.#forEachLoadmoreTrigger(trigger => trigger.disabled = true);
-    const counts = await countsPromise;
-    this.setAttribute('count', counts?.countTotal ?? '');
-    const hasMore = (counts?.countAfter ?? 1) > 0;
-    this.setAttribute('has-more', hasMore);
-    this.#forEachLoadmoreTrigger(trigger => trigger.disabled = !hasMore);
-  }
-
-  #forEachLoadmoreTrigger(action) {
-    if (this.mode === 'loadmore') {
-      const loadmoreSelector = this.getAttribute('loadmore-selector') || '.loadmore';
-      this.querySelectorAll(loadmoreSelector).forEach(action);
-    }
-  }
-
-  async #resetRenderState(page = 1) {
-    console.debug('resetRenderState', page);
-    try {
-      this.viewer?.abort();
-      await this.#currentRenderState.promise;
-    } catch (error) {
-      console.error('current render failed', error);
-    }
-    this.#currentRenderState = {};
-    this.#renderer?.remove();
-    this.setAttribute('page', page);
-    const result = await this.render();
-    return result;
+    return uniq([...super.observedAttributes, 'filter', 'sort-fields']);
   }
 
   disconnectedCallback() {
-    this.#viewer = null;
-    this.#renderer = null;
+    super.disconnectedCallback();
+    this.#mutationObserver?.disconnect();
   }
 }
 
