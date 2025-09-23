@@ -55,6 +55,8 @@ class BlogConfig extends Config {
 
 class BlogViewerElement extends CelDataViewerElement {
 
+  #mutationObserver;
+
   constructor() {
     super(new BlogConfig());
   }
@@ -125,10 +127,11 @@ class BlogViewerElement extends CelDataViewerElement {
       entry.classList.add('cel_cm_blog_article');
       if (!data.isPublic) entry.classList.add('cel_nav_restricted_rights');
     });
-    new MutationObserver((mutations) => 
+    this.#mutationObserver = new MutationObserver((mutations) => 
       mutations.some(m => m.type === "childList" && m.addedNodes.length > 0) 
       && window.initContextMenuAsync?.()
-    ).observe(this.renderer.htmlElem, {subtree: true, childList: true});
+    );
+    this.#mutationObserver.observe(this.renderer.htmlElem, {subtree: true, childList: true});
   }
 
   static get initAttributes() {
@@ -137,6 +140,11 @@ class BlogViewerElement extends CelDataViewerElement {
 
   static get observedAttributes() {
     return uniq([...super.observedAttributes, 'filter', 'sort-fields']);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.#mutationObserver?.disconnect();
   }
 }
 
