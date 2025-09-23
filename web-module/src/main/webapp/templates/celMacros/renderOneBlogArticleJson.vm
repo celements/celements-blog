@@ -4,8 +4,6 @@ $builder.openDictionary()
   $builder.addPropertyNonEmpty('articleId', $articleId)
   #set($hasViewRights = $services.rightsAccess.hasAccessLevel($articleDocRef, $viewAccessLevel))
   #if($hasViewRights)
-    #set($publishDate = '')
-    #set($publishDateStr = '')
     #set($publishDate = $article.getPublishDate($language))
     #set($isPublished = false)
     #if("$!publishDate" != '')
@@ -19,8 +17,11 @@ $builder.openDictionary()
         #set($blog_dateFormat = 'long_date')
       #end
       #if($showFields.contains('publishDate') || $showAll)
+        $builder.addPropertyNonEmpty('publishDate', $services.date.format('yyyy-MM-dd', $publishDate))
+      #end
+      #if($showFields.contains('publishDateFormatted') || $showAll)
         #set($publishDateStr = $datetool.format($blog_dateFormat, $publishDate, $services.celementsweb.getLocal($language)))
-        $builder.addPropertyNonEmpty('publishDate', $publishDateStr)
+        $builder.addPropertyNonEmpty('publishDateFormatted', $publishDateStr)
       #end
     #end
     $builder.addPropertyNonEmpty('isPublic', $isPublic)
