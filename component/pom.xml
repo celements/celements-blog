@@ -28,7 +28,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>celements-blog</artifactId>
-  <version>6.5-SNAPSHOT</version>
+  <version>6.6-SNAPSHOT</version>
   <description>Celements Blog</description>
   <dependencies>
     <dependency>
