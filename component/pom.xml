@@ -65,13 +65,13 @@
       <groupId>com.celements</groupId>
       <artifactId>celements-scheduler</artifactId>
       <version>7.0-SNAPSHOT</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-mailsender</artifactId>
       <version>7.0-SNAPSHOT</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <scm>
