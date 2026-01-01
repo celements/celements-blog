@@ -60,6 +60,8 @@ public class ArticleTest extends AbstractComponentTest {
     blogServiceMock = createMock(IBlogServiceRole.class);
     article.injected_blogService = blogServiceMock;
     articleDoc = createMock(XWikiDocument.class);
+    articleDoc.setFromCache(false);
+    expectLastCall().anyTimes();
   }
 
   @Test
