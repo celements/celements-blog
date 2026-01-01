@@ -26,13 +26,13 @@
   <parent>
     <groupId>com.celements</groupId>
     <artifactId>celementsweb</artifactId>
-    <version>6.2</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>blog-web</artifactId>
   <packaging>war</packaging>
   <name>Blog Web-Module</name>
-  <version>6.7-SNAPSHOT</version>
+  <version>7.0-SNAPSHOT</version>
   <description>	</description>
   <licenses>
     <license>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>com.celements</groupId>
       <artifactId>celements-blog</artifactId>
-      <version>6.5</version>
+      <version>7.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>
@@ -55,6 +55,15 @@
       <plugin>
         <groupId>com.jarslab.maven</groupId>
         <artifactId>babel-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>js-transpile</id>
+            <configuration>
+              <babelSrc>${project.basedir}/babel-jslib/babel.min.js</babelSrc>
+              <targetDir>${project.basedir}/target/${project.build.finalName}/resources/</targetDir>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
