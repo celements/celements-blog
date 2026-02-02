@@ -87,6 +87,8 @@ public class ArticleEngineHQLTest extends AbstractComponentTest {
     expect(xdoc.resolveClassReference(eq("XWiki.ArticleClass"))).andReturn(articleClassRef);
     expect(xdoc.getXObjects(eq(articleClassRef))).andReturn(objVec);
     expect(xdoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
+    xdoc.setFromCache(false);
+    expectLastCall().anyTimes();
     replayDefault(confDoc, confxDoc, xdoc);
     List<Article> result = engine.getBlogArticles(artSpace, Collections.<String>emptyList(), "de",
         true, false, false, true, true, true, true, false, true, true);
@@ -128,6 +130,8 @@ public class ArticleEngineHQLTest extends AbstractComponentTest {
     expect(xdoc.getXObjects(eq(articleClassRef))).andReturn(objVec);
     expect(xdoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xdoc.getSpace()).andReturn(artSpace).atLeastOnce();
+    xdoc.setFromCache(false);
+    expectLastCall().anyTimes();
     replayDefault(confDoc, confxDoc, xdoc);
     List<Article> result = engine.getBlogArticles(artSpace, Collections.<String>emptyList(), "de",
         true, false, false, true, true, true, true, false, true, true);
@@ -178,6 +182,8 @@ public class ArticleEngineHQLTest extends AbstractComponentTest {
     expect(xdoc.getXObjects(eq(articleClassRef))).andReturn(objVec);
     expect(xdoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xdoc.getSpace()).andReturn(artSpace).atLeastOnce();
+    xdoc.setFromCache(false);
+    expectLastCall().anyTimes();
     replayDefault(confDoc, confxDoc, xdoc);
     List<Article> result = engine.getBlogArticles(artSpace, Collections.<String>emptyList(), "de",
         true, false, false, true, true, true, true, false, true, true);
@@ -229,6 +235,8 @@ public class ArticleEngineHQLTest extends AbstractComponentTest {
     expect(xdoc.getXObjects(eq(articleClassRef))).andReturn(objVec);
     expect(xdoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xdoc.getSpace()).andReturn(artSpace).atLeastOnce();
+    xdoc.setFromCache(false);
+    expectLastCall().anyTimes();
     replayDefault(confDoc, confxDoc, xdoc);
     List<Article> result = engine.getBlogArticles(artSpace, Collections.<String>emptyList(), "de",
         true, false, false, true, true, true, true, false, true, true);
@@ -272,6 +280,8 @@ public class ArticleEngineHQLTest extends AbstractComponentTest {
     expect(xdoc.getXObjects(eq(articleClassRef))).andReturn(objVec);
     expect(xdoc.getDocumentReference()).andReturn(articleDocRef).atLeastOnce();
     expect(xdoc.getSpace()).andReturn(artSpace).atLeastOnce();
+    xdoc.setFromCache(false);
+    expectLastCall().anyTimes();
     replayDefault(confDoc, confxDoc, xdoc);
     List<Article> result = engine.getBlogArticles(artSpace, Collections.<String>emptyList(), "de",
         true, false, false, true, true, true, true, false, true, true);
