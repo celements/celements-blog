@@ -36,7 +36,7 @@ public class ArticleLoadParameter {
   private String searchTerm = null;
 
   private int offset = 0;
-  private int limit = 0;
+  private int limit = -1;
   private List<String> sortFields = Arrays.asList("-" + BlogClasses.ARTICLE_CLASS + "."
       + BlogClasses.PROPERTY_ARTICLE_PUBLISH_DATE, "name");
 
@@ -165,7 +165,7 @@ public class ArticleLoadParameter {
     if (limit > 0) {
       this.limit = limit;
     } else {
-      this.limit = 0;
+      this.limit = -1;
     }
     return this;
   }
