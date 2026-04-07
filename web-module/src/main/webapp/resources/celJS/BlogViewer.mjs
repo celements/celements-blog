@@ -119,6 +119,7 @@ class BlogViewerElement extends CelDataViewerElement {
   connectedCallback() {
     super.connectedCallback();
     this.#initBlogRenderer();
+    this.#initContextMenuObserver();
   }
 
   #initBlogRenderer() {
@@ -127,6 +128,10 @@ class BlogViewerElement extends CelDataViewerElement {
       entry.classList.add('cel_cm_blog_article');
       if (!data.isPublic) entry.classList.add('cel_nav_restricted_rights');
     });
+  }
+
+  #initContextMenuObserver() {
+    this.#mutationObserver?.disconnect();
     this.#mutationObserver = new MutationObserver((mutations) => 
       mutations.some(m => m.type === "childList" && m.addedNodes.length > 0) 
       && window.initContextMenuAsync?.()
@@ -140,6 +145,17 @@ class BlogViewerElement extends CelDataViewerElement {
 
   static get observedAttributes() {
     return uniq([...super.observedAttributes, 'filter', 'sort-fields']);
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (super.attributeChangedCallback) {
+      super.attributeChangedCallback(name, oldValue, newValue);
+    }
+    if (this.isConnected && this.loader && (oldValue !== newValue)) {
+      if (this.constructor.initAttributes.includes(name)) {
+        this.#initBlogRenderer();
+      }
+    }
   }
 
   disconnectedCallback() {
