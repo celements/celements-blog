@@ -148,9 +148,7 @@ class BlogViewerElement extends CelDataViewerElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (super.attributeChangedCallback) {
-      super.attributeChangedCallback(name, oldValue, newValue);
-    }
+    super.attributeChangedCallback?.(name, oldValue, newValue);
     if (this.isConnected && this.loader && (oldValue !== newValue)) {
       if (this.constructor.initAttributes.includes(name)) {
         this.#initBlogRenderer();
