@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>blog-web</artifactId>
-  <version>7.1-RC1</version>
+  <version>7.1-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>Blog Web-Module</name>
   <description>	</description>
@@ -47,6 +47,6 @@
     <connection>scm:git:git://github.com/celements/celements-blog</connection>
     <developerConnection>scm:git:git@github.com:celements/celements-blog.git</developerConnection>
     <url>https://github.com/celements/celements-blog/web-module</url>
-    <tag>blog-web-7.1-RC1</tag>
+    <tag>HEAD</tag>
   </scm>
 </project>
